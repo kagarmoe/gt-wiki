@@ -39,3 +39,53 @@ Verbs: `ingest`, `query`, `experiment`, `lint`, `decision`, `drift-found`.
 - Makefile `build` target produces three binaries: `gt`, `gt-proxy-server`, `gt-proxy-client`. README only documents `gt`; the two proxy binaries are undocumented.
 - Install dir: `$(HOME)/.local/bin`.
 - → [gastown/files/makefile.md](gastown/files/makefile.md), [gastown/binaries/gt.md](gastown/binaries/gt.md)
+
+## [2026-04-11] decision | gastown purpose reframe + Obsidian vault + task-tracking split (schema v1.1)
+
+- **gastown topic purpose reframed.**
+  [gastown/README.md](gastown/README.md) rewritten to make the mission
+  explicit: the wiki maps gastown code to produce an **authoritative
+  rewrite of gastown's documentation**. Code is the source of truth;
+  docs are downstream and not authoritative. The Docker build at
+  `~/gt/` is a concrete milestone along that path. "Drift" items are
+  the work list for the doc rewrite, not passive observation. Project
+  purpose lives in the topic README, not in CLAUDE.md, per separation
+  of concerns (Claude/wiki mechanics in CLAUDE.md; project purpose in
+  the topic).
+- **Obsidian vault** initialized via `.obsidian/app.json` with
+  wiki-aligned link config: `useMarkdownLinks: true`,
+  `newLinkFormat: "relative"`, `alwaysUpdateLinks: true`. Matches the
+  CLAUDE.md rule against `[[wikilinks]]`. Ephemeral Obsidian state
+  (`workspace.json`, caches) is gitignored.
+- **Task tracking split** between two tools by audience:
+  - Agents use **beads** (`.beads/` with embedded local dolt —
+    operationally independent from the Gas Town dolt server on port
+    3307). Committed `bd init` scaffolding as its own commit.
+  - Kimberly uses the **Obsidian Tasks plugin** for personal tasks
+    (plain GFM checkboxes aggregated by plugin queries).
+  - Cross-tool handoff via the `wants-wiki-entry` bead label
+    (agent → Kimberly) and `→ handed to bd-<id>` notation on closed
+    Kimberly tasks (Kimberly → agent). No sync bridge.
+- Did **not** add a `task` wiki page type or `task-opened`/`task-closed`
+  log verbs — both trackers have native state semantics and the wiki
+  schema should not duplicate them. The log captures *findings* and
+  *decisions*, not task state transitions.
+- Wiki-specific bd conventions: `--actor wiki-curator` for
+  LLM-originated beads; labels `wiki-investigation`, `wiki-content`,
+  `drift`, plus topic (`gastown`), plus `wants-wiki-entry` for
+  handoff. Descriptions must link wiki entity pages and cite source
+  `file:line` references.
+- Seeded three beads from the 2026-04-11 scaffolding session's open
+  investigation threads:
+  - `wiki-ztf` — Verify BuiltProperly ldflag bypass in Docker build.
+  - `wiki-13o` — Document undocumented proxy binaries
+    (`gt-proxy-server`, `gt-proxy-client`).
+  - `wiki-cqx` — Annotate stale comment + misattributed error on
+    `internal/cmd/root.go`.
+- **Schema version:** bumped to v1.1. CLAUDE.md updated: directory
+  layout tree adds `.obsidian/`, `.beads/`, `.claude/plans/`,
+  `.claude/llm-wiki.md`, `AGENTS.md`; new "Task tracking" section
+  added.
+- → [CLAUDE.md](CLAUDE.md), [AGENTS.md](AGENTS.md),
+  [gastown/README.md](gastown/README.md), `.obsidian/app.json`,
+  `.beads/` (config + hooks committed)

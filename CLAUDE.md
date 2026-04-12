@@ -1,6 +1,6 @@
 # CLAUDE.md — Wiki Schema
 
-**Schema version:** 1 (2026-04-11)
+**Schema version:** 1.1 (2026-04-11)
 
 ## Purpose
 

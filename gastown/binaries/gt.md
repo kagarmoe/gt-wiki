@@ -99,7 +99,7 @@ steps in order for every `gt` invocation:
    `persistentPreRun`, but the effect is observable before subcommand
    bodies run).
 4. **Command usage logging** — fire-and-forget; excludes `tap` and
-   `signal` commands.
+   [`signal`](../commands/signal.md) commands.
 5. **Session registry init** — discovers the town root (CWD walk with
    `GT_TOWN_ROOT`/`GT_ROOT` env-var fallback) and initializes the
    session prefix registry via `session.InitRegistry`. Used to route

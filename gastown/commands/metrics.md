@@ -119,7 +119,7 @@ type usageEntry struct {
 Written by `logCommandUsage` in `persistentPreRun` — see the
 `persistentPreRun` sequence documented in
 [../binaries/gt.md](../binaries/gt.md) step 4, which notes that
-usage logging is fire-and-forget and excludes `tap` and `signal`.
+usage logging is fire-and-forget and excludes `tap` and [`signal`](signal.md).
 
 ### Subcommands
 
@@ -153,7 +153,7 @@ Defined in `init()` (`metrics.go:21-27`):
   elsewhere in `internal/cmd/` — finding the exact path would require
   a cross-file grep. Likely `~/.gt/cmd-usage.jsonl` per the Long text
   at `metrics.go:33-34`.
-- The `logCommandUsage` helper and the `tap`/`signal` exclusion list
+- The `logCommandUsage` helper and the `tap`/[`signal`](signal.md) exclusion list
   live in `root.go`; linking to a dedicated page would be useful.
 - `buildCommandPath` is referenced at `metrics.go:219` but not defined
   in this file — another cross-reference to resolve.

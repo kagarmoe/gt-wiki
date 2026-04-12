@@ -59,13 +59,13 @@ this wiki's per-command page (stub if not yet written).
 | `account`      | `accountCmd`     | `internal/cmd/account.go:520` | [account.md](account.md) |
 | `activity`     | `activityCmd`    | `internal/cmd/activity.go:87` | [activity.md](activity.md) |
 | `agent-log` [?]| `agentLogCmd`    | `internal/cmd/agent_log.go:37`| — stub      |
-| `agents`       | `agentsCmd`      | `internal/cmd/agents.go:147`  | — stub      |
+| `agents`       | `agentsCmd`      | `internal/cmd/agents.go:147`  | [agents.md](agents.md) |
 | `assign`       | `assignCmd`      | `internal/cmd/assign.go:64`   | [assign.md](assign.md) |
 | `audit`        | `auditCmd`       | `internal/cmd/audit.go:59`    | [audit.md](audit.md) |
 | `bead`         | `beadCmd`        | `internal/cmd/bead.go:94`     | [bead.md](bead.md) |
-| `boot`         | `bootCmd`        | `internal/cmd/boot.go:99`     | — stub      |
+| `boot`         | `bootCmd`        | `internal/cmd/boot.go:99`     | [boot.md](boot.md) |
 | `broadcast`    | `broadcastCmd`   | `internal/cmd/broadcast.go:24`| — stub      |
-| `callbacks`    | `callbacksCmd`   | `internal/cmd/callbacks.go:117`| — stub     |
+| `callbacks`    | `callbacksCmd`   | `internal/cmd/callbacks.go:117`| [callbacks.md](callbacks.md) |
 | `cat`          | `catCmd`         | `internal/cmd/cat.go:33`      | [cat.md](cat.md) |
 | `changelog`    | `changelogCmd`   | `internal/cmd/changelog.go:47`| [changelog.md](changelog.md) |
 | `checkpoint`   | `checkpointCmd`  | `internal/cmd/checkpoint_cmd.go:80` | [checkpoint.md](checkpoint.md) |
@@ -80,12 +80,12 @@ this wiki's per-command page (stub if not yet written).
 | `cycle`        | `cycleCmd`       | `internal/cmd/cycle.go:24`    | — stub      |
 | `daemon`       | `daemonCmd`      | `internal/cmd/daemon.go:166`  | — stub      |
 | `dashboard`    | `dashboardCmd`   | `internal/cmd/dashboard.go:55`| [dashboard.md](dashboard.md) |
-| `deacon`       | `deaconCmd`      | `internal/cmd/deacon.go:467`  | — stub      |
+| `deacon`       | `deaconCmd`      | `internal/cmd/deacon.go:467`  | [deacon.md](deacon.md) |
 | `directive`    | `directiveCmd`   | `internal/cmd/directive.go:39`| [directive.md](directive.md) |
 | `disable`      | `disableCmd`     | `internal/cmd/disable.go:41`  | [disable.md](disable.md) |
 | `dnd`          | `dndCmd`         | `internal/cmd/dnd.go:41`      | — stub      |
 | `doctor`       | `doctorCmd`      | `internal/cmd/doctor.go:131`  | [doctor.md](doctor.md) |
-| `dog`          | `dogCmd`         | `internal/cmd/dog.go:298`     | — stub      |
+| `dog`          | `dogCmd`         | `internal/cmd/dog.go:298`     | [dog.md](dog.md) |
 | `dolt`         | `doltCmd`        | `internal/cmd/dolt.go:389`    | — stub      |
 | `done`         | `doneCmd`        | `internal/cmd/done.go:88`     | [done.md](done.md) |
 | `down`         | `downCmd`        | `internal/cmd/down.go:93`     | — stub      |
@@ -109,7 +109,7 @@ this wiki's per-command page (stub if not yet written).
 | `log`          | `logCmd`         | `internal/cmd/log.go:88`      | [log.md](log.md) |
 | `maintain`     | `maintainCmd`    | `internal/cmd/maintain.go:67` | — stub      |
 | `mail`         | `mailCmd`        | `internal/cmd/mail.go:543`    | — stub      |
-| `mayor`        | `mayorCmd`       | `internal/cmd/mayor.go:136`   | — stub      |
+| `mayor`        | `mayorCmd`       | `internal/cmd/mayor.go:136`   | [mayor.md](mayor.md) |
 | `memories`     | `memoriesCmd`    | `internal/cmd/memories.go:17` | — stub      |
 | `metrics`      | `metricsCmd`     | `internal/cmd/metrics.go:26`  | [metrics.md](metrics.md) |
 | `molecule`     | `moleculeCmd`    | `internal/cmd/molecule.go:269`| [molecule.md](molecule.md) |
@@ -123,27 +123,27 @@ this wiki's per-command page (stub if not yet written).
 | `patrol`       | `patrolCmd`      | `internal/cmd/patrol.go:62`   | [patrol.md](patrol.md) |
 | `peek`         | `peekCmd`        | `internal/cmd/peek.go:18`     | — stub      |
 | `plugin`       | `pluginCmd`      | `internal/cmd/plugin.go:165`  | [plugin.md](plugin.md) |
-| `polecat`      | `polecatCmd`     | `internal/cmd/polecat.go:378` | — stub      |
+| `polecat`      | `polecatCmd`     | `internal/cmd/polecat.go:378` | [polecat.md](polecat.md) |
 | `prime`        | `primeCmd`       | `internal/cmd/prime.go:109`   | [prime.md](prime.md) |
 | `proxy` [?]    | `proxySubcmdsCmd`| `internal/cmd/proxy_subcmds.go:48`| — stub  |
 | `prune-branches`| `pruneBranchesCmd`| `internal/cmd/prune_branches.go:46`| [prune-branches.md](prune-branches.md) |
 | `quota`        | `quotaCmd`       | `internal/cmd/quota.go:980`   | — stub      |
 | `ready`        | `readyCmd`       | `internal/cmd/ready.go:49`    | [ready.md](ready.md) |
 | `reaper`       | `reaperCmd`      | `internal/cmd/reaper.go:573`  | — stub      |
-| `refinery`     | `refineryCmd`    | `internal/cmd/refinery.go:269`| — stub      |
+| `refinery`     | `refineryCmd`    | `internal/cmd/refinery.go:269`| [refinery.md](refinery.md) |
 | `release`      | `releaseCmd`     | `internal/cmd/release.go:37`  | [release.md](release.md) |
 | `remember`     | `rememberCmd`    | `internal/cmd/remember.go:40` | — stub      |
 | `repair`       | `repairCmd`      | `internal/cmd/repair.go:36`   | [repair.md](repair.md) |
 | `resume`       | `resumeCmd`      | `internal/cmd/resume.go:30`   | [resume.md](resume.md) |
 | `rig`          | `rigCmd`         | `internal/cmd/rig.go:343`     | — stub      |
-| `role`         | `roleCmd`        | `internal/cmd/role.go:139`    | — stub      |
+| `role`         | `roleCmd`        | `internal/cmd/role.go:139`    | [role.md](role.md) |
 | `scheduler`    | `schedulerCmd`   | `internal/cmd/scheduler.go:117`| [scheduler.md](scheduler.md) |
 | `seance`       | `seanceCmd`      | `internal/cmd/seance.go:74`   | [seance.md](seance.md) |
-| `session`      | `sessionCmd`     | `internal/cmd/session.go:206` | — stub      |
+| `session`      | `sessionCmd`     | `internal/cmd/session.go:206` | [session.md](session.md) |
 | `shell`        | `shellCmd`       | `internal/cmd/shell.go:64`    | [shell.md](shell.md) |
 | `show`         | `showCmd`        | `internal/cmd/show.go:12`     | — stub      |
 | `shutdown`     | `shutdownCmd`    | `internal/cmd/start.go:164`   | — stub      |
-| `signal`       | `signalCmd`      | `internal/cmd/signal.go:8`    | — stub      |
+| `signal`       | `signalCmd`      | `internal/cmd/signal.go:8`    | [signal.md](signal.md) |
 | `sling`        | `slingCmd`       | `internal/cmd/sling.go:168`   | [sling.md](sling.md) |
 | `stale`        | `staleCmd`       | `internal/cmd/stale.go:40`    | [stale.md](stale.md) |
 | `start`        | `startCmd`       | `internal/cmd/start.go:163`   | — stub      |
@@ -164,7 +164,7 @@ this wiki's per-command page (stub if not yet written).
 | `vitals`       | `vitalsCmd`      | `internal/cmd/vitals.go:26`   | [vitals.md](vitals.md) |
 | `warrant`      | `warrantCmd`     | `internal/cmd/warrant.go:119` | — stub      |
 | `whoami`       | `whoamiCmd`      | `internal/cmd/whoami.go:33`   | [whoami.md](whoami.md) |
-| `witness`      | `witnessCmd`     | `internal/cmd/witness.go:142` | — stub      |
+| `witness`      | `witnessCmd`     | `internal/cmd/witness.go:142` | [witness.md](witness.md) |
 | `wl`           | `wlCmd`          | `internal/cmd/wl.go:70`       | [wl.md](wl.md) |
 | `worktree`     | `worktreeCmd`    | `internal/cmd/worktree.go:94` | — stub      |
 
@@ -209,7 +209,7 @@ bead will track this.
 
 ## What's NOT yet in this index
 
-- **Mapped so far:** 59 of 111 top-level commands have entity pages — the full `GroupDiag` set (22), the full `GroupConfig` set (11), and the full `GroupWork` set (26: assign, bead, cat, changelog, cleanup, close, compact, convoy, done, formula, handoff, hook, molecule, mountain, mq, orphans, prune-branches, ready, release, resume, scheduler, sling, synthesis, trail, unsling, wl). Remaining groups pending: Agents, Comm, Services, Workspace.
+- **Mapped so far:** 71 of 111 top-level commands have entity pages — full groups: `GroupDiag` (22), `GroupConfig` (11), `GroupWork` (26), `GroupAgents` (12: agents, boot, callbacks, deacon, dog, mayor, polecat, refinery, role, session, signal, witness). Remaining groups pending: Comm, Services, Workspace.
 - **`Use:` field verification per command.** Many entries have inferred
   command names flagged `[?]`.
 - **`GroupID` assignment per command.** Each command needs a quick read

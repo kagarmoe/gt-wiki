@@ -713,3 +713,72 @@ OPEN.
   [gastown/commands/wl.md](gastown/commands/wl.md),
   [gastown/README.md](gastown/README.md),
   [index.md](index.md)
+
+## [2026-04-11] ingest | Batch 3d (Layer c sub-batch: Agent Management group — 12 top-level commands)
+
+Fourth sub-batch of Layer (c) command mapping. Read 12 Go files in
+`/home/kimberly/repos/gastown/internal/cmd/` and produced 12 new
+wiki entity pages under `gastown/commands/`. `GroupAgents` covers
+the lifecycle-manager CLI surface for the Gas Town personas:
+mayor, polecat, deacon, dog, witness, refinery — plus agents/role/
+session/signal/boot/callbacks infrastructure.
+
+**Cobra group progress:** 4 of 7 groups complete
+(Diag ✓, Config ✓, Work ✓, Agents ✓; Comm, Services, Workspace
+remaining). **Coverage: 71 of 111 top-level commands mapped.**
+
+**Commands mapped:**
+
+- [agents](gastown/commands/agents.md) — 4-subcommand parent with its own RunE = `list`; multi-socket enumeration (town + default + gt-test-*).
+- [boot](gastown/commands/boot.md) — daemon-tick-spawned watchdog for the Deacon; 3 subcommands (`status`/`spawn`/`triage`); Long help calls Boot "a special dog" but Boot is NOT registered as one.
+- [callbacks](gastown/commands/callbacks.md) — drains Mayor's inbox; 6 callback patterns; `SLING_REQUEST` logs command but Deacon actually slings.
+- [deacon](gastown/commands/deacon.md) — **15 subcommands (largest file in Sub A: 1644 lines)**; lifecycle + heartbeat + health + pause + patrol helpers; most subcommands are internal molecule-step entry points.
+- [dog](gastown/commands/dog.md) — 9 subcommands; dogs are cross-rig reusable workers with worktrees into every rig; managed by the Deacon.
+- [mayor](gastown/commands/mayor.md) — pure-lifecycle (start/stop/attach/status/restart/acp); `attach` is the fat one (ACP→tmux migration + Dolt init + daemon start + optional Claude respawn).
+- [polecat](gastown/commands/polecat.md) — **11 top-level + 5-subcommand identity subtree**; `polecat.go` is 1786 lines with siblings `polecat_identity.go` (1079), `polecat_spawn.go` (506), `polecat_cycle.go` (85); `nuke` is a 7-step protocol with gt-4vr guardrail (best-effort push before delete) and gt-v5ku cooperation with Refinery (local-only branch delete).
+- [refinery](gastown/commands/refinery.md) — per-rig merge queue processor; 11 subcommands; three different beads access patterns coexist (Manager, Engineer, direct beads.New) — suggests `unclaimed` predates the Engineer API.
+- [role](gastown/commands/role.md) — agent identity inspection; 6 subcommands; uniquely in GroupAgents, `gt role` bare (no subcommand) aliases to `gt role show` instead of requiring a subcommand.
+- [session](gastown/commands/session.md) — low-level tmux session surface for polecats; 9 subcommands; `session check` bypasses the polecat manager and reads `<rig>/polecats/` directly — divergent view from `gt polecat list`; `session inject` explicitly deprecated in favor of `gt nudge`.
+- [signal](gastown/commands/signal.md) — Claude Code Stop-hook handler; only `stop` subcommand is wired; has a per-agent state file (`/tmp/gt-signal-stop-<addr>.json`) that remembers the last block reason and flips to approve on repeat to prevent infinite block loops that would consume the agent's entire context window.
+- [witness](gastown/commands/witness.md) — per-rig polecat health monitor lifecycle; 5 subcommands; `--foreground` is vestigial (patrol logic moved to `mol-witness-patrol` molecule but the flag still parses and prints a notice).
+
+**Neutral observations surfaced:**
+
+- **Boot vs dogs contradiction.** `boot.go:34` Long help calls Boot "a special dog" but Boot is not registered in the dog kennel nor typed as any `AgentDog` (there is no `AgentDog` type at all). Cross-concept collision worth noting for Batch 6 role-page writing.
+- **Dogs are invisible to `gt agents`.** `AgentType` in `agents.go` has no dog entry, so `gt agents list`/`menu` never shows dogs. Fresh operators won't discover `gt dog list` via the menu.
+- **`callbacks` handler for `SLING_REQUEST` doesn't sling.** Logs the exact `gt sling <bead> <rig>` command string but relies on the Deacon to execute.
+- **`mayor attach` does much more than attach** — upgrades ACP → tmux, starts Dolt (fatal on failure), starts daemon, potentially respawns Claude with rebuilt startup context.
+- **`handleMergeCompleted` uses `cwd` rather than `townRoot`** (`callbacks.go:343`) for the `beads.New(...)` call. Flagged as a potential bug.
+- **`gt witness --foreground` is vestigial**. Flag parses but `start --foreground` prints "no longer runs patrol loop" notice.
+- **`gt polecat nuke` deliberately leaves remote branches alone** — gt-v5ku explicitly spells out the race with the Refinery. "Nuke" is carefully cooperative with the merge queue.
+- **`gt polecat nuke --force` still performs best-effort push before deletion** (gt-4vr guardrail). Opposite of what "force" usually implies.
+- **`gt refinery` splits beads access three ways** — `status`/`queue` via `refinery.Manager`, `ready`/`blocked` via `refinery.NewEngineer`, `unclaimed` via direct `beads.New(r.Path)`. Strong hint `unclaimed` predates the Engineer API.
+- **`gt signal stop` has an explicit infinite-loop guard.** Without it, unread mail would consume the agent's entire context window at every turn boundary (`signal_stop.go:96-103`).
+- **`gt polecat check-recovery` can override `SAFE_TO_NUKE` to `NEEDS_MQ_SUBMIT`.** A missing MR for the branch downgrades the verdict — bead `cleanup_status` field is not the final word.
+- **`gt session check` produces a divergent view from `gt polecat list`.** Bypasses polecat manager; polecats without identity beads but with dirs show up; polecats with identity beads but no dir don't.
+
+**Polecat-safe within Agents group:** 0 of 12. Verified by direct grep.
+
+**Beads-exempt within Agents group:** 4 of 12 (`polecat`, `witness`, `refinery`, `signal`).
+
+**Branch-check-exempt within Agents group:** 0 of 12.
+
+**Next sub-batch:** 3e — Comm group (mail, nudge, broadcast, notify, handoff [Batch 3c], escalate, etc.). Controller picks.
+
+**Beads status:** `wiki-3zo` and `wiki-ef3` remain open.
+
+→ [gastown/commands/README.md](gastown/commands/README.md),
+  [gastown/commands/agents.md](gastown/commands/agents.md),
+  [gastown/commands/boot.md](gastown/commands/boot.md),
+  [gastown/commands/callbacks.md](gastown/commands/callbacks.md),
+  [gastown/commands/deacon.md](gastown/commands/deacon.md),
+  [gastown/commands/dog.md](gastown/commands/dog.md),
+  [gastown/commands/mayor.md](gastown/commands/mayor.md),
+  [gastown/commands/polecat.md](gastown/commands/polecat.md),
+  [gastown/commands/refinery.md](gastown/commands/refinery.md),
+  [gastown/commands/role.md](gastown/commands/role.md),
+  [gastown/commands/session.md](gastown/commands/session.md),
+  [gastown/commands/signal.md](gastown/commands/signal.md),
+  [gastown/commands/witness.md](gastown/commands/witness.md),
+  [gastown/README.md](gastown/README.md),
+  [index.md](index.md)

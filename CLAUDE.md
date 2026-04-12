@@ -34,12 +34,18 @@ sources are never modified — only read.
 ```
 ~/repos/wiki/
   CLAUDE.md          # this file
+  AGENTS.md          # agent-facing task-tracking entrypoint (bd integration)
   index.md           # global catalog of all pages
   log.md             # chronological event log
   .claude/
+    settings.json         # Claude Code settings (committed)
     settings.local.json   # permission scoping; gitignored
+    plans/                # LLM workflow plans; gitignored
+    llm-wiki.md           # Karpathy LLM-wiki pattern reference; gitignored
+  .obsidian/         # Obsidian vault config (app.json committed; workspace state gitignored)
+  .beads/            # beads issue tracker (config + hooks committed; dolt db + runtime gitignored)
   <topic>/           # one folder per topic namespace (gastown, ...)
-    README.md        # topic overview + sub-index
+    README.md        # topic overview + sub-index (project purpose lives here, per-topic)
     binaries/        # entity pages: one per binary
     commands/        # entity pages: one per CLI subcommand
     packages/        # entity pages: Go packages / source modules
@@ -198,6 +204,82 @@ Periodically or on request:
 
 **Lint produces findings, not fixes.** Discuss with Kimberly before acting.
 Log with the `lint` verb.
+
+## Task tracking
+
+Task tracking uses two tools, split by who is doing the work:
+
+### Agent work → beads (`bd`)
+
+Agent investigation threads, follow-ups, and anything a future Claude
+Code session (or Gas Town crew agent) should pick up live in **beads**.
+The wiki has its own embedded `.beads/` database (local dolt), not
+connected to the Gas Town dolt server on port 3307 — the wiki is
+operationally independent.
+
+See `~/repos/CLAUDE.md` for generic `bd` usage (`bd ready`, `bd show`,
+`bd update --claim`, `bd close`, etc.). **Wiki-specific conventions on
+top of that:**
+
+- **Actor:** LLM sessions working on the wiki use
+  `--actor wiki-curator` so audit trails distinguish wiki-curation
+  beads from other work. Set via `BEADS_ACTOR=wiki-curator` in the
+  session env, or pass `--actor wiki-curator` on each command.
+- **Labels:**
+  - `wiki-investigation` — open investigation thread (verify something,
+    read a source, capture an outcome).
+  - `wiki-content` — a page needs writing or updating.
+  - `drift` — drift-annotation work on an existing page.
+  - `<topic>` — topic scoping (`gastown`, etc.).
+  - `wants-wiki-entry` — handoff from agent to Kimberly (see below).
+- **Descriptions must link to wiki pages and source refs:** every bead
+  description should name the wiki entity pages it touches (absolute
+  paths, e.g. `~/repos/wiki/gastown/binaries/gt.md`) and cite
+  source-code references in the form `file:line` for anything in
+  `~/repos/gastown/`.
+- **Outcome filing:** when closing a bead that produced a finding,
+  append an entry to `log.md` with the appropriate verb (`ingest`,
+  `experiment`, `drift-found`) and update the relevant entity page.
+  The bead closure itself is not a `log.md` entry — the finding is.
+
+### Kimberly's work → Obsidian Tasks plugin
+
+Kimberly's personal tasks (curation decisions, questions to
+investigate, reading queue, things she wants to revisit) live as GFM
+checkboxes **anywhere in the vault**, aggregated via the Obsidian
+**Tasks plugin**.
+
+- Plain `- [ ]` checkboxes are sufficient. Tasks plugin emoji metadata
+  (`📅` due date, `⏫` priority, `🔁` recurrence) is optional.
+- No fixed file location — file tasks wherever they fit (inline on an
+  entity page, in a personal notes file, etc.). Tasks plugin scans the
+  whole vault.
+- Tasks plugin query blocks aggregate on demand:
+
+  ````markdown
+  ```tasks
+  not done
+  sort by priority
+  ```
+  ````
+
+### Cross-tool handoff
+
+The two trackers occasionally hand work off. Use conventions, not a
+sync bridge:
+
+- **Agent → Kimberly:** the agent files a bead normally and adds the
+  `wants-wiki-entry` label. Kimberly surfaces these with
+  `bd list -l wants-wiki-entry`. She either resolves the bead herself
+  and closes it, or promotes it into her Tasks-plugin tracker (and
+  closes the bead with a pointer to where she filed it).
+- **Kimberly → agent:** Kimberly closes her checkbox with a trailing
+  pointer: `- [x] ... → handed to bd-<id>`. She then runs `bd create`
+  with whatever actor makes sense (the default git-user identity is
+  fine for human-originated beads).
+
+**Do not duplicate tasks across trackers.** A task lives in exactly
+one system at a time; handoff moves it across.
 
 ## index.md format
 

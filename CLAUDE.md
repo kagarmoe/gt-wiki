@@ -225,13 +225,16 @@ top of that:**
   `--actor wiki-curator` so audit trails distinguish wiki-curation
   beads from other work. Set via `BEADS_ACTOR=wiki-curator` in the
   session env, or pass `--actor wiki-curator` on each command.
-- **Labels:**
+- **Core labels (extend as needed):**
   - `wiki-investigation` — open investigation thread (verify something,
     read a source, capture an outcome).
   - `wiki-content` — a page needs writing or updating.
   - `drift` — drift-annotation work on an existing page.
   - `<topic>` — topic scoping (`gastown`, etc.).
   - `wants-wiki-entry` — handoff from agent to Kimberly (see below).
+  - Free-form tags (e.g. `docker`, `makefile`) are fine when they help
+    narrow a query — add them alongside the core labels, not in place
+    of them.
 - **Descriptions must link to wiki pages and source refs:** every bead
   description should name the wiki entity pages it touches (absolute
   paths, e.g. `~/repos/wiki/gastown/binaries/gt.md`) and cite
@@ -296,7 +299,7 @@ Append-only. Each entry starts with `## [YYYY-MM-DD] <verb> | <subject>` so
 
 ## Schema evolution
 
-This schema is **version 1**. It will change as the wiki grows. Update this
+This schema is **version 1.1**. It will change as the wiki grows. Update this
 file when new page types emerge, when conventions start hurting rather than
 helping, or when a better workflow appears. Note schema changes in `log.md`
 with the `decision` verb. Old pages don't need to be retrofitted unless a

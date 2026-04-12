@@ -86,6 +86,7 @@ Verbs: `ingest`, `query`, `experiment`, `lint`, `decision`, `drift-found`.
   layout tree adds `.obsidian/`, `.beads/`, `.claude/plans/`,
   `.claude/llm-wiki.md`, `AGENTS.md`; new "Task tracking" section
   added.
-- → [CLAUDE.md](CLAUDE.md), [AGENTS.md](AGENTS.md),
-  [gastown/README.md](gastown/README.md), `.obsidian/app.json`,
-  `.beads/` (config + hooks committed)
+- → [CLAUDE.md](CLAUDE.md), [gastown/README.md](gastown/README.md),
+  `.gitignore`, `.obsidian/app.json`
+  (`.beads/` scaffolding and `AGENTS.md` were committed earlier by
+  `bd init` in commit `0532fe7`, not this decision)

@@ -1,4 +1,13 @@
+# Claude Code workflow artifacts
 .claude/settings.local.json
+.claude/plans/
+.claude/llm-wiki.md
+
+# Obsidian ephemeral state (UI layout, per-device, backups)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/workspace.json.bak
+.obsidian/cache
 
 # Beads / Dolt files (added by bd init)
 .dolt/

@@ -11,3 +11,8 @@ Global catalog of all pages. Organized by topic, then category.
 ### Files
 
 - [Makefile](gastown/files/makefile.md) — canonical build recipe with `BuiltProperly` ldflag bypass
+
+### Commands
+
+- [gt command tree](gastown/commands/README.md) — authoritative index of all ~107 top-level subcommands (README claims ~12)
+- [version](gastown/commands/version.md) — `gt version` subcommand (diagnostics group, polecat-safe)

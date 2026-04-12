@@ -94,7 +94,12 @@ the live queue.
 
 ### Binaries
 
-- [gt](binaries/gt.md) — main CLI
+- [gt](binaries/gt.md) — main CLI; startup sequence, ldflags, self-kill check, exempt-command maps, telemetry init
+
+### Commands
+
+- [gt command tree](commands/README.md) — authoritative inventory of ~107 top-level subcommands + 495 total cobra.Command definitions
+- [version](commands/version.md) — `gt version` (diagnostics, polecat-safe)
 
 ### Files
 

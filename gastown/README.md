@@ -95,7 +95,15 @@ the 12 layers):
 
 ### Files
 
-- [Makefile](files/makefile.md) — canonical build recipe
+- [Makefile](files/makefile.md) — canonical build recipe; produces `gt`, `gt-proxy-server`, `gt-proxy-client` with the `BuiltProperly` ldflag
+- [Dockerfile](files/dockerfile.md) — primary container image for `gt`
+- [Dockerfile.e2e](files/dockerfile-e2e.md) — end-to-end test container
+- [docker-compose.yml](files/docker-compose.md) — Compose spec
+- [docker-entrypoint.sh](files/docker-entrypoint.md) — container entrypoint shell script
+- [flake.nix](files/flake-nix.md) — Nix flake (dev shell, packages)
+- [.goreleaser.yml](files/goreleaser-yml.md) — GoReleaser release-pipeline build config
+- [.golangci.yml](files/golangci-yml.md) — golangci-lint configuration
+- [go.mod](files/go-mod.md) — Go module manifest
 
 ### Inventory
 

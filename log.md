@@ -216,3 +216,97 @@ kept, one bead per plan batch created as an anchor.
   [gastown/commands/version.md](gastown/commands/version.md),
   [gastown/files/makefile.md](gastown/files/makefile.md),
   [index.md](index.md)
+
+## [2026-04-11] ingest | Batch 1 (Layer a: Build & packaging)
+
+Read 10 files at `/home/kimberly/repos/gastown/` root and produced full
+entity pages under `gastown/files/` plus committed the 4 uncommitted
+A-level inventory pages in a prior step of this batch.
+
+**Sources read:**
+
+- `/home/kimberly/repos/gastown/Makefile`
+- `/home/kimberly/repos/gastown/Dockerfile`
+- `/home/kimberly/repos/gastown/Dockerfile.e2e`
+- `/home/kimberly/repos/gastown/docker-compose.yml`
+- `/home/kimberly/repos/gastown/docker-entrypoint.sh`
+- `/home/kimberly/repos/gastown/flake.nix`
+- `/home/kimberly/repos/gastown/flake.lock` (supporting)
+- `/home/kimberly/repos/gastown/.goreleaser.yml`
+- `/home/kimberly/repos/gastown/.golangci.yml`
+- `/home/kimberly/repos/gastown/go.mod`
+- `/home/kimberly/repos/gastown/go.sum` (supporting, not transcribed)
+
+**Pages created:**
+
+- [gastown/files/dockerfile.md](gastown/files/dockerfile.md)
+- [gastown/files/dockerfile-e2e.md](gastown/files/dockerfile-e2e.md)
+- [gastown/files/docker-compose.md](gastown/files/docker-compose.md)
+- [gastown/files/docker-entrypoint.md](gastown/files/docker-entrypoint.md)
+- [gastown/files/flake-nix.md](gastown/files/flake-nix.md)
+- [gastown/files/goreleaser-yml.md](gastown/files/goreleaser-yml.md)
+- [gastown/files/golangci-yml.md](gastown/files/golangci-yml.md)
+- [gastown/files/go-mod.md](gastown/files/go-mod.md)
+
+**Pages expanded:**
+
+- [gastown/files/makefile.md](gastown/files/makefile.md) — partial → verified; per-target subsections added for all 10 phony targets.
+
+**Pages committed earlier in this batch** (separate commit `6faf5db`):
+
+- [gastown/inventory/README.md](gastown/inventory/README.md)
+- [gastown/inventory/repo-root.md](gastown/inventory/repo-root.md) — later modified in this commit for back-references
+- [gastown/inventory/docs-tree.md](gastown/inventory/docs-tree.md)
+- [gastown/inventory/go-packages.md](gastown/inventory/go-packages.md)
+
+**Index updates:**
+
+- [gastown/README.md](gastown/README.md) — `### Files` sub-index expanded to list all 9 `files/*` pages.
+- [index.md](index.md) — gastown `### Files` section expanded to match.
+
+**Cross-linking outcome:** 131 outbound markdown links across the 9
+`files/*` pages, verified to resolve. `gastown/inventory/repo-root.md`
+updated with back-references from the top-level files table to the new
+per-file pages.
+
+**Neutral observations surfaced** (filed as "Notes / open questions" on
+the relevant pages, not as drift):
+
+- Go version disagrees across build paths: `go.mod` declares `1.25.8`,
+  `Dockerfile` uses `1.25.6`, `Dockerfile.e2e` uses `1.26-alpine`,
+  `flake.nix` overlays `1.25.8`. Only `flake.nix` and `go.mod` agree.
+- `.goreleaser.yml` has no `brews:` block despite README advertising
+  `brew install gastown`. Homebrew formula lives in a separate
+  tap repo or homebrew-core.
+- `.goreleaser.yml` release binaries use `Build={{.ShortCommit}}`, not
+  `BuiltProperly`. Release binaries bypass the self-kill check via
+  `Build != "dev"` rather than `BuiltProperly=1`.
+- `.goreleaser.yml` FreeBSD build sets `CGO_ENABLED=0` while all other
+  targets enable CGO — CGO-only code paths silently absent on the
+  FreeBSD release.
+- `cmd/gt-desktop` referenced by the `desktop-build` target in the
+  Makefile but not in [gastown/inventory/go-packages.md](gastown/inventory/go-packages.md)
+  — directory existence not yet verified.
+- `.golangci.yml` has `run.tests: false` AND test-file exclusion
+  rules (dead code under current config).
+- `flake.nix` Go overlay comment is stale (mentions beads v0.60.0,
+  go.mod now requires v0.63.3).
+- `docker-entrypoint.sh` is wired only into the primary Dockerfile;
+  Dockerfile.e2e has no ENTRYPOINT.
+
+**Next batch:** Batch 2 — Layer (b) Binaries & entry points
+(`cmd/gt-proxy-server`, `cmd/gt-proxy-client`). Tracked in bead
+`wiki-u2r`.
+
+→ [gastown/files/makefile.md](gastown/files/makefile.md),
+  [gastown/files/dockerfile.md](gastown/files/dockerfile.md),
+  [gastown/files/dockerfile-e2e.md](gastown/files/dockerfile-e2e.md),
+  [gastown/files/docker-compose.md](gastown/files/docker-compose.md),
+  [gastown/files/docker-entrypoint.md](gastown/files/docker-entrypoint.md),
+  [gastown/files/flake-nix.md](gastown/files/flake-nix.md),
+  [gastown/files/goreleaser-yml.md](gastown/files/goreleaser-yml.md),
+  [gastown/files/golangci-yml.md](gastown/files/golangci-yml.md),
+  [gastown/files/go-mod.md](gastown/files/go-mod.md),
+  [gastown/inventory/repo-root.md](gastown/inventory/repo-root.md),
+  [gastown/README.md](gastown/README.md),
+  [index.md](index.md)

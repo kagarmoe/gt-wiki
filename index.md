@@ -15,7 +15,15 @@ Global catalog of all pages. Organized by topic, then category.
 
 ### Files
 
-- [Makefile](gastown/files/makefile.md) — canonical build recipe
+- [Makefile](gastown/files/makefile.md) — canonical build recipe; produces `gt`, `gt-proxy-server`, `gt-proxy-client` with the `BuiltProperly` ldflag
+- [Dockerfile](gastown/files/dockerfile.md) — primary container image for `gt`
+- [Dockerfile.e2e](gastown/files/dockerfile-e2e.md) — end-to-end test container
+- [docker-compose.yml](gastown/files/docker-compose.md) — Compose spec
+- [docker-entrypoint.sh](gastown/files/docker-entrypoint.md) — container entrypoint shell script
+- [flake.nix](gastown/files/flake-nix.md) — Nix flake (dev shell, packages)
+- [.goreleaser.yml](gastown/files/goreleaser-yml.md) — GoReleaser release-pipeline build config
+- [.golangci.yml](gastown/files/golangci-yml.md) — golangci-lint configuration
+- [go.mod](gastown/files/go-mod.md) — Go module manifest
 
 ### Inventory
 

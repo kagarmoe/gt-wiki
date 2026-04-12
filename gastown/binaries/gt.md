@@ -253,40 +253,27 @@ in a follow-up bead.
    `/go/bin` instead. `~/gt/Dockerfile` was originally wrong about this
    assumption.
 
-5. **Binary name is dynamic, undocumented.**
-   `/home/kimberly/repos/gastown/internal/cli/name.go` allows `gt` to be
-   invoked as any name via `GT_COMMAND`. The README and help output do
-   not mention this mechanism; a user who sees the help text showing
-   `gt` in an environment where the binary was renamed would have no
-   way to know why the help examples use `gt`. Purpose-stated: coexist
-   with Graphite (also uses `gt`).
-
-6. **Command surface is ~10× larger than docs claim.** README documents
-   roughly a dozen top-level subcommands; code registers **~107**.
-   Specific list of undocumented commands pending beads mapping each
-   one, but the categorical scale of the miss is the drift. See
-   [../commands/README.md](../commands/README.md).
-
-7. **Three prominent runtime checks are undocumented.** None of the
-   following are mentioned in README:
-   - Stale binary warning (warns when binary is N commits behind repo).
-   - Town-root branch warning (warns when repo is on a non-`main`-ish
-     branch).
-   - Beads version check (warns when `bd` is missing/outdated).
-   Each is a visible side-effect on `stderr` that users will encounter
-   and may misinterpret as an error.
-
-8. **Telemetry init is undocumented.** `gt` runs OpenTelemetry by
-   default on every invocation (`Execute()` initializes a provider),
-   exports OTEL resource attributes to the process environment so child
-   `bd` processes inherit them, and shuts down the provider on exit.
-   None of this is mentioned in README. Users who care about
-   telemetry / privacy / offline-use have no way to know this from the
-   docs. Endpoint/destination not yet investigated — tracked in a
-   follow-up bead.
+Items above are the four confirmed claim-vs-code mismatches carried
+over from the scaffolding session.
 
 ## Notes / open questions
 
+- `internal/cli/name.go`: `gt` reads `GT_COMMAND` env var at startup
+  (via `cli.Name()` + `sync.Once`) and uses the value as the cobra
+  command name, falling back to `"gt"`. Purpose stated in the file
+  comment: coexist with Graphite (also uses `gt`).
+- `Execute()` at `internal/cmd/root.go:291-317` initializes an
+  OpenTelemetry provider via `telemetry.Init(ctx, "gastown", Version)`
+  on every invocation and calls `telemetry.SetProcessOTELAttrs` to
+  export OTEL resource attributes into the process environment so
+  child `bd` processes inherit them. Deferred shutdown with a 2-second
+  timeout. Endpoint, opt-out env var, and data shipped all TBD —
+  tracked in bead `wiki-9u4`.
+- `persistentPreRun` runs three checks on every invocation that emit
+  stderr warnings: stale binary (`version.CheckStaleBinary`),
+  town-root branch (`warnIfTownRootOffMain`), beads version
+  (`CheckBeadsVersion`). Each has its own exempt-command list; see
+  "beadsExemptCommands" and "branchCheckExemptCommands" above.
 - The Homebrew formula sets `Build` to `"Homebrew"` via ldflags, which
   bypasses the self-kill check without needing `BuiltProperly`. Need to
   verify the exact formula content.

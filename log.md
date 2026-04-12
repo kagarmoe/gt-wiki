@@ -97,7 +97,7 @@ Read: `cmd/gt/main.go`, `internal/cmd/root.go`, `internal/cmd/version.go`,
 `internal/cli/name.go`, plus grep across `internal/cmd/*.go` for
 `rootCmd.AddCommand` and `var ... = &cobra.Command{`.
 
-**Headline findings (a "doc-rewrite work list" of its own):**
+**Enumeration findings (neutral — classification pending):**
 
 - **Top-level command surface is 111 registrations (~107 unique) — not
   the dozen-ish the README documents.** Full inventory in

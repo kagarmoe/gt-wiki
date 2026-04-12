@@ -38,12 +38,14 @@ Counts as of 2026-04-11:
   `mayor start`, `convoy launch`, etc.). The 111 top-level commands
   each have on average ~4 nested children.
 
-## Summary
+## Counts
 
-The complete top-level command surface is ~4× bigger than an engineer
-would guess from reading the README, and the nested command surface is
-another ~4× bigger on top of that. Upstream documentation of the CLI
-surface is effectively a headline with an iceberg under it.
+111 top-level `rootCmd.AddCommand` registrations, ~107 unique
+top-level commands, 495 total `cobra.Command` definitions. A neutral
+inventory — no claim about what any of these commands is for or
+whether it's correctly documented. Per-command entity pages will
+capture the answer to "what does this command actually do" in
+subsequent enumeration batches.
 
 ## Top-level commands (alphabetical)
 

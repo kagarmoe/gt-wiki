@@ -146,7 +146,7 @@ Not transcribed line-by-line. Worth noting a few by category:
   `github.com/charmbracelet/x/term`.
 - **Gopsutil process metrics**:
   `github.com/shirou/gopsutil/v4 v4.26.2` — likely the backing for
-  `gt vitals` / `gt health` process introspection.
+  [`gt vitals`](../commands/vitals.md) / `gt health` process introspection.
 - **OTEL transitive**:
   `go.opentelemetry.io/auto/sdk v1.2.1`,
   `go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.61.0`,

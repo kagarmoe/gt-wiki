@@ -370,3 +370,131 @@ proxy binaries were mentioned as bare text.
   [gastown/files/flake-nix.md](gastown/files/flake-nix.md),
   [gastown/README.md](gastown/README.md),
   [index.md](index.md)
+
+## [2026-04-11] ingest | Batch 3a (Layer c sub-batch: Diagnostics group — 22 top-level commands)
+
+First sub-batch of Layer (c) command mapping. Read 21 Go files in
+`/home/kimberly/repos/gastown/internal/cmd/` and produced 21 new
+wiki entity pages under `gastown/commands/`. The 22nd Diag command
+(`version`) already had a page from a prior session. Together these
+form the complete `GroupDiag` set as defined at
+`/home/kimberly/repos/gastown/internal/cmd/root.go:319-348` (7 cobra
+groups; Diagnostics is one).
+
+**Cobra group progress:** 1 of 7 groups complete
+(Diag ✓; Work, Agents, Comm, Services, Workspace, Config remaining).
+
+**Commands mapped** (alphabetical):
+
+1. [activity](gastown/commands/activity.md)
+2. [audit](gastown/commands/audit.md)
+3. [checkpoint](gastown/commands/checkpoint.md)
+4. [costs](gastown/commands/costs.md)
+5. [dashboard](gastown/commands/dashboard.md)
+6. [doctor](gastown/commands/doctor.md)
+7. [feed](gastown/commands/feed.md)
+8. [heartbeat](gastown/commands/heartbeat.md)
+9. [info](gastown/commands/info.md)
+10. [log](gastown/commands/log.md)
+11. [metrics](gastown/commands/metrics.md)
+12. [patrol](gastown/commands/patrol.md)
+13. [prime](gastown/commands/prime.md)
+14. [repair](gastown/commands/repair.md)
+15. [seance](gastown/commands/seance.md)
+16. [stale](gastown/commands/stale.md)
+17. [status](gastown/commands/status.md)
+18. [thanks](gastown/commands/thanks.md)
+19. [upgrade](gastown/commands/upgrade.md)
+20. [version](gastown/commands/version.md) (pre-existing)
+21. [vitals](gastown/commands/vitals.md)
+22. [whoami](gastown/commands/whoami.md)
+
+**Index updates:**
+
+- [gastown/commands/README.md](gastown/commands/README.md) —
+  entity-page column updated for 21 rows; "mapped so far" progress
+  note added to the "What's NOT yet in this index" section.
+- [gastown/README.md](gastown/README.md) — sub-index `### Commands`
+  expanded with an inline list of the 22 Diag commands.
+- [index.md](index.md) — root gastown `### Commands` noting
+  Batch 3a completion.
+
+**Neutral observations surfaced** (filed as "Notes / open questions"
+on individual pages, not as drift):
+
+- **`audit` hard-codes `<townRoot>/gastown/mayor/rig`** as the beads
+  directory — multi-rig towns have a silent blind spot.
+- **`prime` has a destructive-cycle guard** against GH#2638: a banner
+  "DATABASE ERROR — DO NOT RUN gt done" prevents an agent from
+  misreading a DB error as "no work" and closing an active bead.
+- **`repair`'s `Long` text lists six repair targets but only 2 checks
+  are registered** (`NewRigConfigSyncCheck`, `NewStaleDoltPortCheck`);
+  the other 4 may be side effects of the 2 Fix methods or phantom
+  documentation.
+- **`stale` has intentionally inverted `--quiet` exit codes**
+  (0=stale, 1=fresh).
+- **`info --whats-new` is a hand-maintained 440-line static slice**
+  with no automated sync against git history.
+- **`costs` has a four-tier data plane**: live tmux transcript scan,
+  `~/.gt/costs.jsonl` append log, ephemeral Dolt wisps, permanent
+  digest beads.
+- **`dashboard`'s Dolt env-var forcing** defensively patches a class
+  of bug where child `bd` processes inherit the dashboard's HTTP
+  listen port as their Dolt port.
+- **`doctor` is double-exempt** (both `beadsExemptCommands` and
+  `branchCheckExemptCommands`) — reflects its "tool used to fix the
+  problem" role.
+- **`feed` depends on `getCurrentTmuxSession` defined in
+  `handoff.go`** — cross-file coupling worth noting.
+- **`upgrade.generateCLAUDEMD` is a comment-pinned mirror of
+  `install.go`'s `createTownRootAgentMDs`** — silent drift possible
+  between them; no automatic generation either way.
+
+**Polecat-safe coverage within Diag group:** 3 of 22 (`version`,
+`status`, `prime`) — confirmed against `AnnotationPolecatSafe` in each
+command's cobra.Command definition. `seance` was NOT polecat-safe
+despite an earlier grep ambiguity — Sub B verified directly in
+`seance.go` that no annotation is present.
+
+**Beads-exempt coverage within Diag group:** 10 of 22 (version, doctor,
+heartbeat, seance, prime, status, costs, feed, metrics, upgrade) per
+`beadsExemptCommands` at `root.go:44-77`. The remaining 12 require `bd`
+to function normally.
+
+**Branch-check-exempt coverage within Diag group:** 3 of 22 (`version`,
+`doctor`, `upgrade`) per `branchCheckExemptCommands` at `root.go:81-91`.
+
+**Next sub-batch:** 3b — the remaining cobra groups. Six of seven
+groups still unmapped: Work, Agents, Comm, Services, Workspace, Config.
+The group to walk next is the controller's call; `GroupDiag` was
+chosen for 3a because `version.md` already existed as a template.
+
+**Beads status:** `wiki-3zo` (Batch 3 anchor, Layer c command layer)
+remains OPEN — Batch 3 is not done. `wiki-ef3` (systematic subcommand
+mapping) also remains OPEN — it is effectively equal to Batch 3 and
+closes when Batch 3 closes.
+
+→ [gastown/commands/README.md](gastown/commands/README.md),
+  [gastown/commands/activity.md](gastown/commands/activity.md),
+  [gastown/commands/audit.md](gastown/commands/audit.md),
+  [gastown/commands/checkpoint.md](gastown/commands/checkpoint.md),
+  [gastown/commands/costs.md](gastown/commands/costs.md),
+  [gastown/commands/dashboard.md](gastown/commands/dashboard.md),
+  [gastown/commands/doctor.md](gastown/commands/doctor.md),
+  [gastown/commands/feed.md](gastown/commands/feed.md),
+  [gastown/commands/heartbeat.md](gastown/commands/heartbeat.md),
+  [gastown/commands/info.md](gastown/commands/info.md),
+  [gastown/commands/log.md](gastown/commands/log.md),
+  [gastown/commands/metrics.md](gastown/commands/metrics.md),
+  [gastown/commands/patrol.md](gastown/commands/patrol.md),
+  [gastown/commands/prime.md](gastown/commands/prime.md),
+  [gastown/commands/repair.md](gastown/commands/repair.md),
+  [gastown/commands/seance.md](gastown/commands/seance.md),
+  [gastown/commands/stale.md](gastown/commands/stale.md),
+  [gastown/commands/status.md](gastown/commands/status.md),
+  [gastown/commands/thanks.md](gastown/commands/thanks.md),
+  [gastown/commands/upgrade.md](gastown/commands/upgrade.md),
+  [gastown/commands/vitals.md](gastown/commands/vitals.md),
+  [gastown/commands/whoami.md](gastown/commands/whoami.md),
+  [gastown/README.md](gastown/README.md),
+  [index.md](index.md)

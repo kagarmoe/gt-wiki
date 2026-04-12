@@ -150,8 +150,8 @@ ports:
 ```
 
 Publishes container port 8080 to host port `DASHBOARD_PORT` (default
-8080). This is presumably the Gas Town dashboard, though the dashboard
-isn't mapped in this wiki yet.
+8080). This is presumably the [`gt dashboard`](../commands/dashboard.md)
+HTTP listener, which defaults to port 8080.
 
 #### Command (`docker-compose.yml:38`)
 
@@ -195,9 +195,8 @@ Compose creates per project.
 
 ## Notes / open questions
 
-- What port does the "dashboard" actually serve on? The compose file
-  hardcodes container port 8080 but no page in the wiki yet maps that
-  to a specific `gt` subcommand or service.
+- The [`gt dashboard`](../commands/dashboard.md) page now confirms the
+  default port is 8080, matching the compose file's hardcoded mapping.
 - `IS_SANDBOX=1` is consumed somewhere in [gt](../binaries/gt.md).
   `grep -rn IS_SANDBOX` in `internal/` would locate the consumer —
   follow-up.

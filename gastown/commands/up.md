@@ -68,7 +68,7 @@ Witnesses" per the Long help (`up.go:136-137`).
 prefetch** (`up.go:198-284`)
 Five goroutines in a single `WaitGroup`:
 
-0. **Dolt server** — if `doltserver.DefaultConfig(townRoot).DataDir`
+0. **Dolt server** — if [`doltserver`](../packages/doltserver.md)`.DefaultConfig(townRoot).DataDir`
    exists, start it via `doltserver.Start`. Otherwise mark `doltSkipped`.
 1. **Daemon** — `ensureDaemon` (`up.go:504-566`) checks for a
    `ShutdownSentinel` file first (GH#2656: don't restart the daemon

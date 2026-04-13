@@ -231,7 +231,7 @@ Parent-level flags: none. Each subcommand has its own flags:
   `remove` *resets* it rather than deleting, preserving
   persistent identity across add/remove cycles.
   `CreateDogAgentBead` and `ResetDogAgentBead` are both in the
-  `internal/beads` package but only called from this file.
+  [`internal/beads`](../packages/beads.md) package but only called from this file.
 - **`dispatch` requires `--plugin`, so there is no "dispatch by
   bead" mode.** Bead-driven dispatch goes through `gt sling`
   instead. This is a real split: `gt dog dispatch --plugin` is

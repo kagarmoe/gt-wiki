@@ -98,7 +98,7 @@ per-agent Dolt servers, which would race the canonical server's
 restart and grab the port first.
 
 **Phase 4b-ii — Stop Dolt server** (`down.go:280-302`)
-`doltserver.IsRunning` then `doltserver.Stop`.
+[`doltserver`](../packages/doltserver.md)`.IsRunning` then `doltserver.Stop`.
 
 **Phase 4b-iii — Stop imposter / orphan Dolt servers**
 (`down.go:304-330`)

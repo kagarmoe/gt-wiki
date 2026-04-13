@@ -195,8 +195,8 @@ Mode and priority are validated eagerly at `nudge.go:356-361`.
 - **The 1.5K-line file.** `runNudge` is the tip of a long tail
   including `runNudgeChannel`, pattern resolution, ACP handling,
   and `watchAndDeliver`. This page covers the cobra surface and
-  the core delivery flow; the `nudge_poller.go` sibling and the
-  `internal/nudge` package are not mapped.
+  the core delivery flow; the `nudge_poller.go` sibling is not
+  mapped, but the [`internal/nudge`](../packages/nudge.md) package is.
 - **Queue durability.** `nudge.Enqueue` writes a file; `Drain`
   uses rename-based atomic claiming (`nudge.go:317-319`
   comment). If two watchers race, only one wins — the losers

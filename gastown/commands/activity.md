@@ -65,7 +65,7 @@ The top-level `activity` command is a cobra parent with no `Run` of its own
 4. Calls `events.LogFeed(eventType, actor, payload)`
    (`activity.go:185-187`) to append a JSON line to
    `<town-root>/.events.jsonl` (the file path is defined as
-   `events.EventsFile` in the `internal/events` package).
+   `events.EventsFile` in the [`internal/events`](../packages/events.md) package).
 5. Prints a confirmation line with the actor and payload JSON
    (`activity.go:189-193`).
 

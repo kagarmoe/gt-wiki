@@ -24,6 +24,8 @@ Global catalog of all pages. Organized by topic, then category.
 
 ### Packages
 
+Platform services (Batch 4):
+
 - [cli](gastown/packages/cli.md) — CLI binary-name override (`cli.Name()`)
 - [config](gastown/packages/config.md) — town settings, agent registry, startup commands
 - [session](gastown/packages/session.md) — tmux session substrate for all agent roles
@@ -33,6 +35,17 @@ Global catalog of all pages. Organized by topic, then category.
 - [util](gastown/packages/util.md) — atomic file writes, exec, orphan cleanup
 - [version](gastown/packages/version.md) — build commit + stale binary detection
 - [workspace](gastown/packages/workspace.md) — town-root discovery
+
+Data layer (Batch 5):
+
+- [beads](gastown/packages/beads.md) — Go library interface to beads databases; ~10,300 lines of Gas Town domain logic
+- [channelevents](gastown/packages/channelevents.md) — file-based per-channel pub/sub
+- [doltserver](gastown/packages/doltserver.md) — per-town Dolt MySQL server lifecycle + imposter killing
+- [events](gastown/packages/events.md) — append-only JSONL activity feed; 21 event types
+- [lock](gastown/packages/lock.md) — agent-identity file locks with tmux-aware stale detection
+- [mail](gastown/packages/mail.md) — durable messaging backed by beads with `gt:message` label
+- [mq](gastown/packages/mq.md) — merge-request ID minter (NOT a message queue)
+- [nudge](gastown/packages/nudge.md) — ephemeral file-drop queue for agent prompts
 
 ### Files
 

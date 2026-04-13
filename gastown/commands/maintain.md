@@ -61,7 +61,7 @@ gt maintain --threshold 50 # Custom flatten threshold
 
 **Preflight**
 - Resolve town root via `workspace.FindFromCwdOrError`.
-- Refuse if `doltserver.DefaultConfig(townRoot).IsRemote()` —
+- Refuse if [`doltserver`](../packages/doltserver.md)`.DefaultConfig(townRoot).IsRemote()` —
   maintenance requires a local server (`maintain.go:84-86`).
 - Refuse if `doltserver.IsRunning(townRoot)` is false (suggests
   `gt dolt start`) — needed for the reap and flatten phases.

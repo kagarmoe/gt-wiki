@@ -1105,3 +1105,50 @@ Bead closed.
   [gastown/packages/workspace.md](gastown/packages/workspace.md),
   [gastown/README.md](gastown/README.md),
   [index.md](index.md)
+
+## [2026-04-11] ingest | Batch 5 (Layer e: Data layer — 8 package pages)
+
+Second batch of the package layer. Produced 8 entity pages for the
+data-layer packages under `/home/kimberly/repos/gastown/internal/`.
+
+**Packages mapped:**
+
+- [beads](gastown/packages/beads.md) — Go library interface to beads databases. Hybrid subprocess/SDK dispatch (shells out to `bd` for most operations, uses `beadsdk.Storage` for in-process fast paths). 28 files, ~10,300 lines. NOT the same as the `bd` binary or the `.beads/` directory. Contains Gas Town domain logic (agent beads, molecules, merge slots, rig identity, channels, escalations, delegation, routing) as well as thin bd wrappers.
+- [channelevents](gastown/packages/channelevents.md) — file-based per-channel pub/sub. One JSON file per event under `<townRoot>/events/<channel>/`. Rendezvous semantics (consumer deletes after handling). Distinct from `events`.
+- [doltserver](gastown/packages/doltserver.md) — per-town Dolt MySQL server (port 3307) lifecycle manager. Handles start/stop via exec with `Setpgid: true`, imposter killing, phantom DB quarantine, stale LOCK/socket cleanup. Authentication is `root`/no-password for localhost; multi-town isolation is by port. Hosts the "Wanted List Commons" schema as a co-located tenant (unrelated to the Dolt server's lifecycle — may warrant its own package).
+- [events](gastown/packages/events.md) — append-only JSONL activity feed at `<townRoot>/.events.jsonl` with cross-process flock. 21 event types + 21 payload constructors. Best-effort semantics: silently no-ops when not in a town workspace.
+- [lock](gastown/packages/lock.md) — agent-identity file locks at `<workerDir>/.runtime/agent.lock`. `CleanStaleLocks` requires BOTH dead PID AND missing tmux session before cleaning — critical under Claude Code where the spawning parent often exits while the tmux child keeps running. Windows flock is a no-op by design.
+- [mail](gastown/packages/mail.md) — durable messaging. Messages are beads with `gt:message` label. ~3500 lines of routing (direct, queue, channel, group, announce), threading via random 6-byte hex `ThreadID`, two-phase ack delivery. Has a native-SDK fast path (~5ms) alongside the subprocess path (~600ms).
+- [mq](gastown/packages/mq.md) — single-file (59 lines) merge-request ID minter. SHA-256 of branch + timestamp + random → `<prefix>-mr-<10hex>`. NOT a message queue despite the name (that lives in `internal/mail`'s router). Scheme was expanded from 6 to 10 hex chars after birthday-paradox collisions at ~150K IDs.
+- [nudge](gastown/packages/nudge.md) — ephemeral queue. Writes JSON files to `<townRoot>/.runtime/nudge_queue/<session>/`. Drained by Claude Code's UserPromptSubmit hook (inline) or by background `gt nudge-poller` for non-Claude agents (Gemini/Codex/Cursor). Atomic-rename claim protocol with unique-suffix Windows compatibility. Orphan-claim sweep restores rather than deletes.
+
+**Neutral observations surfaced:**
+
+- **`internal/beads` distinction**: `bd` is the tool; `.beads/` is the data; `internal/beads` is the Go library. Three different things with the same root word.
+- **Hybrid dispatch is per-method, not per-instance**: every `Beads` method checks `if b.store != nil` before falling through to subprocess. Missing `storeX` methods silently use the subprocess path even when a store is attached.
+- **`ListMergeRequests` runs hand-rolled SQL**: `bd list` only queries the `issues` table, but MRs are stored in the `wisps` table (bd v0.59+). `ListMergeRequests` runs a `bd sql --json` SELECT against `wisps + wisp_labels` to collect MRs.
+- **`NeedsForceForID` bypasses bd's prefix-inference heuristic** for multi-hyphen IDs like `st-stockdrop-polecat-nux`.
+- **`doltserver` hosts the Wanted List Commons schema** (`wl_commons.go`, `wl_charsheet.go`, ~36KB) — a tenant schema riding on the same server, unrelated to Dolt lifecycle. May warrant its own package.
+- **`doltserver` authentication is effectively none**: `root`/empty password for localhost. Multi-town isolation is by port.
+- **`KillImposters` compares running `dolt sql-server` data dirs** against expected town data dir using `/proc/<pid>` forensics. Requires stopping idle monitors first (gt-restart-race fix) because idle monitors auto-respawn rogue servers.
+- **`internal/mail` does NOT use `internal/lock`.** It relies on bd's transactional guarantees for beads mode and `github.com/gofrs/flock` directly for the legacy JSONL fallback.
+- **`internal/nudge` does NOT use flock either.** Atomic-rename with unique suffix per drainer. Unique suffix is load-bearing specifically on Windows where shared-destination rename is not atomic.
+- **`events` vs `channelevents` are two different systems** with no shared code. `events` is an append-only audit trail; `channelevents` is a file-based rendezvous/pub-sub with one file per event and consumer deletes.
+- **Mail's subprocess read timeout is 60s** (not 30s) because of real `signal: killed` incidents under concurrent agent load.
+- **Mail's in-process store path bypasses ~600ms of subprocess + Dolt-connection overhead** per operation.
+- **Wisp messages are queried via raw SQL** from `internal/mail` because `bd list` filters wisps out.
+
+**Next batch:** Batch 6 — Layer (f) Agent runtime (domain layer). Largest and most central batch. Produces both package pages AND first-class domain pages (roles/, concepts/, workflows/). Per the plan's autonomous-mode stop conditions, Batch 6 requires explicit controller approval before starting.
+
+**Beads status:** `wiki-w0k` (Batch 5 anchor) closed by this commit. Batches 6–12 still open.
+
+→ [gastown/packages/beads.md](gastown/packages/beads.md),
+  [gastown/packages/channelevents.md](gastown/packages/channelevents.md),
+  [gastown/packages/doltserver.md](gastown/packages/doltserver.md),
+  [gastown/packages/events.md](gastown/packages/events.md),
+  [gastown/packages/lock.md](gastown/packages/lock.md),
+  [gastown/packages/mail.md](gastown/packages/mail.md),
+  [gastown/packages/mq.md](gastown/packages/mq.md),
+  [gastown/packages/nudge.md](gastown/packages/nudge.md),
+  [gastown/README.md](gastown/README.md),
+  [index.md](index.md)

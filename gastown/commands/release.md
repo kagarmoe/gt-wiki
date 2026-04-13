@@ -55,7 +55,7 @@ gt release gt-abc -r "worker died"
    many failed; otherwise `nil` (`:73-77`).
 
 The implementation of `beads.Release` and `beads.ReleaseWithReason`
-lives in `internal/beads/` (not read here). Per the Long help
+lives in [`internal/beads/`](../packages/beads.md) (not read here). Per the Long help
 (`:21-23`), a release moves the issue to `open` status and clears
 the assignee so another worker can claim it.
 

@@ -68,7 +68,7 @@ them, sorts newest-first, applies a limit, and emits text or JSON.
      `spawn`, `done`, `handoff`, `handoff-NOPERSIST`, `crash`, `kill`,
      `nudge`, `wake`.
    - **`collectFeedEvents`** (`audit.go:405-448`) — reads the same
-     `.events.jsonl` file that [activity](activity.md) writes and
+     [`.events.jsonl`](../packages/events.md) file that [activity](activity.md) writes and
      [feed](feed.md) streams. Rendered via `formatFeedSummary`
      (`audit.go:451-483`) for types `sling`, `merged`, `merge_failed`,
      `handoff`, `done`, `mail`.

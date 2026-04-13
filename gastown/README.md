@@ -116,6 +116,17 @@ Platform service packages under `internal/` (Batch 4 — Layer d):
 - [version](packages/version.md) — build-time Commit var + `CheckStaleBinary` with false-positive guards
 - [workspace](packages/workspace.md) — town-root discovery walks with env-var fallbacks
 
+Data layer packages (Batch 5 — Layer e):
+
+- [beads](packages/beads.md) — Go library interface to beads databases; hybrid subprocess/SDK dispatch; ~10,300 lines of Gas Town domain logic (agent beads, molecules, merge slots, rig identity, channels, escalations, delegation, routing)
+- [channelevents](packages/channelevents.md) — file-based pub/sub for named channels (one file per event; rendezvous semantics)
+- [doltserver](packages/doltserver.md) — per-town Dolt MySQL server (port 3307) lifecycle manager + imposter killing
+- [events](packages/events.md) — append-only JSONL activity feed at `<townRoot>/.events.jsonl`; 21 event types
+- [lock](packages/lock.md) — agent-identity file locks with tmux-session-aware stale detection
+- [mail](packages/mail.md) — durable messaging: messages are beads with `gt:message` label; ~3500 lines of routing/threading/claim logic
+- [mq](packages/mq.md) — merge-request ID minter (SHA-256 based; NOT a message queue despite the name)
+- [nudge](packages/nudge.md) — ephemeral queue: JSON files under `<townRoot>/.runtime/nudge_queue/<session>/`; hook-drained or poller-drained
+
 ### Files
 
 - [Makefile](files/makefile.md) — canonical build recipe; produces `gt`, `gt-proxy-server`, `gt-proxy-client` with the `BuiltProperly` ldflag

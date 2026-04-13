@@ -54,7 +54,7 @@ Single terminal command (no subcommands). Runs `runFeed`
 2. **TUI mode** (default when stdout is a TTY and `--plain` is not set,
    `feed.go:130-155`): calls `runFeedTUI` (`feed.go:233-288`).
 3. **Plain mode** (non-TTY or `--plain`, `feed.go:159`): calls
-   `runFeedDirect` (`feed.go:209-230`), which reads `.events.jsonl`
+   `runFeedDirect` (`feed.go:209-230`), which reads [`.events.jsonl`](../packages/events.md)
    directly via `feed.PrintGtEvents`.
 
 ### TUI mode

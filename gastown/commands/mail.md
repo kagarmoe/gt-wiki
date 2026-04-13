@@ -86,7 +86,8 @@ From `mail.go:64-65`: "Messages are stored in beads as issues
 with `type=message`." Mail is not a distinct data store; it's a
 conventional use of beads plus a folder-of-labels dispatching
 layer. That's why `mail` is beads-exempt at the preflight level
-but still calls into the beads package internally — it needs
+but still calls into the [`internal/mail`](../packages/mail.md) package
+(which in turn uses [`internal/beads`](../packages/beads.md)) — it needs
 bd installed to actually do anything.
 
 ### Subcommands

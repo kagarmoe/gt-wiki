@@ -82,7 +82,7 @@ database. Idempotent — safe to run repeatedly.
 **`start`** (`dolt.go:56-63`, run: `dolt.go:392-442`)
 Refuses if `config.IsRemote()`. Refuses if no databases found
 (redirects to `gt dolt init-rig <name>` — `dolt.go:407-409`). Calls
-`doltserver.Start(townRoot)`, prints PID/port/data-dir/connection
+[`doltserver`](../packages/doltserver.md)`.Start(townRoot)`, prints PID/port/data-dir/connection
 string, then runs `doltserver.VerifyDatabasesWithRetry(townRoot, 5)` to
 confirm every on-disk DB is actually being served. If verification
 detects DBs on disk but not served, it warns about a stale manifest and

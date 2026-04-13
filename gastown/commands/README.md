@@ -64,7 +64,7 @@ this wiki's per-command page (stub if not yet written).
 | `audit`        | `auditCmd`       | `internal/cmd/audit.go:59`    | [audit.md](audit.md) |
 | `bead`         | `beadCmd`        | `internal/cmd/bead.go:94`     | [bead.md](bead.md) |
 | `boot`         | `bootCmd`        | `internal/cmd/boot.go:99`     | [boot.md](boot.md) |
-| `broadcast`    | `broadcastCmd`   | `internal/cmd/broadcast.go:24`| — stub      |
+| `broadcast`    | `broadcastCmd`   | `internal/cmd/broadcast.go:24`| [broadcast.md](broadcast.md) |
 | `callbacks`    | `callbacksCmd`   | `internal/cmd/callbacks.go:117`| [callbacks.md](callbacks.md) |
 | `cat`          | `catCmd`         | `internal/cmd/cat.go:33`      | [cat.md](cat.md) |
 | `changelog`    | `changelogCmd`   | `internal/cmd/changelog.go:47`| [changelog.md](changelog.md) |
@@ -83,14 +83,14 @@ this wiki's per-command page (stub if not yet written).
 | `deacon`       | `deaconCmd`      | `internal/cmd/deacon.go:467`  | [deacon.md](deacon.md) |
 | `directive`    | `directiveCmd`   | `internal/cmd/directive.go:39`| [directive.md](directive.md) |
 | `disable`      | `disableCmd`     | `internal/cmd/disable.go:41`  | [disable.md](disable.md) |
-| `dnd`          | `dndCmd`         | `internal/cmd/dnd.go:41`      | — stub      |
+| `dnd`          | `dndCmd`         | `internal/cmd/dnd.go:41`      | [dnd.md](dnd.md) |
 | `doctor`       | `doctorCmd`      | `internal/cmd/doctor.go:131`  | [doctor.md](doctor.md) |
 | `dog`          | `dogCmd`         | `internal/cmd/dog.go:298`     | [dog.md](dog.md) |
 | `dolt`         | `doltCmd`        | `internal/cmd/dolt.go:389`    | — stub      |
 | `done`         | `doneCmd`        | `internal/cmd/done.go:88`     | [done.md](done.md) |
 | `down`         | `downCmd`        | `internal/cmd/down.go:93`     | — stub      |
 | `enable`       | `enableCmd`      | `internal/cmd/enable.go:34`   | [enable.md](enable.md) |
-| `escalate`     | `escalateCmd`    | `internal/cmd/escalate.go:171`| — stub      |
+| `escalate`     | `escalateCmd`    | `internal/cmd/escalate.go:171`| [escalate.md](escalate.md) |
 | `estop`        | `estopCmd`       | `internal/cmd/estop.go:71`    | — stub      |
 | `feed`         | `feedCmd`        | `internal/cmd/feed.go:31`     | [feed.md](feed.md) |
 | `forget`       | `forgetCmd`      | `internal/cmd/forget.go:13`   | — stub      |
@@ -108,7 +108,7 @@ this wiki's per-command page (stub if not yet written).
 | `krc`          | `krcCmd`         | `internal/cmd/krc.go:139`     | — stub      |
 | `log`          | `logCmd`         | `internal/cmd/log.go:88`      | [log.md](log.md) |
 | `maintain`     | `maintainCmd`    | `internal/cmd/maintain.go:67` | — stub      |
-| `mail`         | `mailCmd`        | `internal/cmd/mail.go:543`    | — stub      |
+| `mail`         | `mailCmd`        | `internal/cmd/mail.go:543`    | [mail.md](mail.md) |
 | `mayor`        | `mayorCmd`       | `internal/cmd/mayor.go:136`   | [mayor.md](mayor.md) |
 | `memories`     | `memoriesCmd`    | `internal/cmd/memories.go:17` | — stub      |
 | `metrics`      | `metricsCmd`     | `internal/cmd/metrics.go:26`  | [metrics.md](metrics.md) |
@@ -116,12 +116,12 @@ this wiki's per-command page (stub if not yet written).
 | `mountain`     | `mountainCmd`    | `internal/cmd/mountain.go:105`| [mountain.md](mountain.md) |
 | `mq`           | `mqCmd`          | `internal/cmd/mq.go:364`      | [mq.md](mq.md) |
 | `namepool`     | `namepoolCmd`    | `internal/cmd/namepool.go:111`| — stub      |
-| `notify`       | `notifyCmd`      | `internal/cmd/notify.go:38`   | — stub      |
-| `nudge`        | `nudgeCmd`       | `internal/cmd/nudge.go:62`    | — stub      |
+| `notify`       | `notifyCmd`      | `internal/cmd/notify.go:38`   | [notify.md](notify.md) |
+| `nudge`        | `nudgeCmd`       | `internal/cmd/nudge.go:62`    | [nudge.md](nudge.md) |
 | `nudge-poller` [?]| `nudgePollerCmd` | `internal/cmd/nudge_poller.go:23` | — stub |
 | `orphans`      | `orphansCmd`     | `internal/cmd/orphans.go:181` | [orphans.md](orphans.md) |
 | `patrol`       | `patrolCmd`      | `internal/cmd/patrol.go:62`   | [patrol.md](patrol.md) |
-| `peek`         | `peekCmd`        | `internal/cmd/peek.go:18`     | — stub      |
+| `peek`         | `peekCmd`        | `internal/cmd/peek.go:18`     | [peek.md](peek.md) |
 | `plugin`       | `pluginCmd`      | `internal/cmd/plugin.go:165`  | [plugin.md](plugin.md) |
 | `polecat`      | `polecatCmd`     | `internal/cmd/polecat.go:378` | [polecat.md](polecat.md) |
 | `prime`        | `primeCmd`       | `internal/cmd/prime.go:109`   | [prime.md](prime.md) |
@@ -209,7 +209,7 @@ bead will track this.
 
 ## What's NOT yet in this index
 
-- **Mapped so far:** 71 of 111 top-level commands have entity pages — full groups: `GroupDiag` (22), `GroupConfig` (11), `GroupWork` (26), `GroupAgents` (12: agents, boot, callbacks, deacon, dog, mayor, polecat, refinery, role, session, signal, witness). Remaining groups pending: Comm, Services, Workspace.
+- **Mapped so far:** 78 of 111 top-level commands have entity pages — full groups: `GroupDiag` (22), `GroupConfig` (11), `GroupWork` (26), `GroupAgents` (12), `GroupComm` (7: broadcast, dnd, escalate, mail, notify, nudge, peek). Remaining groups pending: Services, Workspace.
 - **`Use:` field verification per command.** Many entries have inferred
   command names flagged `[?]`.
 - **`GroupID` assignment per command.** Each command needs a quick read

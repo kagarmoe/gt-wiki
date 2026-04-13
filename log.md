@@ -782,3 +782,53 @@ remaining). **Coverage: 71 of 111 top-level commands mapped.**
   [gastown/commands/witness.md](gastown/commands/witness.md),
   [gastown/README.md](gastown/README.md),
   [index.md](index.md)
+
+## [2026-04-11] ingest | Batch 3e (Layer c sub-batch: Communication group — 7 top-level commands)
+
+Fifth sub-batch of Layer (c) command mapping. Read 7 Go files in
+`/home/kimberly/repos/gastown/internal/cmd/` and produced 7 new
+wiki entity pages under `gastown/commands/`.
+
+**Cobra group progress:** 5 of 7 groups complete
+(Diag ✓, Config ✓, Work ✓, Agents ✓, Comm ✓; Services and
+Workspace remaining). **Coverage: 78 of 111 top-level commands.**
+
+**Commands mapped:**
+
+- [broadcast](gastown/commands/broadcast.md) — fan-out nudge to all workers; immediate tmux delivery only; no `--force`; honors DND.
+- [dnd](gastown/commands/dnd.md) — binary (muted/normal) wrapper over the 3-level notification state; beads-exempt.
+- [escalate](gastown/commands/escalate.md) — severity-routed escalation primitive; escalations are beads with the `gt:escalation` label.
+- [mail](gastown/commands/mail.md) — durable messaging family with 15+ subcommands; messages are beads with `type=message`; polecat-safe; beads-exempt.
+- [notify](gastown/commands/notify.md) — 3-level notification state (`verbose`/`normal`/`muted`).
+- [nudge](gastown/commands/nudge.md) — universal sync messaging; 3 delivery modes (`wait-idle`/`queue`/`immediate`); polecat-safe; beads-exempt.
+- [peek](gastown/commands/peek.md) — tmux capture-pane wrapper with built-in aliases for `mayor`/`deacon`/`boot`/rig/polecat/crew.
+
+**Neutral observations:**
+
+- **`gt mail peek` vs top-level `gt peek`** are two different commands in the same `GroupComm`. Mail's `peek` previews first unread; top-level `peek` is a tmux capture-pane alias. User-confusion risk.
+- **`mail --wisp=true` is the default** — mail described as "durable" actually defaults to ephemeral/wisp; permanence is opt-in via `--permanent`.
+- **`broadcast` has no `--force`** — honors DND with no override, unlike `nudge`.
+- **`dnd off` silently erases the verbose preference**. Toggling DND off unconditionally writes `NotifyNormal`; no restore-previous-level memory.
+- **`escalate` is NOT beads-exempt** — the "something is broken" command requires bd to function.
+- **`broadcast` uses direct `NudgeSession`, not `deliverNudge`** — broadcast cannot benefit from wait-idle/queue modes. Every broadcast is an interrupt.
+- **`nudge --if-fresh` uses a magic 60s threshold** (`nudge.go:135`) to suppress compaction/clear-restart nudges.
+- **No `broadcast_test.go`** — only Comm command without a sibling test file.
+
+**Polecat-safe within Comm:** 2 of 7 (`mail`, `nudge`).
+**Beads-exempt within Comm:** 4 of 7 (`dnd`, `mail`, `nudge`, plus verify against `root.go:44-77`).
+**Branch-check-exempt within Comm:** 0.
+
+**Next sub-batch:** 3f — Services or Workspace group. Controller picks.
+
+**Beads status:** `wiki-3zo` and `wiki-ef3` remain open.
+
+→ [gastown/commands/README.md](gastown/commands/README.md),
+  [gastown/commands/broadcast.md](gastown/commands/broadcast.md),
+  [gastown/commands/dnd.md](gastown/commands/dnd.md),
+  [gastown/commands/escalate.md](gastown/commands/escalate.md),
+  [gastown/commands/mail.md](gastown/commands/mail.md),
+  [gastown/commands/notify.md](gastown/commands/notify.md),
+  [gastown/commands/nudge.md](gastown/commands/nudge.md),
+  [gastown/commands/peek.md](gastown/commands/peek.md),
+  [gastown/README.md](gastown/README.md),
+  [index.md](index.md)

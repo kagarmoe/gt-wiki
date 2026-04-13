@@ -17,6 +17,7 @@ Global catalog of all pages. Organized by topic, then category.
 - **Configuration group (11 commands)** — fully mapped in Batch 3b.
 - **Work Management group (26 commands)** — fully mapped in Batch 3c.
 - **Agent Management group (12 commands)** — fully mapped in Batch 3d.
+- **Communication group (7 commands)** — fully mapped in Batch 3e.
 - Individual pages linked from [gastown/commands/README.md](gastown/commands/README.md) entity-page column.
 
 ### Files

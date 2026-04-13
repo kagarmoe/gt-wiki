@@ -278,7 +278,7 @@ is not yet mapped as a wiki entity page.
 
 - The default config path is `~/gt/.runtime/proxy/config.json`. That
   directory shape (and who writes the file) is not mapped yet — likely
-  provisioned by [`gt polecat`](../commands/polecat.md) / `gt rig` / a setup workflow.
+  provisioned by [`gt polecat`](../commands/polecat.md) / [`gt rig`](../commands/rig.md) / a setup workflow.
 - `discoverAllowedSubcmds` runs `gt proxy-subcmds` at startup. That
   subcommand isn't yet mapped — lives at
   `/home/kimberly/repos/gastown/internal/cmd/proxy_subcmds.go`.

@@ -99,6 +99,7 @@ the 12 layers):
 - **Agent Management group** (12 commands, fully mapped): [agents](commands/agents.md), [boot](commands/boot.md), [callbacks](commands/callbacks.md), [deacon](commands/deacon.md), [dog](commands/dog.md), [mayor](commands/mayor.md), [polecat](commands/polecat.md), [refinery](commands/refinery.md), [role](commands/role.md), [session](commands/session.md), [signal](commands/signal.md), [witness](commands/witness.md)
 - **Communication group** (7 commands, fully mapped): [broadcast](commands/broadcast.md), [dnd](commands/dnd.md), [escalate](commands/escalate.md), [mail](commands/mail.md), [notify](commands/notify.md), [nudge](commands/nudge.md), [peek](commands/peek.md)
 - **Services group** (11 commands, fully mapped): [daemon](commands/daemon.md), [dolt](commands/dolt.md), [down](commands/down.md), [estop](commands/estop.md), [maintain](commands/maintain.md), [quota](commands/quota.md), [reaper](commands/reaper.md), [shutdown](commands/shutdown.md), [start](commands/start.md), [thaw](commands/thaw.md), [up](commands/up.md)
+- **Workspace group** (7 commands, fully mapped): [crew](commands/crew.md), [git-init](commands/git-init.md), [init](commands/init.md), [install](commands/install.md), [namepool](commands/namepool.md), [rig](commands/rig.md), [worktree](commands/worktree.md)
 
 ### Files
 

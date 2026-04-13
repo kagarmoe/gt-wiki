@@ -897,3 +897,51 @@ remaining). **Coverage: 89 of 111 top-level commands.**
   [gastown/commands/up.md](gastown/commands/up.md),
   [gastown/README.md](gastown/README.md),
   [index.md](index.md)
+
+## [2026-04-11] ingest | Batch 3g (Layer c sub-batch: Workspace group — 7 top-level commands; final cobra group)
+
+Seventh and final cobra-group sub-batch of Layer (c) command mapping.
+Read 7 Go files in `/home/kimberly/repos/gastown/internal/cmd/` and
+produced 7 new wiki entity pages under `gastown/commands/`.
+
+**Cobra group progress:** 7 of 7 groups complete ✓ ✓ ✓ ✓ ✓ ✓ ✓
+(Diag, Config, Work, Agents, Comm, Services, Workspace). **Coverage:
+96 of 111 top-level commands mapped via cobra groups.**
+
+**Commands mapped:**
+
+- [crew](gastown/commands/crew.md) — CLI surface for persistent, user-managed crew workspaces (full clones, unlike polecat worktrees); 13 subcommands across 9 sibling files.
+- [git-init](gastown/commands/git-init.md) — `.gitignore` + git init + branch-protection post-checkout hook for an existing HQ; retrofit path when `gt install --git` wasn't used.
+- [init](gastown/commands/init.md) — low-level primitive to scaffold agent subdirs and `.git/info/exclude` in an existing git repo to make it a rig.
+- [install](gastown/commands/install.md) — creates the Gas Town HQ (town root): mayor/, deacon/, beads, Dolt bring-up, optional git, shell, wrappers, supervisor.
+- [namepool](gastown/commands/namepool.md) — show pool status, list/switch/create/delete themes, add custom names for polecat naming; 6 subcommands.
+- [rig](gastown/commands/rig.md) — manages rig containers: add/remove/list, patrol lifecycle, operational state (park/dock), plus detect/quick-add/config/settings/menu/reset; ~20 subcommands across 8 files.
+- [worktree](gastown/commands/worktree.md) — create/list/remove cross-rig git worktrees for crew members, with env-var exports for identity preservation.
+
+**Neutral observations surfaced:**
+
+- **`crew` and `rig` are parent stubs for large subcommand trees** distributed across many sibling files. `crew.go` (432 lines) is CLI wiring only; all `runCrew*` functions live in `crew_add.go`, `crew_at.go`, `crew_lifecycle.go`, `crew_list.go`, `crew_maintenance.go`, `crew_status.go`, `crew_cycle.go`. `rig.go` (2481 lines) defines 12 subcommands in the core file, 8 more in siblings.
+- **`gt worktree` is crew-specific, not general git.** Prints identity-preserving env vars for the user to paste. One of the few places gt has an explicit `runtime.GOOS == "windows"` branch.
+- **Three distinct setup primitives:** `gt init` scaffolds a rig's agent dirs inside an existing git repo. `gt install` creates the enclosing HQ. `gt git-init` retrofits git into an existing HQ. They chain: `gt install` → `gt git-init` (if `--git` omitted) → `gt rig add` (transitively covers what `gt init` does).
+- **`crewCmd.Long` contains the canonical crew-vs-polecat definition** ("Polecats: Ephemeral...witness-managed. Auto-nuked. Crew: Persistent. User-managed."). Preserved verbatim on the crew page.
+- **`gt install` hides an escape hatch:** `gt install <existing-hq> --wrappers` bypasses the "already a workspace" guard and installs wrappers only, returning successfully.
+- **`namepool.detectCurrentRigWithPath`** excludes `mayor` and `deacon` from being treated as rigs but not other agent dirs like `plugins/` — flagged as a possible latent bug.
+
+**Polecat-safe within Workspace:** 0 of 7.
+**Beads-exempt within Workspace:** 3 of 7 (`crew`, `rig`, `install`).
+**Branch-check-exempt within Workspace:** 2 of 7 (`install`, `git-init`).
+
+**Cobra-group mapping complete (96 of 111 commands).** Remaining ~15 commands have no `GroupID` and did not self-assign to any of the 7 cobra groups. These will be mapped in Batch 3h (or directly in the next subagent dispatch) before Batch 3 closes.
+
+**Beads status:** `wiki-3zo` (Batch 3 anchor) and `wiki-ef3` (systematic subcommand mapping) remain OPEN until all 111 commands are mapped, not just the 96 grouped ones.
+
+→ [gastown/commands/README.md](gastown/commands/README.md),
+  [gastown/commands/crew.md](gastown/commands/crew.md),
+  [gastown/commands/git-init.md](gastown/commands/git-init.md),
+  [gastown/commands/init.md](gastown/commands/init.md),
+  [gastown/commands/install.md](gastown/commands/install.md),
+  [gastown/commands/namepool.md](gastown/commands/namepool.md),
+  [gastown/commands/rig.md](gastown/commands/rig.md),
+  [gastown/commands/worktree.md](gastown/commands/worktree.md),
+  [gastown/README.md](gastown/README.md),
+  [index.md](index.md)

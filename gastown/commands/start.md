@@ -48,9 +48,9 @@ Dolt-readiness gate.
 ### Subcommands
 
 **`crew`** (`start.go:114-131`, run: `start.go:974-1051`)
-Convenience command that combines `gt crew add` and
-`gt crew at --detached`. Starts a crew workspace, creating it if it
-doesn't exist. Resolves `rig/name` format from the positional arg, or
+Convenience command that combines [`gt crew add`](crew.md) and
+[`gt crew at --detached`](crew.md). Starts a crew workspace, creating
+it if it doesn't exist. Resolves `rig/name` format from the positional arg, or
 falls back to `--rig`, then to `inferRigFromCwd`, then to
 `inferRigFromCrewName`. Resolves the Claude account via
 `config.ResolveAccountConfigDir` using `constants.MayorAccountsPath`.

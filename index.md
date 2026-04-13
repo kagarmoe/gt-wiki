@@ -19,6 +19,7 @@ Global catalog of all pages. Organized by topic, then category.
 - **Agent Management group (12 commands)** — fully mapped in Batch 3d.
 - **Communication group (7 commands)** — fully mapped in Batch 3e.
 - **Services group (11 commands)** — fully mapped in Batch 3f.
+- **Workspace group (7 commands)** — fully mapped in Batch 3g. All 7 cobra groups complete.
 - Individual pages linked from [gastown/commands/README.md](gastown/commands/README.md) entity-page column.
 
 ### Files

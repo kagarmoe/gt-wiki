@@ -116,8 +116,10 @@ before re-running `gt install`.
   preserves wrappers, state, config, cache, and workspace.
 - [doctor.md](doctor.md) — after uninstall, `gt doctor` will fail on
   almost every check; the reinstall flow rebuilds state.
-- **`install`** (not yet mapped) — uninstall's counterpart; see Long
-  text hint `gt install ~/gt --shell` at `uninstall.go:147`.
+- [install.md](install.md) — uninstall's counterpart; see Long
+  text hint `gt install ~/gt --shell` at `uninstall.go:147`. The
+  reinstall flow at `uninstall.go:142-149` points users back at
+  `gt install ~/gt --shell`.
 
 ## Notes / open questions
 

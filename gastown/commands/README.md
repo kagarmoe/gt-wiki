@@ -76,7 +76,7 @@ this wiki's per-command page (stub if not yet written).
 | `config`       | `configCmd`      | `internal/cmd/config.go:1290` | [config.md](config.md) |
 | `convoy`       | `convoyCmd`      | `internal/cmd/convoy.go:426`  | [convoy.md](convoy.md) |
 | `costs`        | `costsCmd`       | `internal/cmd/costs.go:111`   | [costs.md](costs.md) |
-| `crew`         | `crewCmd`        | `internal/cmd/crew.go:431`    | — stub      |
+| `crew`         | `crewCmd`        | `internal/cmd/crew.go:431`    | [crew.md](crew.md) |
 | `cycle`        | `cycleCmd`       | `internal/cmd/cycle.go:24`    | — stub      |
 | `daemon`       | `daemonCmd`      | `internal/cmd/daemon.go:166`  | [daemon.md](daemon.md) |
 | `dashboard`    | `dashboardCmd`   | `internal/cmd/dashboard.go:55`| [dashboard.md](dashboard.md) |
@@ -95,15 +95,15 @@ this wiki's per-command page (stub if not yet written).
 | `feed`         | `feedCmd`        | `internal/cmd/feed.go:31`     | [feed.md](feed.md) |
 | `forget`       | `forgetCmd`      | `internal/cmd/forget.go:13`   | — stub      |
 | `formula`      | `formulaCmd`     | `internal/cmd/formula.go:184` | [formula.md](formula.md) |
-| `git-init` [?] | `gitInitCmd`     | `internal/cmd/gitinit.go:51`  | — stub      |
+| `git-init`     | `gitInitCmd`     | `internal/cmd/gitinit.go:51`  | [git-init.md](git-init.md) |
 | `handoff`      | `handoffCmd`     | `internal/cmd/handoff.go:95`  | [handoff.md](handoff.md) |
 | `health`       | `healthCmd`      | `internal/cmd/health.go:104`  | — stub      |
 | `heartbeat`    | `heartbeatCmd`   | `internal/cmd/heartbeat.go:38`| [heartbeat.md](heartbeat.md) |
 | `hook`         | `hookCmd`        | `internal/cmd/hook.go:188`    | [hook.md](hook.md) |
 | `hooks`        | `hooksCmd`       | `internal/cmd/hooks.go:43`    | [hooks.md](hooks.md) |
 | `info`         | `infoCmd`        | `internal/cmd/info.go:482`    | [info.md](info.md) |
-| `init`         | `initCmd`        | `internal/cmd/init.go:37`     | — stub      |
-| `install`      | `installCmd`     | `internal/cmd/install.go:92`  | — stub      |
+| `init`         | `initCmd`        | `internal/cmd/init.go:37`     | [init.md](init.md) |
+| `install`      | `installCmd`     | `internal/cmd/install.go:92`  | [install.md](install.md) |
 | `issue`        | `issueCmd`       | `internal/cmd/issue.go:53`    | [issue.md](issue.md) |
 | `krc`          | `krcCmd`         | `internal/cmd/krc.go:139`     | — stub      |
 | `log`          | `logCmd`         | `internal/cmd/log.go:88`      | [log.md](log.md) |
@@ -115,7 +115,7 @@ this wiki's per-command page (stub if not yet written).
 | `molecule`     | `moleculeCmd`    | `internal/cmd/molecule.go:269`| [molecule.md](molecule.md) |
 | `mountain`     | `mountainCmd`    | `internal/cmd/mountain.go:105`| [mountain.md](mountain.md) |
 | `mq`           | `mqCmd`          | `internal/cmd/mq.go:364`      | [mq.md](mq.md) |
-| `namepool`     | `namepoolCmd`    | `internal/cmd/namepool.go:111`| — stub      |
+| `namepool`     | `namepoolCmd`    | `internal/cmd/namepool.go:111`| [namepool.md](namepool.md) |
 | `notify`       | `notifyCmd`      | `internal/cmd/notify.go:38`   | [notify.md](notify.md) |
 | `nudge`        | `nudgeCmd`       | `internal/cmd/nudge.go:62`    | [nudge.md](nudge.md) |
 | `nudge-poller` [?]| `nudgePollerCmd` | `internal/cmd/nudge_poller.go:23` | — stub |
@@ -135,7 +135,7 @@ this wiki's per-command page (stub if not yet written).
 | `remember`     | `rememberCmd`    | `internal/cmd/remember.go:40` | — stub      |
 | `repair`       | `repairCmd`      | `internal/cmd/repair.go:36`   | [repair.md](repair.md) |
 | `resume`       | `resumeCmd`      | `internal/cmd/resume.go:30`   | [resume.md](resume.md) |
-| `rig`          | `rigCmd`         | `internal/cmd/rig.go:343`     | — stub      |
+| `rig`          | `rigCmd`         | `internal/cmd/rig.go:343`     | [rig.md](rig.md) |
 | `role`         | `roleCmd`        | `internal/cmd/role.go:139`    | [role.md](role.md) |
 | `scheduler`    | `schedulerCmd`   | `internal/cmd/scheduler.go:117`| [scheduler.md](scheduler.md) |
 | `seance`       | `seanceCmd`      | `internal/cmd/seance.go:74`   | [seance.md](seance.md) |
@@ -166,7 +166,7 @@ this wiki's per-command page (stub if not yet written).
 | `whoami`       | `whoamiCmd`      | `internal/cmd/whoami.go:33`   | [whoami.md](whoami.md) |
 | `witness`      | `witnessCmd`     | `internal/cmd/witness.go:142` | [witness.md](witness.md) |
 | `wl`           | `wlCmd`          | `internal/cmd/wl.go:70`       | [wl.md](wl.md) |
-| `worktree`     | `worktreeCmd`    | `internal/cmd/worktree.go:94` | — stub      |
+| `worktree`     | `worktreeCmd`    | `internal/cmd/worktree.go:94` | [worktree.md](worktree.md) |
 
 **[?] = inferred command name; `Use:` field not yet verified.**
 
@@ -209,7 +209,7 @@ bead will track this.
 
 ## What's NOT yet in this index
 
-- **Mapped so far:** 89 of 111 top-level commands have entity pages — full groups: `GroupDiag` (22), `GroupConfig` (11), `GroupWork` (26), `GroupAgents` (12), `GroupComm` (7), `GroupServices` (11: daemon, dolt, down, estop, maintain, quota, reaper, shutdown, start, thaw, up). Remaining group pending: Workspace.
+- **Mapped so far:** 96 of 111 top-level commands have entity pages — full groups: `GroupDiag` (22), `GroupConfig` (11), `GroupWork` (26), `GroupAgents` (12), `GroupComm` (7), `GroupServices` (11), `GroupWorkspace` (7: crew, git-init, init, install, namepool, rig, worktree). All 7 cobra groups now complete. Remaining: ~15 top-level commands with no `GroupID` assignment (those that did not self-assign to any group in their cobra.Command definition).
 - **`Use:` field verification per command.** Many entries have inferred
   command names flagged `[?]`.
 - **`GroupID` assignment per command.** Each command needs a quick read

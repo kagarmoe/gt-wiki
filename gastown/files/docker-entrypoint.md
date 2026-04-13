@@ -135,6 +135,10 @@ tini reaps the resulting process tree.
   `/gt`.
 - [../binaries/gt.md](../binaries/gt.md) — the `gt` binary at
   `/app/gastown/gt` whose `install` subcommand this script invokes.
+- [../commands/install.md](../commands/install.md) — the `gt install`
+  command that this entrypoint runs to initialize/refresh the workspace
+  at `/gt`; documents the `--force` refresh path, `--git` flag, and the
+  guard behavior on already-installed towns.
 - [Makefile](makefile.md) — builds the binary referenced here; the
   LDFLAGS it sets are what allow the binary to run without the
   self-kill check firing.

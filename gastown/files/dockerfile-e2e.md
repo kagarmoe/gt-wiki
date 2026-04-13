@@ -114,10 +114,10 @@ RUN git config --global user.name "Test User" && \
     dolt config --global --add user.email "test@test.com"
 ```
 
-Test-only identity. `gt install --git` requires valid git identity
-to run, and `dolt init` requires dolt identity — these lines make
-both available inside the container so the tests don't need host
-credentials.
+Test-only identity. [`gt install --git`](../commands/install.md)
+requires valid git identity to run, and `dolt init` requires dolt
+identity — these lines make both available inside the container so
+the tests don't need host credentials.
 
 ### Workspace setup
 

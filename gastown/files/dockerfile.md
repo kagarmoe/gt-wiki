@@ -235,7 +235,7 @@ kept running while humans / agents `docker compose exec` into it.
   works implies either a tolerant module or that the go.mod version
   directive is advisory.
 - The final CMD is `sleep infinity` — there is no "start Gas Town"
-  command baked in. The entrypoint script only runs `gt install`;
-  the user is expected to `docker compose exec gastown zsh` and drive
-  the sandbox interactively.
+  command baked in. The entrypoint script only runs
+  [`gt install`](../commands/install.md); the user is expected to
+  `docker compose exec gastown zsh` and drive the sandbox interactively.
 - No `HEALTHCHECK` directive. No `EXPOSE`.

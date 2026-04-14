@@ -12,10 +12,11 @@ tags: [command, agents, mayor, tmux, acp, lifecycle, session]
 
 # gt mayor
 
-Lifecycle commands for the Mayor — the town-level agent that acts as
-the Overseer's "Chief of Staff" for cross-rig coordination. This page
-documents the `gt mayor` CLI subcommands only; the Mayor's role and
-responsibilities as an agent are pending a dedicated role page.
+Lifecycle commands for the [Mayor](../roles/mayor.md) — the
+town-level agent that acts as the Overseer's "Chief of Staff" for
+cross-rig coordination. This page documents the `gt mayor` CLI
+subcommands only; see the [Mayor role page](../roles/mayor.md) for
+responsibilities and decision-making.
 
 **Parent:** [gt](../binaries/gt.md) (root command)
 **Group:** `GroupAgents` ("Agent Management") (`mayor.go:25`)

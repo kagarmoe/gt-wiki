@@ -16,13 +16,13 @@ tags: [command, agents, polecat, worktree, nuke, lifecycle, git, identity]
 
 # gt polecat
 
-Polecat lifecycle, identity, and cleanup commands. A polecat has
-**persistent identity** (an agent bead tracking CV/work history)
-and **ephemeral sessions/sandboxes** (worktrees that come and go
-with work). This page documents the `gt polecat` CLI subcommand
-tree only; the polecat as a persona (its startup flow, its
-self-cleaning model, its interaction with refinery/witness/deacon)
-is pending a dedicated role page.
+[Polecat](../roles/polecat.md) lifecycle, identity, and cleanup
+commands. A polecat has **persistent identity** (an agent bead
+tracking CV/work history) and **ephemeral sessions/sandboxes**
+(worktrees that come and go with work). This page documents the
+`gt polecat` CLI subcommand tree only; see the
+[Polecat role page](../roles/polecat.md) for startup flow,
+self-cleaning model, and interaction with refinery/witness/deacon.
 
 **Parent:** [gt](../binaries/gt.md) (root command)
 **Group:** `GroupAgents` ("Agent Management") (`polecat.go:34`)

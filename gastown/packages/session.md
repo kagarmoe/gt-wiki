@@ -32,8 +32,11 @@ and spawning the detached `gt agent-log` subprocess that streams Claude
 Code JSONL conversation logs to VictoriaLogs.
 
 Despite the "polecat" focus in the package doc comment, this package
-is the session substrate for **all** agent roles: mayor, deacon,
-witness, refinery, crew, polecat, dog, boot, overseer. The comment on
+is the session substrate for **all** agent roles:
+[mayor](../roles/mayor.md), [deacon](../roles/deacon.md),
+[witness](../roles/witness.md), [refinery](../roles/refinery.md),
+[crew](../roles/crew.md), [polecat](../roles/polecat.md),
+[dog](../roles/dog.md), boot, overseer. The comment on
 `SessionConfig` at `lifecycle.go:22-35` is explicit: it unifies the
 common startup pattern that was previously duplicated across every
 role's session manager.

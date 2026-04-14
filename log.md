@@ -1152,3 +1152,71 @@ data-layer packages under `/home/kimberly/repos/gastown/internal/`.
   [gastown/packages/nudge.md](gastown/packages/nudge.md),
   [gastown/README.md](gastown/README.md),
   [index.md](index.md)
+
+## [2026-04-11] ingest | Batch 6 (Layer f: Agent runtime / domain layer — 30 pages)
+
+The largest and most semantically important batch. Created three new
+category folders (`gastown/roles/`, `gastown/concepts/`, `gastown/workflows/`)
+and produced 30 entity pages covering the Gas Town agent runtime:
+
+- **13 packages** under `gastown/packages/` (mayor, polecat, crew, dog, deacon, refinery, witness, reaper, wisp, convoy, rig, formula, plugin)
+- **8 roles** under `gastown/roles/` (mayor, polecat, crew, dog, deacon, refinery, witness, reaper)
+- **7 concepts** under `gastown/concepts/` (rig, convoy, formula, molecule, wisp, directive, identity)
+- **2 workflows** under `gastown/workflows/` (convoy-launch, polecat-lifecycle)
+
+**Same-batch rule applied:** each of the 13 internal/ packages was read once by a content subagent and its code page + role/concept page were produced together.
+
+**Gas Town personas (roles):**
+
+Eight agents with identity, decisions, and autonomy:
+
+1. [Mayor](gastown/roles/mayor.md) — town-level orchestrator; one per machine; the Overseer's "Chief of Staff"; runs in tmux OR headless ACP mode (the only gt agent with two runtime substrates). `gt mayor attach` does much more than attach.
+2. [Polecat](gastown/roles/polecat.md) — primary feature-building worker; persistent identity (themed name + permanent agent bead + CV chain) + ephemeral sessions + sandbox worktree. Nuke is a cooperative 7-step protocol with gt-4vr push-before-delete guardrail and gt-v5ku remote-branch protection.
+3. [Crew](gastown/roles/crew.md) — persistent user-managed worker; FULL git clones (not worktrees); stable names; mailbox; user's answer to "I want a long-lived dev session with an agent."
+4. [Dog](gastown/roles/dog.md) — reusable cross-rig infrastructure worker; worktrees into every configured rig; managed solely by the Deacon; invisible to `gt agents list` because it's not registered as an `AgentType`. "Cats build features. Dogs clean up messes."
+5. [Deacon](gastown/roles/deacon.md) — town-level watchdog; mechanical sibling of the Mayor; runs patrol loops, heartbeat, feed-stranded/redispatch/health-check state files, escalates to Mayor when rate-limit budgets exhaust.
+6. [Refinery](gastown/roles/refinery.md) — per-rig merge queue processor; pre-merge + post-squash quality gates; squash-merge behind a beads-backed main-push slot lock; spawns a fresh polecat via synthesis task bead on conflict. Batch-then-bisect merging is opt-in.
+7. [Witness](gastown/roles/witness.md) — per-rig polecat health monitor; runs as a Claude driving `mol-witness-patrol`; three completion-detection paths (POLECAT_DONE mail, bead `exit_type`, patrol sweep); Mountain-Eater auto-skip; cross-process flock-serialized spawn-count circuit breaker.
+8. [Reaper](gastown/roles/reaper.md) — **not a long-running agent**; a role performed on demand by a Dog executing `mol-dog-reaper`. Zero gastown package imports; SQL-direct; decision-less eligibility via WHERE clauses.
+
+**Domain concepts:**
+
+- [`rig`](gastown/concepts/rig.md) — workspace abstraction: one repo + one refinery + one witness + polecats + crew. `<rigRoot>` canonical layout (`.repo.git/`, `refinery/rig/`, `mayor/rig/`, `witness/`, `polecats/`, `crew/`, `.beads/`, `plugins/`, `settings/`). **Rigs are not git repos** — they're gastown wrappers around a repo, with `.repo.git/` as the shared bare clone and `refinery/rig/` as a worktree.
+- [`convoy`](gastown/concepts/convoy.md) — cross-rig work-tracking unit; `hq-` prefix; `tracks` (non-blocking) dependency type; multi-stage lifecycle (`open`/`closed`/`staged_ready`/`staged_warnings`); uses molecules (`mol-convoy-feed`) for dispatch.
+- [`formula`](gastown/concepts/formula.md) — static TOML template with steps, variables, overlays; four types (`convoy`/`workflow`/`expansion`/`aspect`); composable via `extends` and `compose.expand`.
+- [`molecule`](gastown/concepts/molecule.md) — running bead-tracked instance of a formula. **Formula : molecule :: class : instance.** Static template on disk vs live state in beads.
+- [`wisp`](gastown/concepts/wisp.md) — ephemeral bead in the `wisps` SQL table (not `issues`); TTL-compactable; escapes compaction only via `ShouldPromote` (has comments / referenced by non-wisp / `gt:keep` label / open past TTL). **Name collision trap:** `internal/wisp` package does NOT implement the wisp concept — that lives in `internal/beads` + `internal/doltserver`.
+- [`directive`](gastown/concepts/directive.md) — operator-provided role override at `<town>/directives/<role>.md` or `<town>/<rig>/directives/<role>.md`; concatenated (town first, rig last); injected at prime time. CLI is a parent-only stub; the config-loader side is implemented in `internal/config/directives.go` (41 lines).
+- [`identity`](gastown/concepts/identity.md) — agent identity via structured address (`<prefix>/<role>` or `<prefix>/<name>`); resolved by `detectSender()` with priority `GT_ROLE` env var → cwd path → `overseer` default. Drives mail routing, bead authorship, role dispatch, directive loading, session naming. Agent bead is the persistent anchor (NOT a wisp; protected from reaper compaction).
+
+**Workflows:**
+
+- [`convoy-launch`](gastown/workflows/convoy-launch.md) — 8 steps: stage → launch (validated transition) → initial dispatch via `mol-convoy-feed` → watch subscription → reactive continuation via `CheckConvoysForIssue` on every close → Deacon safety-net polling → Refinery merges tracked issues → last-merge landing (convoy closes, swarm lands for `gt:owned` convoys).
+- [`polecat-lifecycle`](gastown/workflows/polecat-lifecycle.md) — 9 states: name allocation → worktree + agent bead → session spawn + issue hook → working → `gt done` → Witness POLECAT_DONE handler → refinery merges MR → cleanup (idle vs nuke, persistent-polecat default) → zombie detection (recovery).
+
+**Neutral observations surfaced across Batch 6:**
+
+- **`internal/wisp` package name is a trap.** ~400 lines of utility code plus the pure `ShouldPromote` predicate. The actual wisp CONCEPT (ephemeral beads in the `wisps` table) lives in `internal/beads` + `internal/doltserver` + the external beadsdk SDK. Flagged prominently on both the package page and the concept page.
+- **`internal/reaper` is deliberately isolated** — zero gastown package imports so it can run against a Dolt server even when other packages are in a broken state. All SQL is hand-rolled strings.
+- **`internal/convoy` is only 2 files** (`operations.go` + `multi_store.go`) — the bulk of convoy logic (12 subcommands, 2739 lines) lives in `internal/cmd/convoy.go` and siblings. Future refactor candidate.
+- **Boot lives in the dog kennel but is NOT a dog** — `<kennel>/boot/` uses `.boot-status.json` instead of `.dog.json`; `dog.Manager.Get("boot")` returns `ErrDogNotFound`; `List()` skips it. "Boot is a special dog" is physical layout only, not type registration. No `AgentDog` type exists.
+- **Mayor's ACP mode leaks identity env vars into the parent shell** — `StartACP` calls `os.Setenv` on identity vars in the calling process because the Mayor's ACP path runs in the foreground.
+- **Dog session prefix is `hq-dog-`, not `hq-deacon-`** — explicit to avoid tmux prefix-match collisions with the `hq-deacon` session.
+- **Refinery filters wisps by rig name** because "wisps are shared across all rigs (gh#2718)".
+- **Witness foreground mode is vestigial** — the `--foreground` flag still parses but prints "no longer runs patrol loop" because the patrol logic moved to `mol-witness-patrol`.
+- **Polecat Dolt retries distinguish transient from config errors** — without the split, missing databases would hang polecat spawn for ~3 minutes per attempt (gt-2ra).
+- **Polecat `RemoveWithOptions` resets the agent bead BEFORE filesystem operations** specifically to avoid a race where concurrent slings see a partially-reset bead (gt-14b8o).
+- **Heartbeat v2 is agent-honest** (gt-3vr5): Witness only ever infers "is the heartbeat fresh?". All other state is agent-reported. ZFC principle applied to liveness.
+- **Persistent polecat model flips the default lifecycle** — post-gt-4ac/gt-hdf8, `gt done` no longer tears down the polecat; it transitions to `StateIdle` with the sandbox preserved. Nuke is now an explicit action.
+- **`directive` CLI is a parent-only stub** — `directive.go:38-40` only calls `rootCmd.AddCommand(directiveCmd)` with zero `directiveCmd.AddCommand(...)` calls. The config-loader side is fully implemented and consumed by `gt prime`.
+- **Formula overlays vs directive overlays have opposite semantics**: formula overlays fully replace (rig-level replaces town-level); directive overlays concatenate (both town and rig appear in the prompt).
+- **`compose.aspects` is a parked field** — TOML decodes it, but `resolveChain` in `parser.go:594` ignores it with a "future work" comment.
+- **Identity and BEADS_ACTOR are not coupled at resolution time** — `detectSender()` reads `GT_ROLE` + context vars; `BEADS_ACTOR` is a separate env var. Usually coherent because the session manager sets both, but a debugger or script can decouple them.
+- **Crew validates EVERYTHING before killing any existing session** — a careful invariant not found in other lifecycle packages; prevents the user being left without a running session on validation failure.
+- **Three completion-detection paths in Witness do not dedupe across sessions** — only within one Witness session via `MessageDeduplicator`.
+
+**Bead `wiki-ca4` closed by this commit** — Batch 6 (Layer f: Agent runtime / domain layer) complete.
+
+**Next batch (not started by this commit):** Batch 7 — Layer (g) Diagnostics & health (`internal/doctor` with 120 files, `internal/health`, `internal/keepalive`, `internal/deps`). Per plan autonomous-mode, remaining batches (7-12) are simpler infrastructure mapping with no first-class domain entities, so they can proceed without per-batch controller approval.
+
+→ 30 pages — see the F1 sub-index updates and F2 root index updates for the complete list

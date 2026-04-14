@@ -535,10 +535,10 @@ issue, err := b.Show("hq-cv-abc123")   // routes into hq rig automatically
 - `--allow-stale` probing is cached per `bd` binary path. Tests that
   swap `bd` on `PATH` within a single process must call
   `ResetBdAllowStaleCacheForTest()` (`beads.go:44-49`) between swaps.
-- The `wisps` vs `issues` table split in bd v0.59+ means many methods
-  have to query both tables for complete results (see
-  `ListMergeRequests`). This is a recurring source of "why can't I see
-  my MR in list output?" bugs.
+- The [`wisps`](../concepts/wisp.md) vs `issues` table split in bd
+  v0.59+ means many methods have to query both tables for complete
+  results (see `ListMergeRequests`). This is a recurring source of
+  "why can't I see my MR in list output?" bugs.
 - Multi-hyphen ID handling (`NeedsForceForID`) is a sharp edge that
   exists entirely because of bd's prefix-inference heuristic. Any new
   ID schemes should assume `--force` is required.

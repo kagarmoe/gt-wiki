@@ -127,6 +127,54 @@ Data layer packages (Batch 5 — Layer e):
 - [mq](packages/mq.md) — merge-request ID minter (SHA-256 based; NOT a message queue despite the name)
 - [nudge](packages/nudge.md) — ephemeral queue: JSON files under `<townRoot>/.runtime/nudge_queue/<session>/`; hook-drained or poller-drained
 
+Agent runtime packages (Batch 6 — Layer f):
+
+- [mayor](packages/mayor.md) — orchestrator lifecycle + ACP mode + cleanup veto
+- [deacon](packages/deacon.md) — daemon-tick watchdog; 5 state-file substrates (heartbeat, paused, feed-stranded, redispatch, health-check)
+- [crew](packages/crew.md) — persistent user-managed workers; full git clones
+- [dog](packages/dog.md) — cross-rig reusable workers with worktrees into every rig; managed by the Deacon
+- [polecat](packages/polecat.md) — ephemeral feature-building workers; identity via name pool + agent bead; Dolt-retry-aware spawn
+- [refinery](packages/refinery.md) — per-rig merge queue processor
+- [witness](packages/witness.md) — per-rig polecat health monitor (library for `mol-witness-patrol` molecule)
+- [reaper](packages/reaper.md) — wisp/bead TTL cleanup (SQL-direct; zero gastown package imports)
+- [wisp](packages/wisp.md) — small utility package; the wisp **concept** lives in `internal/beads` + `internal/doltserver`
+- [convoy](packages/convoy.md) — cross-rig work tracking unit primitives (most convoy logic lives in `internal/cmd/convoy.go`)
+- [rig](packages/rig.md) — rig workspace manager
+- [formula](packages/formula.md) — formula/molecule template loader
+- [plugin](packages/plugin.md) — Deacon-patrol plugin loader
+
+### Roles (Batch 6 — Layer f)
+
+Gas Town agent personas — the "characters" with identity, decisions, and autonomy. Each role has a dedicated persona page + a code-side package page.
+
+- [mayor](roles/mayor.md) — town-level orchestrator; one per machine; the only agent that runs in two substrates (tmux + ACP)
+- [polecat](roles/polecat.md) — primary feature-building worker; persistent identity + ephemeral sessions; rig-scoped; themed names
+- [crew](roles/crew.md) — persistent user-managed worker; full git clones; rig-scoped; stable names
+- [dog](roles/dog.md) — cross-rig infrastructure worker; worktrees into every rig; managed by the Deacon; idle ↔ working; invisible to `gt agents`
+- [deacon](roles/deacon.md) — town-level watchdog; mechanical sibling of the Mayor; patrol loops + heartbeat + escalation budget
+- [refinery](roles/refinery.md) — per-rig merge queue processor; pre-merge and post-squash quality gates; batch-then-bisect merging
+- [witness](roles/witness.md) — per-rig polecat health monitor; three completion-detection paths; spawn-storm circuit breaker
+- [reaper](roles/reaper.md) — on-demand cleanup role performed by a Dog executing `mol-dog-reaper`; decision-less SQL pipeline
+
+### Concepts (Batch 6 — Layer f)
+
+Abstract domain ideas that span multiple packages.
+
+- [rig](concepts/rig.md) — workspace abstraction; one repo + one refinery + one witness + polecats + crew; `<rigRoot>` canonical layout
+- [convoy](concepts/convoy.md) — cross-rig work-tracking unit; `tracks` dependency type; multi-stage lifecycle; `hq-` prefix
+- [formula](concepts/formula.md) — static TOML template with steps, variables, overlays; four types (convoy/workflow/expansion/aspect)
+- [molecule](concepts/molecule.md) — running bead-tracked instance of a formula (formula : molecule :: class : instance)
+- [wisp](concepts/wisp.md) — ephemeral bead in the `wisps` table; TTL-compactable; promotion-gated
+- [directive](concepts/directive.md) — operator-provided role override; concatenated town-then-rig; injected at prime time
+- [identity](concepts/identity.md) — agent identity system; `detectSender()` chain; `GT_ROLE` / `GT_RIG` / agent bead / session name
+
+### Workflows (Batch 6 — Layer f)
+
+Multi-step flows that cross packages and roles.
+
+- [convoy-launch](workflows/convoy-launch.md) — stage → launch → initial dispatch → watch subscription → reactive continuation → Deacon safety-net polling → refinery merges → last-merge landing
+- [polecat-lifecycle](workflows/polecat-lifecycle.md) — name allocation → worktree + bead → session spawn + hook → working → `gt done` → Witness POLECAT_DONE → refinery merges → idle or nuke → zombie detection
+
 ### Files
 
 - [Makefile](files/makefile.md) — canonical build recipe; produces `gt`, `gt-proxy-server`, `gt-proxy-client` with the `BuiltProperly` ldflag

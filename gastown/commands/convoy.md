@@ -16,10 +16,11 @@ tags: [command, work, convoy, polecat-safe, tracking, batch, merge-queue]
 
 # gt convoy
 
-Manage convoys — persistent tracking units for batched work that
-span issues, rigs, and merge strategies. The top-level parent for 12
-subcommands implementing the convoy lifecycle, plus an interactive
-TUI view.
+Manage [convoys](../concepts/convoy.md) — persistent tracking units
+for batched work that span issues, [rigs](../concepts/rig.md), and
+merge strategies. The top-level parent for 12 subcommands
+implementing the [convoy lifecycle](../workflows/convoy-launch.md),
+plus an interactive TUI view.
 
 **Parent:** [gt](../binaries/gt.md) (root command)
 **Group:** `GroupWork` ("Work Management") (`convoy.go:167`)

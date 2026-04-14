@@ -375,8 +375,10 @@ Tiny file. One public function:
 Source: `/home/kimberly/repos/gastown/internal/config/overseer.go`.
 
 Loads and manages `mayor/overseer.json`: the human who operates the
-town, distinct from AI agents. Fields: `Name`, `Email`, `Username`,
-`Source` (how identity was detected).
+town, distinct from AI agents (see the
+[identity concept page](../concepts/identity.md) for the agent side
+of the same system). Fields: `Name`, `Email`, `Username`, `Source`
+(how identity was detected).
 
 **Public API:**
 

@@ -20,15 +20,16 @@ tags: [command, workspace, crew, domain-noun, session, tmux, beads-exempt]
 
 # gt crew
 
-Manage **crew workers** — persistent, user-managed workspaces for
-human developers (or long-lived agent sessions) on top of a rig.
-Unlike polecats, crew workspaces are full git clones and do not
-auto-clean.
+Manage [**crew workers**](../roles/crew.md) — persistent,
+user-managed workspaces for human developers (or long-lived agent
+sessions) on top of a [rig](../concepts/rig.md). Unlike
+[polecats](../roles/polecat.md), crew workspaces are full git
+clones and do not auto-clean.
 
-This page documents the `gt crew` CLI subcommands. The "crew worker"
-concept as a persona — how crew members integrate with mail,
-nudges, beads, and cross-rig identity — will get a dedicated
-role/concept page in a later batch (pending Batch 6).
+This page documents the `gt crew` CLI subcommands; see the
+[Crew role page](../roles/crew.md) for persona details and how
+crew members integrate with mail, nudges, beads, and cross-rig
+identity.
 
 **Parent:** [gt](../binaries/gt.md) (root command)
 **Group:** `GroupWorkspace` ("Workspace") (`crew.go:31`)

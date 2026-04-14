@@ -12,11 +12,11 @@ tags: [command, agents, witness, tmux, per-rig, polecat-monitor, lifecycle]
 
 # gt witness
 
-Lifecycle commands for the Witness — the per-rig polecat health
-monitor. One Witness per rig. This page documents the `gt witness`
-CLI subcommands only; the Witness as a persona (its patrol loop,
-its decision logic, its interaction with the Mayor/Deacon) is
-pending a dedicated role page.
+Lifecycle commands for the [Witness](../roles/witness.md) — the
+per-rig polecat health monitor. One Witness per
+[rig](../concepts/rig.md). This page documents the `gt witness`
+CLI subcommands only; see the [Witness role page](../roles/witness.md)
+for patrol loop, decision logic, and interaction with Mayor/Deacon.
 
 **Parent:** [gt](../binaries/gt.md) (root command)
 **Group:** `GroupAgents` ("Agent Management") (`witness.go:26`)

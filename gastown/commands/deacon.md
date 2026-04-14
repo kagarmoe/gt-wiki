@@ -12,11 +12,12 @@ tags: [command, agents, deacon, tmux, patrol, watchdog, heartbeat, health-check,
 
 # gt deacon
 
-Lifecycle and operations commands for the Deacon — the town-level
-watchdog that receives mechanical heartbeats from the daemon and
-watches all rigs. This page documents the `gt deacon` CLI
-subcommands only; the Deacon's role as a persona is pending a
-dedicated role page.
+Lifecycle and operations commands for the
+[Deacon](../roles/deacon.md) — the town-level watchdog that
+receives mechanical heartbeats from the daemon and watches all
+rigs. This page documents the `gt deacon` CLI subcommands only;
+see the [Deacon role page](../roles/deacon.md) for persona
+details and patrol semantics.
 
 **Parent:** [gt](../binaries/gt.md) (root command)
 **Group:** `GroupAgents` ("Agent Management") (`deacon.go:35`)

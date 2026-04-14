@@ -12,12 +12,12 @@ tags: [command, agents, refinery, merge-queue, per-rig, mq, lifecycle]
 
 # gt refinery
 
-Lifecycle and queue-inspection commands for the Refinery — the
-per-rig merge queue processor. One Refinery per rig. This page
-documents the `gt refinery` CLI subcommands only; the Refinery as a
-persona (its conflict-handling logic, its interaction with
-polecats/mayor, the merge protocol) is pending a dedicated role
-page.
+Lifecycle and queue-inspection commands for the
+[Refinery](../roles/refinery.md) — the per-rig merge queue
+processor. One Refinery per [rig](../concepts/rig.md). This page
+documents the `gt refinery` CLI subcommands only; see the
+[Refinery role page](../roles/refinery.md) for conflict handling,
+interaction with polecats/mayor, and the merge protocol.
 
 **Parent:** [gt](../binaries/gt.md) (root command)
 **Group:** `GroupAgents` ("Agent Management") (`refinery.go:31`)

@@ -12,10 +12,11 @@ tags: [command, agents, dog, kennel, infrastructure, cross-rig, deacon, dispatch
 
 # gt dog
 
-Manage dogs — reusable, cross-rig infrastructure workers that live
-in the kennel at `~/gt/deacon/dogs/` and are dispatched by the
-Deacon. This page documents the `gt dog` CLI surface; the Dog
-concept itself is pending a dedicated role page.
+Manage [dogs](../roles/dog.md) — reusable, cross-rig infrastructure
+workers that live in the kennel at `~/gt/deacon/dogs/` and are
+dispatched by the [Deacon](../roles/deacon.md). This page documents
+the `gt dog` CLI surface; see the [Dog role page](../roles/dog.md)
+for persona details.
 
 **Parent:** [gt](../binaries/gt.md) (root command)
 **Group:** `GroupAgents` ("Agent Management") (`dog.go:48`)

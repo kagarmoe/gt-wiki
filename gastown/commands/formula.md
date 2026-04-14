@@ -13,9 +13,10 @@ tags: [command, work, formula, molecule, workflow, bd-wrapper]
 
 # gt formula
 
-Manage workflow formulas — reusable molecule templates (TOML/JSON
-files) that define workflow steps, variables, and composition rules.
-Parent to four subcommands: `list`, `show`, `run`, `create`.
+Manage [workflow formulas](../concepts/formula.md) — reusable
+[molecule](../concepts/molecule.md) templates (TOML/JSON files) that
+define workflow steps, variables, and composition rules. Parent to
+four subcommands: `list`, `show`, `run`, `create`.
 
 **Also known as:** `gt formulas` (alias, `formula.go:40`).
 **Parent:** [gt](../binaries/gt.md) (root command)

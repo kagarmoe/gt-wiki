@@ -40,8 +40,9 @@ store.
 **Imports (notable):** `github.com/go-sql-driver/mysql` (direct MySQL
 protocol driver), `github.com/gofrs/flock` (start lock),
 `gopkg.in/yaml.v3` (reading/writing `config.yaml`),
-[`internal/beads`](beads.md) (beadsDir resolution for per-rig
-databases), [`internal/config`](config.md) (town config for rig enum),
+[`internal/beads`](beads.md) (beadsDir resolution for
+per-[rig](../concepts/rig.md) databases),
+[`internal/config`](config.md) (town config for rig enum),
 `internal/style` (user-facing output), [`internal/util`](util.md)
 (process-group detach). Standard library uses
 `database/sql`, `encoding/json`, `net`, `net/http` (for DoltHub API),

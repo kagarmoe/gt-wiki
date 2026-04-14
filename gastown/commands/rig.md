@@ -19,14 +19,15 @@ tags: [command, workspace, rig, domain-noun, lifecycle, beads-exempt]
 
 # gt rig
 
-Manage **rigs** — the project containers that hold a cloned source
-repo, agent workspaces (Witness, Refinery, Mayor clone), crew
-workspaces, polecat workspaces, and rig-level beads tracking.
+Manage [**rigs**](../concepts/rig.md) — the project containers that
+hold a cloned source repo, agent workspaces
+([Witness](../roles/witness.md), [Refinery](../roles/refinery.md),
+[Mayor](../roles/mayor.md) clone), [crew](../roles/crew.md)
+workspaces, [polecat](../roles/polecat.md) workspaces, and
+rig-level beads tracking.
 
-This page documents the `gt rig` CLI surface. The "rig" as a
-domain concept — what a rig is in Gas Town's mental model, its
-lifecycle states, its relationship to the town HQ — will get a
-dedicated concept page (pending Batch 6).
+This page documents the `gt rig` CLI surface; see the
+[rig concept page](../concepts/rig.md) for the domain model.
 
 **Parent:** [gt](../binaries/gt.md) (root command)
 **Group:** `GroupWorkspace` ("Workspace") (`rig.go:38`)

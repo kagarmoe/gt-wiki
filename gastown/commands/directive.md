@@ -13,10 +13,12 @@ tags: [command, configuration, directives, stub-parent]
 
 # gt directive
 
-Parent command for managing operator-provided role directives. In the
-mapped source file, `directive` is declared as a parent-only shell —
-the `show`, `edit`, and `list` subcommands advertised in its `Long`
-text are not wired up here.
+Parent command for managing operator-provided role
+[directives](../concepts/directive.md). In the mapped source file,
+`directive` is declared as a parent-only shell — the `show`, `edit`,
+and `list` subcommands advertised in its `Long` text are not wired
+up here. See the [directive concept page](../concepts/directive.md)
+for the config-loader side that actually consumes directive files.
 
 **Parent:** [gt](../binaries/gt.md) (root command)
 **Group:** `GroupConfig` ("Configuration")

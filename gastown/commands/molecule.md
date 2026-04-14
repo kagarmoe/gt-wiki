@@ -13,9 +13,11 @@ tags: [command, work, molecule, polecat-safe, hook, dag, agent-workflow]
 
 # gt molecule
 
-Agent-side molecule workflow commands — attach/detach molecules to an
-agent's hook, show progress through a step DAG, and compress completed
-molecules into digests. The parent `Use` value is actually `mol`, with
+Agent-side [molecule](../concepts/molecule.md) workflow commands —
+attach/detach molecules to an agent's hook, show progress through a
+step DAG, and compress completed molecules into digests. A molecule
+is a running instance of a static [formula](../concepts/formula.md)
+template. The parent `Use` value is actually `mol`, with
 `molecule` as an alias (`molecule.go:16-17`).
 
 **Parent:** [gt](../binaries/gt.md) (root command)

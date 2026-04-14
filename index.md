@@ -47,6 +47,54 @@ Data layer (Batch 5):
 - [mq](gastown/packages/mq.md) — merge-request ID minter (NOT a message queue)
 - [nudge](gastown/packages/nudge.md) — ephemeral file-drop queue for agent prompts
 
+Agent runtime (Batch 6):
+
+- [mayor](gastown/packages/mayor.md) — orchestrator lifecycle + ACP
+- [deacon](gastown/packages/deacon.md) — daemon-tick watchdog
+- [crew](gastown/packages/crew.md) — persistent workers
+- [dog](gastown/packages/dog.md) — cross-rig reusable workers
+- [polecat](gastown/packages/polecat.md) — ephemeral feature workers
+- [refinery](gastown/packages/refinery.md) — per-rig merge queue processor
+- [witness](gastown/packages/witness.md) — polecat health monitor library
+- [reaper](gastown/packages/reaper.md) — wisp/bead TTL cleanup
+- [wisp](gastown/packages/wisp.md) — small utility package
+- [convoy](gastown/packages/convoy.md) — cross-rig work tracking
+- [rig](gastown/packages/rig.md) — rig workspace manager
+- [formula](gastown/packages/formula.md) — formula template loader
+- [plugin](gastown/packages/plugin.md) — Deacon patrol plugin loader
+
+### Roles (Batch 6)
+
+Gas Town agent personas:
+
+- [mayor](gastown/roles/mayor.md) — town-level orchestrator
+- [polecat](gastown/roles/polecat.md) — primary feature-building worker
+- [crew](gastown/roles/crew.md) — persistent user-managed worker
+- [dog](gastown/roles/dog.md) — cross-rig infrastructure worker
+- [deacon](gastown/roles/deacon.md) — town-level watchdog
+- [refinery](gastown/roles/refinery.md) — per-rig merge queue processor
+- [witness](gastown/roles/witness.md) — per-rig polecat health monitor
+- [reaper](gastown/roles/reaper.md) — on-demand cleanup via `mol-dog-reaper`
+
+### Concepts (Batch 6)
+
+Abstract domain ideas:
+
+- [rig](gastown/concepts/rig.md) — workspace abstraction
+- [convoy](gastown/concepts/convoy.md) — cross-rig work-tracking unit
+- [formula](gastown/concepts/formula.md) — static TOML workflow template
+- [molecule](gastown/concepts/molecule.md) — running instance of a formula
+- [wisp](gastown/concepts/wisp.md) — ephemeral bead (TTL-compactable)
+- [directive](gastown/concepts/directive.md) — operator-provided role override
+- [identity](gastown/concepts/identity.md) — agent identity system
+
+### Workflows (Batch 6)
+
+Multi-step flows:
+
+- [convoy-launch](gastown/workflows/convoy-launch.md) — staging → launch → dispatch → merge landing
+- [polecat-lifecycle](gastown/workflows/polecat-lifecycle.md) — name allocation → work → nuke
+
 ### Files
 
 - [Makefile](gastown/files/makefile.md) — canonical build recipe; produces `gt`, `gt-proxy-server`, `gt-proxy-client` with the `BuiltProperly` ldflag

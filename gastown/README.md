@@ -31,7 +31,7 @@ discipline.
   classification, upstream documentation rewrites — all deferred to
   later phases.
 - Reading `docs/` content beyond inventory rows — phase 3.
-- Edits to anything outside `~/repos/wiki/`. `/home/kimberly/repos/gastown/`
+- Edits to anything outside `~/repos/gt-wiki/`. `/home/kimberly/repos/gastown/`
   is read-only reference.
 
 ## Working model

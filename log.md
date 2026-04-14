@@ -1472,3 +1472,38 @@ landed. Coverage by layer:
 **Phase 2 (mapping) complete. Phase 3 (drift / gap analysis) is the next major phase, awaiting controller direction.**
 
 → [gastown/inventory/docs-tree.md](gastown/inventory/docs-tree.md)
+
+## [2026-04-14] drift-found | docs/agent-provider-integration.md vs code
+
+Docs accurately describe agent integration tiers (0-3) and JSON registry schema (version 1, agents map). Code implements via AgentRegistry struct, LoadAgentRegistry() merges user JSON with built-in presets. Built-ins cover Claude/Gemini/etc. as examples. Templates exist for OpenCode JSON generation. No major drift. Minor: Gas City mentioned as "upcoming" but no code exists (forward-looking only).
+
+## [2026-04-14] drift-found | docs/CLEANUP.md vs code
+
+Docs claim `gt done` 'pushes branch, submits MR (by default), self-nukes worktree, kills own session'. Code post-gt-4ac/gt-hdf8 transitions polecat to IDLE with sandbox preserved; nuke is explicit action. Other cleanup commands (gt cleanup, gt orphans, gt polecat nuke, etc.) match wiki descriptions.
+
+## [2026-04-14] decision | wiki renamed from ~/repos/wiki to ~/repos/gt-wiki
+
+Wiki repo renamed and published as [kagarmoe/gt-wiki](https://github.com/kagarmoe/gt-wiki). The rename reflects a scope decision: this wiki stays focused on gastown and is being opened to the gastown community as an unofficial code-grounded map of `gastownhall/gastown`; Kimberly's personal notes will live in a separate repo when she starts it. The name `gt-wiki` distinguishes it from GitHub's per-repo wiki feature (`gastownhall/gastown.wiki`) and from any future adoption by the gastownhall org.
+
+**Rename steps completed (commits `d0007a2`, `df5cbb7`):**
+
+- GitHub repo renamed `kagarmoe/wiki` → `kagarmoe/gt-wiki` (auto-redirects old URLs for ~30 days).
+- Local directory `~/repos/wiki` → `~/repos/gt-wiki`.
+- Git remote set to `git@github.com:kagarmoe/gt-wiki.git`.
+- Auto-memory dir `~/.claude/projects/-home-kimberly-repos-wiki` → `~/.claude/projects/-home-kimberly-repos-gt-wiki`.
+- Three tracked files rewritten to use the new path: [CLAUDE.md](CLAUDE.md) (schema directory-layout tree + bd conventions example + permission scoping prose), [.claude/settings.local.json](.claude/settings.local.json) (Write/Edit scope rules), [gastown/binaries/gt-proxy-client.md](gastown/binaries/gt-proxy-client.md) (1 absolute-path reference).
+- Community-publishing scaffolding added in `df5cbb7`: `LICENSE` (CC BY 4.0), top-level `README.md` framing the wiki as unofficial and pointing at `index.md`, `CONTRIBUTING.md` summarizing the schema rules for human contributors.
+
+**Follow-up rewrites in this commit:**
+
+- [gastown/README.md](gastown/README.md) — one stale `~/repos/wiki/` reference in the "explicitly out of scope" section updated to `~/repos/gt-wiki/`.
+- Memory files under `~/.claude/projects/-home-kimberly-repos-gt-wiki/memory/` rewritten: `MEMORY.md` index entries, `reference_wiki.md` (frontmatter `name` field, entry-point paths, permissions path, history line added), `user_directory_convention.md` (frontmatter `description`, directory bullet, findings bullet, history line added).
+
+**Explicitly NOT rewritten:**
+
+- `log.md` historical entries at lines 12 and 15 (inside the 2026-04-11 `decision | wiki scaffolded` entry) still reference `~/repos/wiki/` because the log is append-only per the schema rule at `log.md:204-207`: "Historical log entries above are preserved as written." They describe what happened at the time, including the then-current path. This decision entry is the forward-looking replacement.
+- `.claude/plans/2026-04-11-gastown-map.md` (gitignored) still contains old-path references. Phase 2 is complete; the plan file is historical and does not drive current work.
+
+**Why this matters for Phase 3:** future sessions priming off `MEMORY.md` or `bd remember` queries will now consistently see `~/repos/gt-wiki`. Anyone reading the log from the top will see the 2026-04-11 original path, then this 2026-04-14 rename decision, then the current-state Phase 3 work that follows.
+
+→ [gastown/README.md](gastown/README.md), [CLAUDE.md](CLAUDE.md), [README.md](README.md), [CONTRIBUTING.md](CONTRIBUTING.md), [LICENSE](LICENSE), [gastown/binaries/gt-proxy-client.md](gastown/binaries/gt-proxy-client.md)

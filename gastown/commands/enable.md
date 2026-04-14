@@ -81,14 +81,16 @@ by downstream checks that read the combined env + state.
 - [shell.md](shell.md) — `shell install` also calls `state.Enable(Version)`
   (`shell.go:72`) as a side effect so installing shell hooks implicitly
   re-enables Gas Town.
+- [../packages/state.md](../packages/state.md) — the XDG-compliant
+  `~/.local/state/gastown/state.json` toggle store this command writes.
 - [../binaries/gt.md](../binaries/gt.md) — parent binary.
 - [README.md](README.md) — command tree index.
 
 ## Notes / open questions
 
 - `state.Enable` signature takes a version string, which implies the
-  state file records the version that last toggled it. Worth a
-  `packages/state.md` page to enumerate the full schema.
+  state file records the version that last toggled it. See
+  [../packages/state.md](../packages/state.md) for the full schema.
 - The three behaviors listed in the success output are advertised
   rather than verified here — the actual code paths that check the
   enabled flag live in other commands (`prime`, shell hooks, session

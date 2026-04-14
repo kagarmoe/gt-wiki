@@ -110,6 +110,9 @@ All flags are defined on `activity emit` (`activity.go:75-85`), not on
 - [log](log.md) — the complementary townlog command; `townlog` events and
   `.events.jsonl` events are distinct streams both surfaced by
   [audit](audit.md).
+- [../packages/activity.md](../packages/activity.md) — the
+  activity-tracking color/age classification library used by the
+  status/feed readers on the same event stream.
 - [../binaries/gt.md](../binaries/gt.md) — parent binary and
   `persistentPreRun` context.
 - [README.md](README.md) — command tree index.

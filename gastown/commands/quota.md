@@ -234,6 +234,8 @@ non-init order.)
 - [scheduler](./scheduler.md) — adjacent scheduling primitives
 - [feed](./feed.md) — observability stream that may consume rotation
   events
+- [../packages/quota.md](../packages/quota.md) — the Claude Code
+  rate-limit detection + Keychain token rotation library (darwin-only).
 
 ## Notes / open questions
 

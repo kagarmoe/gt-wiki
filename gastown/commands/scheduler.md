@@ -155,3 +155,6 @@ type scheduledBeadInfo struct {
   [mountain](mountain.md) (convoy + enhanced monitoring),
   [ready](ready.md) (town-wide readiness view used by the
   dispatcher).
+- **Related package.** [../packages/scheduler.md](../packages/scheduler.md)
+  — pure scheduling functions live in the `capacity/` subpackage
+  (the `internal/scheduler` namespace itself has 0 Go files).

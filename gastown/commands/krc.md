@@ -170,6 +170,8 @@ and prints:
   scheduler that calls `gt krc prune --auto` on a timer.
 - [health](health.md) — `formatBytes` is shared between the two
   commands (same package).
+- [../packages/krc.md](../packages/krc.md) — the TTL pruner library
+  and forensic decay model that this command drives.
 - [../binaries/gt.md](../binaries/gt.md) — root.
 
 ## Notes / open questions

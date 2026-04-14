@@ -76,6 +76,11 @@ Long-running processes (Batch 8):
 - [tmux](gastown/packages/tmux.md) — tmux wrapper library (~150 methods)
 - [runtime](gastown/packages/runtime.md) — agent-runtime integration helpers
 
+Supporting libraries (Batch 9 — 24 packages):
+
+- [acp](gastown/packages/acp.md) — Agent Client Protocol proxy
+- [activity](gastown/packages/activity.md), [agentlog](gastown/packages/agentlog.md), [constants](gastown/packages/constants.md), [estop](gastown/packages/estop.md), [feed](gastown/packages/feed.md), [git](gastown/packages/git.md), [github](gastown/packages/github.md), [hooks](gastown/packages/hooks.md), [hookutil](gastown/packages/hookutil.md), [krc](gastown/packages/krc.md), [protocol](gastown/packages/protocol.md), [quota](gastown/packages/quota.md), [scheduler](gastown/packages/scheduler.md), [shell](gastown/packages/shell.md), [state](gastown/packages/state.md), [suggest](gastown/packages/suggest.md), [templates](gastown/packages/templates.md), [testutil](gastown/packages/testutil.md), [townlog](gastown/packages/townlog.md), [tui](gastown/packages/tui.md), [wasteland](gastown/packages/wasteland.md), [web](gastown/packages/web.md), [wrappers](gastown/packages/wrappers.md)
+
 ### Roles (Batch 6)
 
 Gas Town agent personas:

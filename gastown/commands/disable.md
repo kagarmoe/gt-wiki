@@ -92,6 +92,8 @@ current session only, bypassing the persistent disabled flag.
 - [uninstall.md](uninstall.md) — full removal; calls `shell.Remove()`
   among other things. `disable --clean` is a softer subset that
   preserves workspace, state dirs, wrappers.
+- [../packages/state.md](../packages/state.md) — the XDG-compliant
+  toggle store `state.Disable()` writes.
 - [../binaries/gt.md](../binaries/gt.md) — parent binary.
 - [README.md](README.md) — command tree index.
 

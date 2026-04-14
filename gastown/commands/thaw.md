@@ -137,3 +137,5 @@ thaw — a rig removed mid-freeze leaves its sessions stuck in the
 - [status](./status.md) — surfaces E-stop state via
   `addEstopToStatus` in the same source file
   (`estop.go:367-398`)
+- [../packages/estop.md](../packages/estop.md) — the shared sentinel-file
+  primitives that both `estop` and `thaw` manipulate.

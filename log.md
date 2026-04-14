@@ -1289,3 +1289,47 @@ Mapped the process infrastructure that keeps Gas Town running.
 **Next batch:** Batch 9 — Layer (i) Supporting libraries (~24 small packages).
 
 → [gastown/packages/daemon.md](gastown/packages/daemon.md), [tmux](gastown/packages/tmux.md), [runtime](gastown/packages/runtime.md), [gastown/README.md](gastown/README.md), [index.md](index.md)
+
+## [2026-04-11] ingest | Batch 9 (Layer i: Supporting libraries — 24 package pages)
+
+Largest batch by package count. 24 small-to-medium packages mapped across three content subagents.
+
+**Packages mapped:**
+
+- **Substantial (Sub A):** [acp](gastown/packages/acp.md), [hooks](gastown/packages/hooks.md), [krc](gastown/packages/krc.md), [protocol](gastown/packages/protocol.md), [quota](gastown/packages/quota.md), [testutil](gastown/packages/testutil.md), [wasteland](gastown/packages/wasteland.md), [web](gastown/packages/web.md)
+- **Mid (Sub B):** [agentlog](gastown/packages/agentlog.md), [constants](gastown/packages/constants.md), [feed](gastown/packages/feed.md), [git](gastown/packages/git.md), [github](gastown/packages/github.md), [shell](gastown/packages/shell.md), [suggest](gastown/packages/suggest.md), [townlog](gastown/packages/townlog.md)
+- **Thin (Sub C):** [activity](gastown/packages/activity.md), [estop](gastown/packages/estop.md), [hookutil](gastown/packages/hookutil.md), [scheduler](gastown/packages/scheduler.md), [state](gastown/packages/state.md), [templates](gastown/packages/templates.md), [tui](gastown/packages/tui.md), [wrappers](gastown/packages/wrappers.md)
+
+**Structural observations:**
+
+- **`scheduler` and `tui` are empty-namespace parents** — both have 0 top-level Go files. `scheduler` code lives in `capacity/` subpackage (4 files, ~540 lines, pure scheduling functions); `tui` has two subpackages (`convoy/` ~650 lines and `feed/` ~4,000 lines). Consolidated into one page each per namespace.
+- **`git` is a 2,300-line subprocess wrapper** with 14 clone permutations, worktree lifecycle, and `.beads`/`.runtime` allowlist awareness for "is this dirty?" classification.
+- **`github` is distinct from `git`** — `github` uses REST+GraphQL HTTP APIs; `git` shells out to `gh` CLI separately. Both are used by Refinery.
+- **`templates` exceeds the wiki's 3-level nesting cap** — `templates/commands/bodies/*.md` is 5 levels deep. Source-tree observation only.
+- **`feed` is close to page-worthy on its own** (4k lines, 14 files under `tui/feed/`) — flagged as a future split candidate.
+
+**Neutral observations:**
+
+- **`protocol.DefaultRefineryHandler.HandleMergeReady` is almost a no-op** — the comment explicitly says the refinery now queries beads directly; MERGE_READY remains as a liveness signal only.
+- **`krc.MinRetainCount` is tracked but unenforced** — both branches compute `result.EventsRetained = len(retained)` the same way.
+- **`quota.validateTokenHTTP` is dead code** — never called from the main path per inline comment; OAuth tokens would always 401 against bare `/v1/messages`.
+- **`web.api.go` hardcodes `gtPath = "gt"`** rather than `os.Executable()` because test binaries would fork-bomb themselves.
+- **`acp.proxy.go` waits only 200ms** for goroutines to exit after shutdown before abandoning them.
+- **`testutil` preserves `BEADS_*` env vars while stripping `BD_*`** — a quiet prefix gotcha.
+- **`agentlog` is NOT Unix-only.** The earlier claim (from Batch 4 telemetry work) about `agent_logging_windows.go` being a no-op referred to the `internal/telemetry/agent_logging_windows.go` file, not the `internal/agentlog` package. `internal/agentlog` is pure stdlib and handles Windows drive-letter paths explicitly. **Correction to an earlier note.**
+- **`git.copy_windows.go:14` explicitly says "This Windows implementation has not been tested on Windows."**
+- **`townlog` parseLogLine deliberately leaves `Context` empty** — one-way round-trip. Callers of `TailEvents`/`FilterEvents` never see event context.
+- **`feed` ZFC has a silent cap** — `tailReadSize = 1 MB` means dedup/aggregation windows exceeding 1 MB start missing earlier events.
+- **`github` client caches `GITHUB_TOKEN` at `NewClient` time** — env rotation doesn't take effect.
+- **`shell.DetectShell` falls through to zsh** for fish/tcsh/pwsh, producing RC edits that won't load correctly.
+- **`feed.mq_source.go` is a deprecated no-op stub** that still exists to satisfy old call sites (mrqueue package was removed).
+- **`hookutil.IsAutonomousRole` uses literal `"boot"`** alongside constants for the other 4 roles — potential future divergence.
+- **`wrappers.go` ABOUTME header lists 2 wrappers**; code installs 3.
+- **`templates` has two command-name substitution paths** — `CmdName()` template func vs. `cli.Name()` ReplaceAll — drift potential.
+- **`estop` is asymmetric** — town-wide Deactivate has a manual-stop guard; per-rig does not.
+
+**Bead `wiki-4pm` closed.**
+
+**Next batch:** Batch 10 — Layer (j) Plugins (`plugins/*`, 14 dirs mostly empty).
+
+→ 24 package pages — see F1/F2 index updates for full list.

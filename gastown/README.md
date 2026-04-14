@@ -156,6 +156,33 @@ Long-running processes (Batch 8 — Layer h):
 - [tmux](packages/tmux.md) — wrapper library for driving tmux under automation; ~150 methods on one `Tmux` struct; cross-platform (Unix + Windows/psmux support)
 - [runtime](packages/runtime.md) — agent-runtime integration helpers (Claude Code, Codex, Copilot, Gemini); per-provider hook settings + startup fallback matrix
 
+Supporting libraries (Batch 9 — Layer i):
+
+- [acp](packages/acp.md) — Agent Client Protocol proxy between IDE clients and Claude Code agents
+- [activity](packages/activity.md) — activity-tracking color/age classification
+- [agentlog](packages/agentlog.md) — AI-agent conversation-log tailer (ClaudeCode + OpenCode adapter)
+- [constants](packages/constants.md) — shared string/duration/emoji constants
+- [estop](packages/estop.md) — town-wide and per-rig emergency-stop sentinel primitives
+- [feed](packages/feed.md) — feed curator daemon; tails `.events.jsonl`, writes `.feed.jsonl`
+- [git](packages/git.md) — 2,300-line subprocess wrapper around git + 14 clone permutations + worktree lifecycle
+- [github](packages/github.md) — REST + GraphQL HTTP client for PR lifecycle (distinct from git's `gh` CLI bridges)
+- [hooks](packages/hooks.md) — Claude hook-settings base + role override merge engine + embedded-template installer
+- [hookutil](packages/hookutil.md) — `IsAutonomousRole` role classifier (single function)
+- [krc](packages/krc.md) — Key Record Chronicle TTL pruner and forensic decay model
+- [protocol](packages/protocol.md) — typed Witness↔Refinery↔Polecat messages over mail
+- [quota](packages/quota.md) — Claude Code rate-limit detection + Keychain token rotation (darwin-only)
+- [scheduler](packages/scheduler.md) — empty-namespace parent; all code in `capacity/` subpackage (pure scheduling functions)
+- [shell](packages/shell.md) — shell-integration installer; zsh/bash `cd` hook script
+- [state](packages/state.md) — XDG-compliant global enable/disable toggle via `~/.local/state/gastown/state.json`
+- [suggest](packages/suggest.md) — did-you-mean command suggestion (weighted similarity scoring)
+- [templates](packages/templates.md) — embedded role/message/CLAUDE.md templates + commands subpackage
+- [testutil](packages/testutil.md) — env-sanitized subprocess builders + Dolt testcontainer lifecycle
+- [townlog](packages/townlog.md) — human-readable agent-lifecycle log writer at `<townRoot>/logs/town.log`
+- [tui](packages/tui.md) — empty-namespace parent; two large subpackages (`convoy/`, `feed/`) totaling ~4.6k lines
+- [wasteland](packages/wasteland.md) — DoltHub federation (Spider Protocol fraud detection, trust tiers)
+- [web](packages/web.md) — dashboard HTTP layer (embedded templates, CSRF API, setup mode)
+- [wrappers](packages/wrappers.md) — `gt-codex`/`gt-gemini`/`gt-opencode` shell-script installer
+
 ### Roles (Batch 6 — Layer f)
 
 Gas Town agent personas — the "characters" with identity, decisions, and autonomy. Each role has a dedicated persona page + a code-side package page.

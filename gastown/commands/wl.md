@@ -120,9 +120,10 @@ version. Likely a TODO.
   [ready](ready.md) for town-wide ready work or
   [scheduler](scheduler.md) for deferred dispatch.
 - **Thin surface, thick service layer.** Almost all logic lives
-  in `internal/wasteland/Service`. A dedicated `packages/wasteland.md`
-  page would be a natural place to document the federation
-  model, the `rigs` table schema, and the fork-and-push flow.
+  in `internal/wasteland/Service` — see
+  [../packages/wasteland.md](../packages/wasteland.md) for the
+  federation model, Spider Protocol fraud detection, trust tiers,
+  the `rigs` table schema, and the fork-and-push flow.
 - **`gt wl browse` and `gt wl leave` are referenced but not
   wired here.** Expect other wl subcommands in sibling files or
   planned but unimplemented.

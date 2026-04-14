@@ -97,6 +97,8 @@ None on any subcommand.
 ## Related
 
 - [gt](../binaries/gt.md) — parent binary.
+- [../packages/shell.md](../packages/shell.md) — the installer package
+  backing every subcommand here; defines the zsh/bash `cd` hook script.
 - [README.md](README.md) — command tree index.
 - [enable.md](enable.md) — `shell install` quietly re-enables via
   `state.Enable(Version)`; `enable` does the same thing without

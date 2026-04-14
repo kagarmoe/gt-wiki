@@ -99,6 +99,8 @@ None (terminal command).
 ## Related
 
 - [internal/daemon package](../packages/daemon.md) — `daemon/dolt-state.json` + the heartbeat counter surfaced by this dashboard are written by the daemon main loop
+- [../packages/web.md](../packages/web.md) — the dashboard HTTP layer
+  itself: embedded templates, CSRF API, setup mode.
 - [feed](feed.md) — the TUI equivalent of the dashboard; both expose
   convoy status and event streams but from different UI surfaces.
 - [../binaries/gt.md](../binaries/gt.md) — parent binary.

@@ -155,6 +155,8 @@ scans for per-rig `ESTOP.<rig>` sentinel files in the town root via
 - [status](./status.md) — calls `addEstopToStatus`
 - [mayor](./mayor.md), [witness](./witness.md) — exempt sessions
   during E-stop
+- [../packages/estop.md](../packages/estop.md) — the sentinel-file
+  primitives (town-wide and per-rig) backing this command.
 
 ## Notes / open questions
 

@@ -143,6 +143,9 @@ Defined in `init()` (`feed.go:30-43`):
 - [log](log.md) — town log reader; feed's `BdActivitySource` and GT
   events source are distinct streams from `logs/town.log`.
 - [dashboard](dashboard.md) — the web-UI equivalent of the feed TUI.
+- [../packages/feed.md](../packages/feed.md) — the `internal/feed`
+  curator daemon that produces `.feed.jsonl` (distinct from the
+  `internal/tui/feed` Bubble Tea package).
 - [../binaries/gt.md](../binaries/gt.md) — parent binary; documents
   the beads-exempt list.
 - [README.md](README.md) — command tree index.

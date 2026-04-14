@@ -1416,3 +1416,59 @@ Mapped the 9 top-level auxiliary directories: `scripts/`, `templates/`,
 **Next batch:** Batch 12 — Layer (l) Documentation tree (inventory-only enrichment of the 60-file `docs/` tree).
 
 → [gastown/inventory/auxiliary.md](gastown/inventory/auxiliary.md), [gastown/files/claude-dir.md](gastown/files/claude-dir.md), [gastown/files/opencode-dir.md](gastown/files/opencode-dir.md), [gastown/files/templates-agents.md](gastown/files/templates-agents.md), [gastown/README.md](gastown/README.md), [gastown/inventory/README.md](gastown/inventory/README.md), [index.md](index.md)
+
+## [2026-04-11] ingest | Batch 12 (Layer l: Documentation tree enrichment — 60 topics)
+
+Final batch of the gastown-map plan. Per plan, this phase produces
+**no new wiki pages** — only inventory enrichment. Read the first
+~30-50 lines of each of the 60 files under `docs/` and added a
+"topic" column to every row in `gastown/inventory/docs-tree.md`.
+Topics are factual extracts from H1 / first-paragraph, not content
+summaries.
+
+**Page updated:**
+
+- [gastown/inventory/docs-tree.md](gastown/inventory/docs-tree.md) — 60 rows across 10 subdirectory tables, each now with `lines | topic | path` instead of `lines | path`.
+
+**What was read:** first 30-50 lines of each of the 60 files under
+`/home/kimberly/repos/gastown/docs/`. No file was read in full; no
+content was summarized; no drift was hunted.
+
+**What is NOT here (explicitly deferred):**
+
+- **Content mapping of `docs/` files.** Full reading + comparison
+  to wiki entity pages is phase 3 work (drift / gap analysis).
+- **Cross-references from docs/ files to wiki entity pages.**
+  Phase 3.
+- **Doc-rewrite proposals.** Phase 4.
+
+**Incidental correction:** the previous docs-tree.md claimed the
+root-level `docs/` directory had 13 files, but listed only 12 and
+`find` returns 12. The header now correctly says 12. Running total
+remains 60.
+
+**Bead `wiki-1yv` closed.**
+
+**The gastown-map plan is now COMPLETE.** All 12 batches have
+landed. Coverage by layer:
+
+- Layer (a) Build & packaging — 9 files pages (Batch 1: `ba20e30`)
+- Layer (b) Binaries & entry points — 2 new + gt.md updates (Batch 2: `f80bea7`)
+- Layer (c) Command layer — 111 top-level commands across 7 sub-batches (Batches 3a–3h: `f1c2d78` → `a1afaf9`)
+- Layer (d) Platform services — 9 package pages (Batch 4: `b7b89a1`)
+- Layer (e) Data layer — 8 package pages (Batch 5: `edc2ba9`)
+- Layer (f) Agent runtime / domain layer — 30 pages (13 packages + 8 roles + 7 concepts + 2 workflows) (Batch 6: `485a77e`)
+- Layer (g) Diagnostics & health — 4 package pages (Batch 7: `9b76289`)
+- Layer (h) Long-running processes — 3 package pages (Batch 8: `ea50ebb`)
+- Layer (i) Supporting libraries — 24 package pages (Batch 9: `125083c`)
+- Layer (j) Plugins — 2 pages: inventory + dolt-snapshots (Batch 10: `d032c91`)
+- Layer (k) Auxiliary trees — 4 pages (Batch 11: `848f920`)
+- Layer (l) Documentation tree — inventory enrichment only (Batch 12: this commit)
+
+**All 12 batch beads closed.** Four investigation beads (`wiki-9u4` OTEL trace, `wiki-2g3` AnnotationPolecatSafe trace, `wiki-ef3` systematic subcommand mapping, `wiki-13o` proxy binary docs) were closed earlier during the batch execution. Four original scaffolding beads (`wiki-ztf`, `wiki-cqx`, `wiki-0hn`, `wiki-77a` Batch 1) were closed during/before autonomous execution.
+
+**Total wiki page count** (approximate): ~230 pages covering the full gastown code map — binaries, commands, packages, roles, concepts, workflows, files, inventory, plugins.
+
+**Phase 2 (mapping) complete. Phase 3 (drift / gap analysis) is the next major phase, awaiting controller direction.**
+
+→ [gastown/inventory/docs-tree.md](gastown/inventory/docs-tree.md)

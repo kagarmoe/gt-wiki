@@ -32,7 +32,7 @@ sources are never modified — only read.
 ## Directory layout
 
 ```
-~/repos/wiki/
+~/repos/gt-wiki/
   CLAUDE.md          # this file
   AGENTS.md          # agent-facing task-tracking entrypoint (bd integration)
   index.md           # global catalog of all pages
@@ -237,7 +237,7 @@ top of that:**
     of them.
 - **Descriptions must link to wiki pages and source refs:** every bead
   description should name the wiki entity pages it touches (absolute
-  paths, e.g. `~/repos/wiki/gastown/binaries/gt.md`) and cite
+  paths, e.g. `~/repos/gt-wiki/gastown/binaries/gt.md`) and cite
   source-code references in the form `file:line` for anything in
   `~/repos/gastown/`.
 - **Outcome filing:** when closing a bead that produced a finding,
@@ -321,9 +321,9 @@ lint pass says so.
 ## Permission scoping
 
 `.claude/settings.local.json` (gitignored) grants this wiki full
-Read/Write/Edit/Bash permissions within `~/repos/wiki/` and read-only
+Read/Write/Edit/Bash permissions within `~/repos/gt-wiki/` and read-only
 access everywhere else. The LLM owns the wiki and can mutate it freely, but
-treats everything outside `~/repos/wiki/` as reference only.
+treats everything outside `~/repos/gt-wiki/` as reference only.
 
 ## Wiki-specific overrides to the Beads Integration block
 

@@ -198,7 +198,7 @@ The wire-protocol peer (`internal/proxy/exec.go`) is part of the
 ## Notes / open questions
 
 - This binary has no test file (inventory says 1 Go file + 0 tests at
-  `/home/kimberly/repos/wiki/gastown/inventory/go-packages.md:41`).
+  `/home/kimberly/repos/gt-wiki/gastown/inventory/go-packages.md:41`).
   All test coverage of the client/server exchange must live in
   `internal/proxy/e2e_test.go` or the `cmd/gt-proxy-server/config_test.go`
   — not in `cmd/gt-proxy-client/`.

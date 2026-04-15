@@ -1,8 +1,8 @@
-# CLAUDE.md — Wiki Schema
+# CLAUDE.md — Wiki Schema & Coordination
 
-**Schema version:** 1.1 (2026-04-11)
+**Schema version:** 1.2 (2026-04-14)
 
-## Purpose
+## What this is
 
 This is an LLM-maintained knowledge wiki following Karpathy's "LLM Wiki"
 pattern. It's a compounding artifact: findings, cross-references, and
@@ -11,9 +11,7 @@ syntheses accumulate here rather than being re-derived every session.
 **Scope (current):** the `gastown` project — its source code, documentation,
 build system, runtime behavior, and the drift between docs and code.
 
-**Scope (planned):** will grow to cover other repos in `~/repos/`, and may
-eventually absorb content from the personal Obsidian vault at
-`~/Documents/obsidian/`.
+**Scope (planned):** may grow to cover other repos in `~/repos/`.
 
 **Ownership:** the LLM writes and maintains this wiki. Kimberly curates
 sources, directs investigation, asks questions, and reviews changes. Raw
@@ -26,21 +24,30 @@ sources are never modified — only read.
    investigations. Read-only. Source of truth.
 2. **Wiki (this directory):** LLM-owned markdown. Pages, index, log. Fully
    rewriteable.
-3. **Schema (this file):** conventions and workflows. Co-evolves with the
-   wiki as patterns emerge.
+3. **Schema (this file + project-local skills):** conventions and
+   workflows. CLAUDE.md is the slim coordinator; detailed schema reference
+   lives in `.claude/skills/`.
 
 ## Directory layout
 
 ```
 ~/repos/gt-wiki/
-  CLAUDE.md          # this file
+  CLAUDE.md          # this file — slim coordinator
   AGENTS.md          # agent-facing task-tracking entrypoint (bd integration)
+  CONTRIBUTING.md    # community contributor guidelines
+  README.md          # top-level project readme
+  LICENSE            # CC BY 4.0
   index.md           # global catalog of all pages
-  log.md             # chronological event log
+  log.md             # chronological event log (append-only)
   .claude/
     settings.json         # Claude Code settings (committed)
     settings.local.json   # permission scoping; gitignored
-    plans/                # LLM workflow plans; gitignored
+    plans/                # LLM workflow plans; gitignored, per-phase
+    skills/               # project-local skills (triggered runbooks + reference)
+      writing-entity-pages/    # frontmatter, page types, scaffold, drift taxonomy
+      tracking-wiki-work/      # bd conventions + Obsidian Tasks + handoff protocol
+      maintaining-wiki-schema/ # schema evolution, lint workflow, maintenance principles
+      syncing-gastown-updates/ # release-sync runbook (triggered by new gastown tag)
     llm-wiki.md           # Karpathy LLM-wiki pattern reference; gitignored
   .obsidian/         # Obsidian vault config (app.json committed; workspace state gitignored)
   .beads/            # beads issue tracker (config + hooks committed; dolt db + runtime gitignored)
@@ -55,268 +62,65 @@ sources are never modified — only read.
     roles/           # personified agents / positions
     services/        # long-running processes
     workflows/       # multi-step flows
+    plugins/         # plugin-directory pages
+    drift/           # cross-entity drift index + Phase 3 findings aggregation (Phase 3+)
+    inventory/       # A-level enumeration index pages (not entity pages)
     ...              # create additional categories as content arrives
 ```
 
 Sub-folders are created lazily. Don't scaffold empty folders.
 
-**Nesting is capped at 3 levels:** `wiki/<topic>/<category>/<entity>.md`. If
-a page feels like it needs deeper nesting, split the category into sibling
-categories instead.
+## Hard rules (every session)
 
-## Page conventions
+Seven non-negotiable constraints that apply to every wiki work session:
 
-**Naming:** kebab-case filenames matching the entity (`gt.md`,
-`mayor-attach.md`, `gt-proxy-server.md`).
+1. **Code is the only source of truth.** The code at `~/repos/gastown/` is authoritative. Wiki pages, Cobra `Long` help text, `docs/*.md`, and READMEs are all synthesis/derivation and must be verified against code.
+2. **Nesting capped at 3 levels:** `<topic>/<category>/<entity>.md`. If a page feels like it needs deeper nesting, split the category into sibling categories instead.
+3. **Relative markdown links only.** Use `[text](../category/page.md)`, never Obsidian wikilinks (`[[...]]`). External source refs use absolute paths in backticks: `` `/home/kimberly/repos/gastown/internal/cmd/root.go:96-106` ``.
+4. **YAML frontmatter required** on every entity page. See `.claude/skills/writing-entity-pages/` for the full template.
+5. **`log.md` is append-only.** Historical entries are preserved verbatim, even when superseded. Corrections land as new entries, not in-place edits. Grep the timeline with `grep "^## \[" log.md`.
+6. **Kimberly curates; the LLM writes.** Raw sources in `~/repos/gastown/` are read-only. The LLM never modifies source repos.
+7. **Write access is scoped to `~/repos/gt-wiki/`.** Everything outside the wiki is read-only reference. See "Permission scoping" below.
 
-**Wiki-internal links** use relative markdown links:
-`[gt completion](../commands/completion.md)`. Do NOT use Obsidian wikilinks
-(`[[...]]`) — they can't disambiguate when two topics have a page with the
-same basename.
+## Session startup (required reading)
 
-**External source refs** (to files outside the wiki) use absolute paths in
-backticks, optionally with line numbers:
-`/home/kimberly/repos/gastown/internal/cmd/root.go:96-106`. Obsidian cannot
-follow out-of-vault links, so treat these as grep/copy-paste targets rather
-than clickable navigation.
+New session? Read these in order:
 
-### YAML frontmatter (required)
+1. **`log.md` timeline** — `grep "^## \[" log.md | tail -20` to see the last 20 events. The most recent entries tell you what state the investigation is in, what's in progress, what decisions have landed, and what's blocked.
+2. **Active plan** — `ls -t .claude/plans/*.md | head -1` to find the most recent plan file; read it in full. The plan is the authoritative "what are we doing right now" document for whichever phase is active.
+3. **Topic README** under `<topic>/` (currently `gastown/README.md`) — the topic's own scope statement, sub-index, and working-model summary.
+4. **This file (already loaded)** — coordinates the rest. Use the Pointers table below to find operational detail.
 
-Every page starts with frontmatter:
+## Pointers to operational detail
 
-```yaml
----
-title: gt
-type: binary            # see type list below
-status: verified        # verified | partial | stub
-topic: gastown
-created: 2026-04-11
-updated: 2026-04-11
-sources:                # raw source paths this page is grounded in
-  - /home/kimberly/repos/gastown/cmd/gt/
-  - /home/kimberly/repos/gastown/internal/cmd/root.go
-tags: [cli, build]      # free-form, lowercase, kebab-case
----
-```
+The coordination surface. Schema reference, workflows, and decision history live in dedicated artifacts:
 
-Frontmatter is required from day one so Dataview queries work across the
-whole wiki without needing a retrofit pass later.
+| Content | Where it lives |
+|---|---|
+| **Writing / editing entity pages** — frontmatter template, 17 page types, naming + link conventions, 5-section scaffold, drift taxonomy with fix-tier classification, Code → Cobra → Docs authority hierarchy, cross-link discipline, non-retroactive Phase 3 section rule | `.claude/skills/writing-entity-pages/SKILL.md` |
+| **Tracking wiki work** — bd actor (`BEADS_ACTOR=wiki-curator`), label set, bead description format, Obsidian Tasks plugin conventions, cross-tool handoff protocol (`wants-wiki-entry` label, `→ handed to bd-<id>` notation) | `.claude/skills/tracking-wiki-work/SKILL.md` |
+| **Schema evolution + lint + maintenance** — schema version bump policy, lint workflow (orphans, broken links, wiki-stale, stale dates, mention gaps), maintenance principles, common patterns for adding page types/fields/folders | `.claude/skills/maintaining-wiki-schema/SKILL.md` |
+| **Release sync after a new stable gastown release tag** — tag-to-tag delta, scope proposal, per-file audit, commit cadence, batch entry format | `.claude/skills/syncing-gastown-updates/SKILL.md` |
+| **Active phase plan** — current phase's batch decomposition, task-level steps, drift taxonomy (if Phase 3+), PR-delta scoping, review gates | `.claude/plans/` (gitignored; grep for the most recent file) |
+| **Schema decision history** — every `decision` entry in `log.md` is a schema-evolution event. Most recent: `[2026-04-14] decision | Phase 3 schema change: re-enable Docs claim / Drift / Implementation status sections (schema v1.2)` | `log.md` — `grep "decision \|" log.md` |
+| **Event timeline** — `ingest`, `query`, `experiment`, `lint`, `drift-found` entries | `log.md` — `grep "^## \[" log.md` |
+| **Page catalog** | `index.md` |
 
-### Page types (starter set — open for extension)
+## Ingest / Query / Lint workflows
 
-**Code surface:**
+These three workflows remain inline as terse paragraphs. Each will be promoted to its own `.claude/skills/` skill when the workflow grows beyond a single paragraph of guidance.
 
-- `binary` — executables produced by the project
-- `command` — CLI subcommands
-- `package` — source code packages / modules (Go packages, directories)
-- `file` — notable single files (Makefile, Dockerfile, entrypoint scripts)
-- `data-type` — structs, schemas, data shapes
+### Ingest workflow
 
-**Config & runtime surface:**
+When a new source is read (a file, a command output, a doc page): note the source path → read it in full → discuss key takeaways with Kimberly (unless she has delegated) → update or create the entity page for each entity the source touches → update `index.md` if new pages were created → append a `log.md` entry with the `ingest` verb citing sources read and pages touched. Plan: promote to `.claude/skills/ingesting-sources/` when the workflow exceeds one paragraph.
 
-- `config-file` — shapes of config files
-- `env-var` — environment variables
-- `build-target` — Makefile targets, Docker build stages
+### Query workflow
 
-**Design / mental model:**
+When Kimberly asks a question: read `index.md` to find candidate pages → read candidate pages in full (not chunks) → synthesize a code-grounded answer with links to the pages used → if the synthesis is valuable, file it back as a new page under the appropriate category, update `index.md`, and log with the `query` verb. Plan: promote to `.claude/skills/answering-queries/` when the workflow exceeds one paragraph.
 
-- `concept` — abstract ideas
-- `role` — personified agents or positions
-- `service` — long-running processes
-- `workflow` — multi-step flows
+### Lint workflow (summary)
 
-**External:**
-
-- `dependency` — external tools the project relies on
-
-**Meta (investigation artifacts):**
-
-- `experiment` — captured runs, build attempts, test results
-- `drift` — cross-entity drift themes (when docs are broadly wrong)
-- `decision` — design or process decisions made during investigation
-- `note` — freeform synthesis filed back from queries
-
-**This set is open.** When a new kind of thing doesn't fit any existing
-type, add a type to this schema and log the decision in `log.md`. Don't
-force-fit.
-
-### Entity-page starter template (flexible, not a contract)
-
-Required: frontmatter. Recommended: the structure below as a scaffold.
-Allowed: any additional structure the page needs.
-
-```markdown
-# <Title>
-
-## What it actually does
-<code-grounded description with absolute-path file:line references>
-
-## Docs claim
-<what README, docs/, help text say — with source references>
-
-## Drift
-<contradictions between "actually does" and "docs claim">
-
-## Notes / open questions
-```
-
-Drift annotations live **inline on the entity page**, not as separate files.
-Truth and lie stay adjacent. A separate `<topic>/drift/` folder may hold
-cross-entity drift themes ("the whole install story is wrong") without
-double-maintaining per-entity details.
-
-## Ingest workflow
-
-When a new source is read (a file, a command output, a doc page):
-
-1. Note the source path / identifier.
-2. Read it in full.
-3. Discuss key takeaways with Kimberly before writing (unless she has
-   delegated).
-4. For each entity the source touches, update or create the entity page.
-5. If the source is a doc making claims, add those to the entity's "Docs
-   claim" section with a source reference.
-6. Update `index.md` if new pages were created.
-7. Append an entry to `log.md` with the `ingest` verb.
-
-## Query workflow
-
-When Kimberly asks a question:
-
-1. Read `index.md` to find candidate pages.
-2. Read candidate pages in full (not chunks).
-3. Synthesize an answer grounded in wiki content, with links to the pages
-   used.
-4. **If the answer is a valuable synthesis, file it back as a new page**
-   under `<topic>/concepts/` or `<topic>/notes/`, update `index.md`, and log
-   with the `query` verb.
-
-## Lint workflow
-
-Periodically or on request:
-
-- Orphan pages (not linked from `index.md` or any other page)
-- Broken cross-links
-- Claims contradicted by newer sources
-- Stale `updated` dates on pages that should be revisited
-- Entity mentions that should have their own page but don't
-- Gaps that could be filled by reading a specific file
-
-**Lint produces findings, not fixes.** Discuss with Kimberly before acting.
-Log with the `lint` verb.
-
-## Task tracking
-
-Task tracking uses two tools, split by who is doing the work:
-
-### Agent work → beads (`bd`)
-
-Agent investigation threads, follow-ups, and anything a future Claude
-Code session (or Gas Town crew agent) should pick up live in **beads**.
-The wiki has its own embedded `.beads/` database (local dolt), not
-connected to the Gas Town dolt server on port 3307 — the wiki is
-operationally independent.
-
-See `~/repos/CLAUDE.md` for generic `bd` usage (`bd ready`, `bd show`,
-`bd update --claim`, `bd close`, etc.). **Wiki-specific conventions on
-top of that:**
-
-- **Actor:** LLM sessions working on the wiki use
-  `--actor wiki-curator` so audit trails distinguish wiki-curation
-  beads from other work. Set via `BEADS_ACTOR=wiki-curator` in the
-  session env, or pass `--actor wiki-curator` on each command.
-- **Core labels (extend as needed):**
-  - `wiki-investigation` — open investigation thread (verify something,
-    read a source, capture an outcome).
-  - `wiki-content` — a page needs writing or updating.
-  - `drift` — drift-annotation work on an existing page.
-  - `<topic>` — topic scoping (`gastown`, etc.).
-  - `wants-wiki-entry` — handoff from agent to Kimberly (see below).
-  - Free-form tags (e.g. `docker`, `makefile`) are fine when they help
-    narrow a query — add them alongside the core labels, not in place
-    of them.
-- **Descriptions must link to wiki pages and source refs:** every bead
-  description should name the wiki entity pages it touches (absolute
-  paths, e.g. `~/repos/gt-wiki/gastown/binaries/gt.md`) and cite
-  source-code references in the form `file:line` for anything in
-  `~/repos/gastown/`.
-- **Outcome filing:** when closing a bead that produced a finding,
-  append an entry to `log.md` with the appropriate verb (`ingest`,
-  `experiment`, `drift-found`) and update the relevant entity page.
-  The bead closure itself is not a `log.md` entry — the finding is.
-
-### Kimberly's work → Obsidian Tasks plugin
-
-Kimberly's personal tasks (curation decisions, questions to
-investigate, reading queue, things she wants to revisit) live as GFM
-checkboxes **anywhere in the vault**, aggregated via the Obsidian
-**Tasks plugin**.
-
-- Plain `- [ ]` checkboxes are sufficient. Tasks plugin emoji metadata
-  (`📅` due date, `⏫` priority, `🔁` recurrence) is optional.
-- No fixed file location — file tasks wherever they fit (inline on an
-  entity page, in a personal notes file, etc.). Tasks plugin scans the
-  whole vault.
-- Tasks plugin query blocks aggregate on demand:
-
-  ````markdown
-  ```tasks
-  not done
-  sort by priority
-  ```
-  ````
-
-### Cross-tool handoff
-
-The two trackers occasionally hand work off. Use conventions, not a
-sync bridge:
-
-- **Agent → Kimberly:** the agent files a bead normally and adds the
-  `wants-wiki-entry` label. Kimberly surfaces these with
-  `bd list -l wants-wiki-entry`. She either resolves the bead herself
-  and closes it, or promotes it into her Tasks-plugin tracker (and
-  closes the bead with a pointer to where she filed it).
-- **Kimberly → agent:** Kimberly closes her checkbox with a trailing
-  pointer: `- [x] ... → handed to bd-<id>`. She then runs `bd create`
-  with whatever actor makes sense (the default git-user identity is
-  fine for human-originated beads).
-
-**Do not duplicate tasks across trackers.** A task lives in exactly
-one system at a time; handoff moves it across.
-
-## index.md format
-
-One section per topic. Within each section, pages grouped by category, one
-line each with a brief descriptor.
-
-## log.md format
-
-Append-only. Each entry starts with `## [YYYY-MM-DD] <verb> | <subject>` so
-`grep "^## \[" log.md` gives a timeline.
-
-**Verb starter set** (closed for now; loosen later if needed):
-`ingest`, `query`, `experiment`, `lint`, `decision`, `drift-found`.
-
-## Schema evolution
-
-This schema is **version 1.1**. It will change as the wiki grows. Update this
-file when new page types emerge, when conventions start hurting rather than
-helping, or when a better workflow appears. Note schema changes in `log.md`
-with the `decision` verb. Old pages don't need to be retrofitted unless a
-lint pass says so.
-
-## Maintenance principles
-
-- **Don't redo work.** If something has been captured, trust it unless
-  evidence says otherwise.
-- **When evidence contradicts a page, update the page** and note the
-  correction in `log.md`.
-- **Code references anchor truth.** Every "what it actually does" claim
-  should cite `file:line` in the raw source.
-- **Keep pages short and linkable.** Split long pages into sub-pages that
-  reference each other.
-- **Drift is information, not embarrassment.** Record it plainly. The goal
-  is an accurate map.
+Periodically or on request, scan for orphans, broken cross-links, claims contradicted by newer sources, stale `updated:` dates, entity mentions that should have their own page, and gaps that could be filled by reading a specific file. **Produces findings, not fixes.** Discuss with Kimberly before acting. Log with the `lint` verb. Full runbook: `.claude/skills/maintaining-wiki-schema/SKILL.md`.
 
 ## Permission scoping
 
@@ -335,11 +139,11 @@ precedence over the boilerplate:
 **Markdown TODO lists are PERMITTED** for Kimberly's personal task
 tracking via the Obsidian Tasks plugin. The boilerplate rule "do NOT
 use … markdown TODO lists" is scoped to *agent* work (which lives in
-beads), not to human curation work in the vault. See the "Task
-tracking" section above for the wiki's full policy: bd for agents,
-Tasks plugin for Kimberly, with documented cross-tool handoff.
+beads), not to human curation work in the vault. See
+`.claude/skills/tracking-wiki-work/SKILL.md` for the full policy: bd
+for agents, Tasks plugin for Kimberly, with documented cross-tool
+handoff via `wants-wiki-entry` labels.
 
-<!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
 ## Beads Issue Tracker
 
 This project uses **bd (beads)** for issue tracking. Run `bd prime` to see full workflow context and commands.
@@ -384,4 +188,3 @@ bd close <id>         # Complete work
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
-<!-- END BEADS INTEGRATION -->

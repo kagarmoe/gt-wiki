@@ -1,24 +1,34 @@
 ---
 title: gt directive
 type: command
-status: partial
+status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/directive.go
+  - /home/kimberly/repos/gastown/internal/cmd/directive_show.go
+  - /home/kimberly/repos/gastown/internal/cmd/directive_edit.go
+  - /home/kimberly/repos/gastown/internal/cmd/directive_list.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
-tags: [command, configuration, directives, stub-parent]
+tags: [command, configuration, directives]
+phase3_audited: 2026-04-15
+phase3_findings: [wiki-stale]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt directive
 
 Parent command for managing operator-provided role
-[directives](../concepts/directive.md). In the mapped source file,
-`directive` is declared as a parent-only shell — the `show`, `edit`,
-and `list` subcommands advertised in its `Long` text are not wired
-up here. See the [directive concept page](../concepts/directive.md)
-for the config-loader side that actually consumes directive files.
+[directives](../concepts/directive.md). The `show`, `edit`, and `list`
+subcommands advertised in the `Long` text on `directiveCmd` are wired
+up in sibling files — `directive_show.go`, `directive_edit.go`, and
+`directive_list.go`, each of which adds itself to `directiveCmd` in its
+own `init()` (Phase 3 Batch 1b wiki-stale correction: the Phase 2 page
+body incorrectly claimed the subcommands were unwired). See the
+[directive concept page](../concepts/directive.md) for the
+config-loader side that consumes directive files.
 
 **Parent:** [gt](../binaries/gt.md) (root command)
 **Group:** `GroupConfig` ("Configuration")
@@ -31,12 +41,16 @@ for the config-loader side that actually consumes directive files.
 
 ## What it actually does
 
-Source: `/home/kimberly/repos/gastown/internal/cmd/directive.go:7-40`.
+Source: `/home/kimberly/repos/gastown/internal/cmd/directive.go:7-40`
+plus sibling files `directive_show.go`, `directive_edit.go`,
+`directive_list.go`.
 
 ### Invocation
 
 ```
-gt directive <subcommand>
+gt directive show <role> [--rig <name>]
+gt directive edit <role> [--rig <name>] [--town]
+gt directive list
 ```
 
 ### Behavior
@@ -46,8 +60,8 @@ The parent command only enforces that a subcommand is supplied —
 `/home/kimberly/repos/gastown/internal/cmd/directive.go:35`. With no
 arguments, it returns an error and prints help.
 
-Registration is a single call —
-`/home/kimberly/repos/gastown/internal/cmd/directive.go:38-40`:
+`directive.go`'s own `init()` registers only the parent on the root
+(`directive.go:38-40`):
 
 ```go
 func init() {
@@ -55,24 +69,63 @@ func init() {
 }
 ```
 
-No subcommands are added in this file. The `Long` help
-(`directive.go:12-34`) advertises three subcommands — `show`, `edit`,
-`list` — and describes the file layout and resolution strategy, but
-the cobra wiring for them is not in `directive.go`. They are either
-defined in another file not mapped yet or not implemented.
+Each subcommand is defined in its own sibling file and registers
+itself on `directiveCmd` through its own `init()`:
+
+- `directive_show.go:30-33` — `directiveCmd.AddCommand(directiveShowCmd)` + `--rig` flag registration
+- `directive_edit.go:37-41` — `directiveCmd.AddCommand(directiveEditCmd)` + `--rig`, `--town` flag registration
+- `directive_list.go:25-27` — `directiveCmd.AddCommand(directiveListCmd)`
+
+All three are wired at compile time via Go's init ordering — no runtime
+registration or plugin loader is involved. The `Long` text on
+`directiveCmd` at `directive.go:12-34` names the same three
+subcommands and describes the file layout and resolution strategy,
+all of which match the behavior implemented in the sibling files.
 
 ### Subcommands
 
-Advertised by `Long` text (`directive.go:18-22`) but not wired in this
-file:
+#### `show <role>` (`directive_show.go:14-26`, `runDirectiveShow` at `:35-86`)
 
-- `show <role>` — display active directive for a role
-- `edit <role>` — open directive in `$EDITOR`, create if needed
-- `list` — list all directive files
+Displays the resolved directive for a role with source annotation.
+
+1. Validates the role via `isValidRole(role)` against
+   `config.AllRoles()` (`directive_show.go:39-41`, `:107-114`) —
+   errors with the valid-role list on miss.
+2. Resolves the town root and rig name via
+   `resolveDirectiveContext(--rig)` (`directive_show.go:43-46`,
+   `:89-104`); the rig defaults to `detectRigFromPath(townRoot, cwd)`
+   if `--rig` is not passed.
+3. Calls `config.LoadRoleDirective(role, townRoot, rigName)`
+   (`directive_show.go:54`) to get the concatenated directive text.
+4. If empty: prints the "No directive found" message and lists the
+   town and rig paths that were checked (`directive_show.go:55-63`).
+5. Otherwise prints a source-annotated header identifying whether
+   content came from town-only, rig-only, or both
+   (`directive_show.go:70-81`), followed by the directive body.
+
+Takes `--rig <name>` (default: auto-detect).
+
+#### `edit <role>` (`directive_edit.go:14-30`, `runDirectiveEdit` at `:43-...`)
+
+Opens the directive file for a role in `$EDITOR`. Creates the
+containing directory and file if they don't exist. By default edits
+the rig-level directive when a rig is detected, falling back to the
+town-level directive. `--town` forces editing the town-level file
+even inside a rig.
+
+Takes `--rig <name>` and `--town` flags.
+
+#### `list` (`directive_list.go:13-23`, `runDirectiveList` at `:29-...`)
+
+Walks the town and per-rig `directives/` directories and prints each
+found directive file with its scope (town or rig) and role.
+
+Takes no flags.
 
 ### Flags
 
-None declared on the parent command.
+None on the parent command itself; each subcommand declares its own
+flags in its sibling file's `init()`.
 
 ### Directive file layout (per Long text)
 
@@ -95,13 +148,21 @@ None declared on the parent command.
 
 ## Notes / open questions
 
-- **Missing subcommand wiring.** `directive.go:38-40` does not call
-  `directiveCmd.AddCommand(...)` for `show`, `edit`, or `list`. A
-  follow-up read should grep the rest of `internal/cmd/` for
-  `directiveCmd.AddCommand` to find where (or if) they are registered.
+- **Phase 3 Batch 1b wiki-stale correction (2026-04-15):** the Phase 2
+  body of this page claimed `show`, `edit`, and `list` were "not wired
+  up here" and speculated they were "either defined in another file
+  not mapped yet or not implemented." Re-read at gastown HEAD
+  `9f962c4a` confirmed they ARE wired, via sibling files
+  (`directive_show.go`, `directive_edit.go`, `directive_list.go`),
+  each registering itself on `directiveCmd` in its own `init()`. The
+  body above has been rewritten to reflect the actual wiring; the
+  original Phase 2 description was incorrect at Phase 2 time (the
+  sibling files already existed at v1.0.0) rather than drift against
+  later churn.
 - The `Long` text claims directives "override formula defaults where
   they conflict" — no code-grounded reference yet for how that override
-  actually happens.
+  actually happens. Tracing from `config.LoadRoleDirective`
+  (`directive_show.go:54`) would answer it.
 - A full understanding of `directive` needs an entity page for the
   `prime` consumer path and a concept page for directives generally
   (not yet written).

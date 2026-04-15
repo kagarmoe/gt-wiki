@@ -4,11 +4,15 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/plugin.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
 tags: [command, configuration, plugins, deacon, patrol]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt plugin
@@ -158,6 +162,51 @@ Declared in `init()` (`plugin.go:138-156`):
 | `--clean`           | `sync`             | bool   | `false` | Remove target plugins that don't exist in source     |
 | `--limit`           | `history`          | int    | `10`    | Max runs to show                                     |
 
+## Docs claim
+
+### Source
+- `/home/kimberly/repos/gastown/internal/cmd/plugin.go:36-54` — Cobra `Long` text on the parent `pluginCmd` (gate-type enumeration).
+- `/home/kimberly/repos/gastown/internal/cmd/plugin.go:92-100` — Cobra `Long` text on `pluginRunCmd` (gate-check behavior).
+
+### Verbatim
+
+Parent `pluginCmd.Long` (`plugin.go:36-54`):
+
+> Manage plugins that run during Deacon patrol cycles.
+>
+> Plugins are periodic automation tasks defined by plugin.md files with TOML frontmatter.
+>
+> PLUGIN LOCATIONS:
+>   ~/gt/plugins/           Town-level plugins (universal, apply everywhere)
+>   <rig>/plugins/          Rig-level plugins (project-specific)
+>
+> GATE TYPES:
+>   cooldown    Run if enough time has passed (e.g., 1h)
+>   cron        Run on a schedule (e.g., "0 9 * * *")
+>   condition   Run if a check command returns exit 0
+>   event       Run on events (e.g., startup)
+>   manual      Never auto-run, trigger explicitly
+
+`pluginRunCmd.Long` (`plugin.go:92-100`):
+
+> Manually trigger a plugin to run.
+>
+> By default, checks if the gate would allow execution and informs you
+> if it wouldn't. Use --force to bypass gate checks.
+
+## Drift
+
+See forward-link: [../drift/README.md](../drift/README.md).
+
+### `plugin run` gate check is cooldown-only; other gate types silently fall through as open
+
+- **Claim source:** Cobra `Long` text at `/home/kimberly/repos/gastown/internal/cmd/plugin.go:94-95` — "By default, checks if the gate would allow execution and informs you if it wouldn't." The parent `pluginCmd.Long` at `plugin.go:44-49` enumerates five gate types (`cooldown`, `cron`, `condition`, `event`, `manual`) with semantic descriptions, building the expectation that `plugin run` understands all five.
+- **Code does:** `runPluginRun` at `/home/kimberly/repos/gastown/internal/cmd/plugin.go:425-442` checks gate status only when `p.Gate != nil && p.Gate.Type == plugin.GateCooldown`. For any other gate type — `GateCron`, `GateCondition`, `GateEvent`, `GateManual` — the `gateOpen = true` initialization (`plugin.go:426`) stands unchanged, so the gate-closed short-circuit at `plugin.go:458-462` never fires and the plugin always runs. There is no schedule parsing, no `check` command execution, no event-match check, and no "manual gate is closed unless you pass --force" behavior. Users who type `gt plugin run <cron-gated-plugin>` get the plugin's instructions echoed out regardless of the cron schedule; the same for `condition`, `event`, and `manual` gates. Only `cooldown` gates are actually enforced; the `--force` flag at `plugin.go:428` is effectively a no-op for the other four gate types (they were already "open").
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — rewrite `pluginRunCmd.Long` at `plugin.go:92-100` to reflect the actual behavior: gate enforcement is cooldown-only, and other gate types are treated as always-open by the manual-run path. Alternatively, extend `runPluginRun` at `plugin.go:425-442` to handle the other gate types (larger scope). The minimal fix is the `Long` text rewrite; the behavior change is a follow-up if Gas Town wants `gt plugin run` to honor all gate types.
+- **Release position:** `in-release` (`pluginRunCmd.Long` and the cooldown-only gate switch at `plugin.go:425-442` both byte-identical at `v1.0.0:internal/cmd/plugin.go`).
+
 ## Related
 
 - [gt](../binaries/gt.md) — parent binary.
@@ -187,12 +236,7 @@ Declared in `init()` (`plugin.go:138-156`):
   there is no code path from `gt plugin run` back to the recorder
   to amend the record. History will be falsely optimistic. Noted
   neutrally.
-- **Gate semantics beyond cooldown are not enforced by `run`.**
-  Only `GateCooldown` is checked (`plugin.go:428`). `cron`,
-  `condition`, `event`, `manual` all fall through `gateOpen = true`
-  and the plugin runs unconditionally. This may be intentional for
-  the manual `gt plugin run` path (the user is explicitly bypassing
-  gates) but is not documented.
+- **Gate semantics beyond cooldown are not enforced by `run`.** → promoted to `## Drift` above (`plugin run` cobra-drift finding).
 - **Sync auto-detection** (`plugin.FindGastownSource`) is a black
   box from this file. A `packages/plugin.md` page should enumerate
   the search order and fallback rules.

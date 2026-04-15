@@ -4,11 +4,15 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/config.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
 tags: [command, configuration, town-settings, agents, scheduler, lifecycle, cost-tier]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt config
@@ -214,6 +218,53 @@ Declared in `init()` (`config.go:1259-1261`):
 |--------------|--------------------------------|--------|---------|---------------------------------------------------------------|
 | `--json`     | `agent list`, `default-agent list` | bool   | `false` | JSON output                                                   |
 | `--provider` | `agent set`                    | string | `""`    | Agent provider preset (inferred from command basename if set) |
+
+## Docs claim
+
+### Source
+- `/home/kimberly/repos/gastown/internal/cmd/config.go:693-723` — Cobra `Long` text on `configGetCmd`.
+
+### Verbatim
+
+> Get a town configuration value using dot-notation keys.
+>
+> Supported keys:
+>   convoy.notify_on_complete   Push notification to Mayor session on convoy
+>                               completion (true/false, default: false)
+>   cli_theme                   CLI color scheme
+>   default_agent               Default agent preset name
+>   scheduler.max_polecats      Dispatch mode (-1 = direct, N > 0 = deferred)
+>   scheduler.batch_size        Beads per heartbeat
+>   scheduler.spawn_delay       Delay between spawns
+>   maintenance.window          Maintenance window start time (HH:MM)
+>   maintenance.interval        How often: daily, weekly, monthly, or duration
+>   maintenance.threshold       Commit count threshold
+>
+>   Lifecycle (Dolt data maintenance):
+>   lifecycle.reaper.enabled     Wisp reaper enabled (true/false)
+>   lifecycle.reaper.interval    Reaper check interval
+>   lifecycle.reaper.delete_age  Duration before closed wisps are deleted
+>   lifecycle.compactor.enabled  Compactor dog enabled (true/false)
+>   lifecycle.compactor.interval Compactor check interval
+>   lifecycle.compactor.threshold Commit count threshold for compaction
+>   lifecycle.doctor.enabled     Doctor dog enabled (true/false)
+>   lifecycle.doctor.interval    Doctor check interval
+>   lifecycle.backup.enabled     JSONL + Dolt backups enabled (true/false)
+>   lifecycle.backup.interval    Backup interval
+
+## Drift
+
+See forward-link: [../drift/README.md](../drift/README.md).
+
+### `config get` `Long` text omits `dolt.port` from its Supported keys list
+
+- **Claim source:** Cobra `Long` text at `/home/kimberly/repos/gastown/internal/cmd/config.go:695-705` (the `Supported keys:` block of `configGetCmd`).
+- **Docs claim:** the `configGetCmd` `Long` enumerates its supported keys and does **not** list `dolt.port`. `configSetCmd` `Long` at `config.go:648-661` does list `dolt.port` — the asymmetry suggests `get dolt.port` is not supported.
+- **Code does:** `runConfigGet` at `/home/kimberly/repos/gastown/internal/cmd/config.go:896-905` has an explicit `case "dolt.port":` that loads `daemon.LoadPatrolConfig(townRoot)`, reads `GT_DOLT_PORT` from the env section, and falls back to the default `"3307"`. The key is fully supported. Even the `default` branch's error message at `config.go:911` enumerates `dolt.port` in the "Supported keys:" text it prints back to the user, contradicting the `Long` text on the same command.
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — add `dolt.port` to the `Supported keys:` block of `configGetCmd.Long` at `config.go:695-705`, mirroring the `dolt.port` entry in `configSetCmd.Long` at `config.go:653-655`. The code at `config.go:896` and the error message at `config.go:911` are already correct; only the `Long` text is wrong.
+- **Release position:** `in-release` (`configGetCmd.Long` at `v1.0.0:internal/cmd/config.go:693-723` is byte-identical — `dolt.port` also missing — and `runConfigGet`'s `case "dolt.port":` already exists at `v1.0.0:internal/cmd/config.go:896`).
 
 ## Related
 

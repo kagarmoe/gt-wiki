@@ -4,11 +4,15 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/uninstall.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
 tags: [command, configuration, lifecycle, destructive]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt uninstall
@@ -105,6 +109,51 @@ uninstall the `gt` binary — the reinstall hint at `uninstall.go:146`
 tacitly confirms this by telling the user to `go install ... gt`
 before re-running `gt install`.
 
+## Docs claim
+
+### Source
+- `/home/kimberly/repos/gastown/internal/cmd/uninstall.go:29-45` — Cobra `Long` text on `uninstallCmd`.
+- `/home/kimberly/repos/gastown/internal/cmd/uninstall.go:50-51` — `--workspace` flag help text.
+
+### Verbatim
+
+`uninstallCmd.Long` (`uninstall.go:29-45`):
+
+> Completely remove Gas Town from the system.
+>
+> By default, removes:
+>   - Shell integration (~/.zshrc or ~/.bashrc)
+>   - Wrapper scripts (~/bin/gt-codex, ~/bin/gt-gemini, ~/bin/gt-opencode)
+>   - State directory (~/.local/state/gastown/)
+>   - Config directory (~/.config/gastown/)
+>   - Cache directory (~/.cache/gastown/)
+>
+> The workspace (e.g., ~/gt) is NOT removed unless --workspace is specified.
+>
+> Use --force to skip confirmation prompts.
+>
+> Examples:
+>   gt uninstall                    # Remove Gas Town, keep workspace
+>   gt uninstall --workspace        # Also remove workspace directory
+>   gt uninstall --force            # Skip confirmation
+
+`--workspace` flag help (`uninstall.go:50-51`):
+
+> Also remove the workspace directory (DESTRUCTIVE)
+
+## Drift
+
+See forward-link: [../drift/README.md](../drift/README.md).
+
+### `--workspace` is a hardcoded two-location scan, silently no-ops for any other workspace path
+
+- **Claim source:** Cobra `Long` text at `/home/kimberly/repos/gastown/internal/cmd/uninstall.go:38` ("The workspace (e.g., ~/gt) is NOT removed unless --workspace is specified") and the `--workspace` flag description at `uninstall.go:50-51` ("Also remove the workspace directory (DESTRUCTIVE)"). The Examples block at `uninstall.go:44` (`gt uninstall --workspace        # Also remove workspace directory`) reinforces the reading: `--workspace` removes "the" workspace — singular, the user's workspace, whatever that is.
+- **Code does:** `findWorkspaceForUninstall` at `/home/kimberly/repos/gastown/internal/cmd/uninstall.go:152-171` ignores any state, config, or environment hint about where the user's workspace lives. It tries exactly two hardcoded candidates — `$HOME/gt` and `$HOME/gastown` — and for each, requires a `mayor/` subdirectory to exist (`uninstall.go:163-168`) before returning that path. If neither candidate is a real workspace, it returns `""`. The caller at `uninstall.go:122-131` (the `--workspace` branch of `runUninstall`) then sees the empty string and — critically — **does not error, does not warn the user**. The state/config/cache dirs are still removed (as they would be without `--workspace`), but the workspace at a non-standard path is silently left in place. A user who kept their town at `~/code/gastown`, `~/work/gt`, or any other path runs `gt uninstall --workspace`, reads the confirmation prompt (which warns "WORKSPACE WILL BE DELETED" at `uninstall.go:70-72`), types `y`, and then discovers after the fact that their workspace is untouched — only the XDG directories are gone.
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — either (a) narrow the `Long` text at `uninstall.go:29-45` and the `--workspace` flag help at `uninstall.go:50-51` to spell out the two-candidate scan and the "silently skipped if elsewhere" behavior, or (b) expand `findWorkspaceForUninstall` at `uninstall.go:152-171` to discover the real workspace from config (`state.Load()` already runs upstream; the install flow records the workspace root somewhere that could be read back). The minimal doc-only fix is to add one line to the `Long`: "With --workspace, removes ~/gt or ~/gastown if present; workspaces at other paths are not detected and must be removed manually." A better product fix is path (b). Even with path (b), the confirmation prompt should warn when no workspace is found, rather than silently proceeding with the XDG-only removal.
+- **Release position:** `in-release` (`uninstallCmd.Long` at `v1.0.0:internal/cmd/uninstall.go:25-46` byte-identical; `findWorkspaceForUninstall`'s two-candidate scan already present at v1.0.0).
+
 ## Related
 
 - [gt](../binaries/gt.md) — parent binary.
@@ -123,10 +172,7 @@ before re-running `gt install`.
 
 ## Notes / open questions
 
-- The workspace-detection heuristic is narrow: only `~/gt` and
-  `~/gastown`, only if they contain a `mayor/` dir. Users who kept
-  their town at `~/code/gastown` or `~/work/gt` will not have their
-  workspace removed by `--workspace` and will get no warning.
+- The workspace-detection heuristic is narrow → promoted to `## Drift` above (`--workspace` cobra-drift finding).
 - State/config/cache paths are returned by `state.StateDir()`,
   `state.ConfigDir()`, `state.CacheDir()`
   (`uninstall.go:64-66`) — worth pinning in a `packages/state.md`

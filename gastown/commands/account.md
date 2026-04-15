@@ -4,11 +4,15 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/account.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
 tags: [command, configuration, claude-code, accounts, multi-account]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt account
@@ -177,6 +181,38 @@ Declared in `init()` (`account.go:506-511`):
 | `--json`            | `account list`           | bool   | `false` | JSON output                      |
 | `--email`           | `account add`            | string | `""`    | Account email address            |
 | `--desc`            | `account add`            | string | `""`    | Account description              |
+
+## Docs claim
+
+### Source
+- `/home/kimberly/repos/gastown/internal/cmd/account.go:29-38` — Cobra `Long` text on the parent `accountCmd`.
+
+### Verbatim
+
+> Manage multiple Claude Code accounts for Gas Town.
+>
+> This enables switching between accounts (e.g., personal vs work) with
+> easy account selection per spawn or globally.
+>
+> Commands:
+>   gt account list              List registered accounts
+>   gt account add <handle>      Add a new account
+>   gt account default <handle>  Set the default account
+>   gt account status            Show current account info
+
+## Drift
+
+See forward-link: [../drift/README.md](../drift/README.md).
+
+### Parent `Long` text enumerates 4 subcommands; 5 are registered
+
+- **Claim source:** Cobra `Long` text at `/home/kimberly/repos/gastown/internal/cmd/account.go:34-38`.
+- **Docs claim:** the "Commands:" list advertises exactly four subcommands — `list`, `add`, `default`, `status`. A user reading `gt account --help` would reasonably conclude those are the complete subcommand set.
+- **Code does:** `init()` at `/home/kimberly/repos/gastown/internal/cmd/account.go:513-518` registers five subcommands on `accountCmd`: `accountListCmd`, `accountAddCmd`, `accountDefaultCmd`, `accountStatusCmd`, **and `accountSwitchCmd`**. `accountSwitchCmd` is declared at `account.go:278-295` with `Use: "switch <handle>"`, `Short: "Switch to a different account"`, and a multi-step `Long` describing the symlink rewrite at `~/.claude`. It is fully functional (`runAccountSwitch` at `account.go:351-465`) — the only path that actually flips the live account — but the parent `Long` text never mentions it. Users discover `switch` only by running `gt account` (which falls through `requireSubcommand`) and reading the cobra-generated `Available Commands:` block, which does include `switch`.
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — extend the Commands list in `accountCmd.Long` at `account.go:34-38` to include `switch <handle>`, matching the actual init() registration order. The `Long` texts on the individual sub-command vars (`accountSwitchCmd.Long` at `account.go:281-288`) are already correct and need no change.
+- **Release position:** `in-release` (parent `Long` text byte-identical at `v1.0.0:internal/cmd/account.go:29-38`; `accountSwitchCmd` already registered in the v1.0.0 init block).
 
 ## Related
 

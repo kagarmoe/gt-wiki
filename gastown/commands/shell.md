@@ -4,11 +4,15 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/shell.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
 tags: [command, configuration, shell-integration, lifecycle]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt shell
@@ -94,6 +98,34 @@ Registered in `init()` (`shell.go:60-65`):
 
 None on any subcommand.
 
+## Docs claim
+
+### Source
+- `/home/kimberly/repos/gastown/internal/cmd/shell.go:31-37` — Cobra `Long` text on `shellInstallCmd`.
+
+### Verbatim
+
+> Install or update the Gas Town shell integration.
+>
+> This adds a hook to your shell RC file that:
+>   - Sets GT_TOWN_ROOT and GT_RIG when you cd into a Gas Town rig
+>   - Offers to add new git repos to Gas Town on first visit
+>
+> Run this after upgrading gt to get the latest shell hook features.
+
+## Drift
+
+See forward-link: [../drift/README.md](../drift/README.md).
+
+### `shell install` silently re-enables Gas Town without mentioning it in the `Long` text
+
+- **Claim source:** Cobra `Long` text at `/home/kimberly/repos/gastown/internal/cmd/shell.go:31-37`. The text describes only two effects: adding the `cd` hook to the shell RC file, and the side behaviors of that hook (`GT_TOWN_ROOT`/`GT_RIG` setting, new-repo prompting). Nothing in the text suggests touching the persistent `Enabled` flag.
+- **Code does:** `runShellInstall` at `/home/kimberly/repos/gastown/internal/cmd/shell.go:67-81` performs two independent actions. First, `shell.Install()` writes the `cd` hook (`shell.go:68-70`). Second, `state.Enable(Version)` is called at `shell.go:72-74` to persist the "enabled" state in `~/.local/state/gastown/state.json`. A `state.Enable` error prints a dim warning but does NOT fail the command, so the hook-install path almost always leaves the user with `Gas Town: enabled`. This means a user who previously ran `gt disable` and then reinstalls shell hooks via `gt shell install` — perhaps to pick up "latest shell hook features" as the `Long` text encourages — will find their global kill-switch silently flipped back to enabled with no mention in the help text or the success output at `shell.go:77`. The symmetry is broken: `shell remove` (`shell.go:83-90`) does NOT call `state.Disable()`, so the state flag is asymmetric across the two commands.
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — add one line to `shellInstallCmd.Long` at `shell.go:31-37` documenting the `state.Enable(Version)` side effect. Suggested wording: "Also sets the global 'enabled' state (equivalent to `gt enable`)." If the product intent is to make `shell install` install-only, remove the `state.Enable` call at `shell.go:72-74` and document separately that users who previously disabled need to run `gt enable` after reinstalling shell hooks. The minimal fix is the doc change; the behavior change is a follow-up decision.
+- **Release position:** `in-release` (`shellInstallCmd.Long` and `runShellInstall`'s `state.Enable(Version)` call both byte-identical at `v1.0.0:internal/cmd/shell.go`).
+
 ## Related
 
 - [gt](../binaries/gt.md) — parent binary.
@@ -113,10 +145,7 @@ None on any subcommand.
 
 ## Notes / open questions
 
-- The `install` → `enable` coupling is convenient but asymmetric:
-  `shell install` enables, `shell remove` does not disable. A user
-  running `shell remove` still has `Enabled=true` in state until
-  they run `gt disable`. Non-obvious from the command's help text.
+- The `install` → `enable` coupling → promoted to `## Drift` above (`shell install` cobra-drift finding). The asymmetric symmetry with `shell remove` (which does NOT flip state to disabled) is captured in the same finding.
 - **Completion is NOT here.** Tab-completion is cobra's built-in
   `completion` command on the root (see `root.go` imports and
   cobra's default `AddCommand`), exempt from beads on `root.go:47`.

@@ -1507,3 +1507,135 @@ Wiki repo renamed and published as [kagarmoe/gt-wiki](https://github.com/kagarmo
 **Why this matters for Phase 3:** future sessions priming off `MEMORY.md` or `bd remember` queries will now consistently see `~/repos/gt-wiki`. Anyone reading the log from the top will see the 2026-04-11 original path, then this 2026-04-14 rename decision, then the current-state Phase 3 work that follows.
 
 → [gastown/README.md](gastown/README.md), [CLAUDE.md](CLAUDE.md), [README.md](README.md), [CONTRIBUTING.md](CONTRIBUTING.md), [LICENSE](LICENSE), [gastown/binaries/gt-proxy-client.md](gastown/binaries/gt-proxy-client.md)
+
+## [2026-04-14] decision | Phase 3 schema change: re-enable Docs claim / Drift / Implementation status sections (schema v1.2)
+
+Phase 2's mapping-only scope reframe at [log.md:158](log.md) removed `## Docs claim` and `## Drift` sections from entity pages because Phase 2's deliverable was the map, not the audit. Phase 3 is the audit; it needs those sections back. This entry records the re-enablement under explicit conventions that Phase 2's framing never had — a disciplined authority hierarchy, a per-page audit-tracking frontmatter, and a non-retroactive application rule.
+
+**This is not a reversal of the Phase 2 walkback.** It is the next phase doing what Phase 2 deliberately deferred.
+
+### Authority hierarchy (Code → Cobra → Docs)
+
+The load-bearing rule for Phase 3's drift taxonomy: **code is the only source of truth**. Cobra `Long` help text is derived from code. `docs/*.md` files are derived from Cobra/code. The hierarchy determines both finding classification and fix direction: the fix always starts at the highest tier that's wrong, because fixes there cascade downward.
+
+- **Code** — authoritative. `/home/kimberly/repos/gastown/internal/...`, `cmd/...`, source-of-truth for every behavior claim.
+- **Cobra** — derived. Cobra command `Long` strings, annotations, error messages. Should agree with code.
+- **Docs** — derived. `/home/kimberly/repos/gastown/docs/*.md`, README. Should agree with Cobra + code.
+
+Docs are NOT authoritative by themselves. Wiki pages (Phase 2 synthesis) are ALSO not authoritative — they must be verified against source during Phase 3.
+
+### Re-enabled sections (in order, on every entity page that gets Phase 3 annotations)
+
+1. `## What it actually does` — unchanged from Phase 2.
+2. `## Docs claim` — NEW. Verbatim quotes from upstream docs / Cobra `Long` text / README that make claims about this entity. Every claim cites its source with absolute path + line range. No paraphrasing.
+3. `## Drift` — NEW. Only when docs and code disagree. Structured as Claim → Code → Resolution with `file:line` citations on both sides. Tagged per the drift taxonomy (below).
+4. `## Implementation status` — NEW. Only when docs describe aspirational / partial / vestigial behavior. Tagged `unbuilt`, `partial`, or `vestigial`. Explicitly distinct from drift: aspirational docs are not wrong, they describe a future state that hasn't been built. Phase 6 (Implementation) treats them differently — preserve as vision vs factually rewrite.
+5. `## Notes / open questions` — unchanged. Neutral observations that are not drift or implementation-status findings stay here.
+
+### Drift taxonomy (9 categories, with fix-tier derived from the authority hierarchy)
+
+| Category | Definition | Fix tier |
+|----------|------------|----------|
+| `cobra drift` | Cobra `Long` text (or other in-code docstrings) contradicts code in the same source tree | **Code** (edit Cobra string; in-source docs fix) |
+| `drift` | `docs/*.md` or README contradicts correct Cobra/code | **Docs** (upstream docs PR) |
+| `compound drift` | Both Cobra AND docs are wrong independently. Tag both `cobra drift` AND `drift` on the same finding. | **Code first, then docs** (fix Cobra; docs fix may cascade automatically or need manual follow-up) |
+| `implementation-status: unbuilt` | Docs describe behavior labeled "vision" / "planned" with zero code support | **None** (preserve as vision + status callout) |
+| `implementation-status: partial` | Docs describe partially-implemented behavior | **None** (preserve + status callout) |
+| `implementation-status: vestigial` | Code exists but is explicitly documented or commented as superseded / dead / "no longer runs" | **Code** (remove dead code) OR **Docs** (document the vestige) — per finding |
+| `gap` | Docs describe something real that has no wiki page yet (Phase 2 missed it or deferred it) | **Wiki** (we missed it) |
+| `wiki-stale` | Phase 2 wiki page body disagrees with current source — our own synthesis has drifted | **Wiki** (our synthesis) |
+| `neutral` | Notes that on review turn out NOT to be drift | **None** (stay in `## Notes / open questions`) |
+
+**Rationale for category differentiation:** `cobra drift` is separate from `drift` because the fix path differs (upstream code change vs upstream docs change). `compound drift` handles the frequent case where docs echo wrong Cobra text. `implementation-status` is separate from drift because aspirational docs aren't wrong, they're forward-looking. `wiki-stale` is separate because it's a lint finding on our own synthesis, not a finding about upstream content.
+
+### Frontmatter additions
+
+Every page audited in Phase 3 gets these frontmatter fields added (regardless of whether any findings were promoted):
+
+```yaml
+phase3_audited: 2026-04-15                              # ISO date when the audit happened
+phase3_findings: [drift, cobra-drift, implementation-status-unbuilt,
+                  implementation-status-partial, implementation-status-vestigial,
+                  wiki-stale, gap, none]                # list matching the taxonomy above
+phase3_findings_post_release: false                     # true iff ≥1 finding on this page is post-release
+```
+
+`phase3_findings: [none]` is valid and means "audited, no findings" — a page walked with zero findings still gets `phase3_audited:` set and `phase3_findings: [none]` so it appears in the audit roll-call. Dataview query `phase3_audited is undefined` is the unfinished-work list.
+
+`phase3_findings_post_release` supports the release-position dimension (see "Release position" below).
+
+### Release position (orthogonal to category)
+
+Phase 3 audits against current gastown main, which is ahead of the most recent stable release. Every finding carries a release-position tag in addition to its category:
+
+- **`in-release`**: the cited code existed at the last stable release tag. Phase 6 fixes can upstream immediately.
+- **`post-release`**: the cited code was introduced after the last release. Phase 6 fixes must wait for the next release before upstreaming.
+
+Phase 3 uses **v1.0.0** (gastown commit `5f07285e`, 2026-04-02) as the authority baseline. The PR-delta scoping in Batch 0 Task 1 Part A captures the churn between v1.0.0 and origin/main. For each finding, the sub-batch checks whether the cited `file:line` exists at v1.0.0 and tags accordingly.
+
+### New category folder: `drift/`
+
+Schema directory layout adds `<topic>/drift/` for the consolidated Phase 3 drift index. Page type `drift` already exists in the schema's open type set. Lazy creation: the folder is created in Batch 13 when the consolidated index lands.
+
+### Non-retroactive clause (critical)
+
+**The re-enabled `## Docs claim` / `## Drift` / `## Implementation status` sections are NOT a retroactive schema requirement on Phase 2 pages.** Existing pages written during Phase 2 remain valid as-is; they acquire Phase 3 sections only when the Phase 3 audit sweep reaches them. A future session reading schema v1.2 must NOT interpret it as "every page needs a `## Docs claim` section retrofit." The clause closes a specific failure mode — misreading the schema change as a 213-page migration demand. Phase 2's output stands; Phase 3 annotates it incrementally.
+
+Equivalently: `phase3_audited` is the opt-in marker. A page without `phase3_audited` is NOT in violation of schema v1.2. It's simply "not yet audited."
+
+### Schema version bump
+
+1.1 → 1.2, recorded in [CLAUDE.md](CLAUDE.md) header (landed as commit 808eecb on 2026-04-14, together with the CLAUDE.md restructure from 387 lines to 190-line slim coordinator).
+
+### Plan file
+
+The full plan for Phase 3 (batch decomposition, task-level steps, drift taxonomy tables, subagent prompt templates) lives at `.claude/plans/2026-04-14-phase3-drift.md` — gitignored per schema (plan files are local-only artifacts, never committed).
+
+### Why this is distinct from the Phase 2 walkback
+
+Phase 2's walkback removed premature drift annotations when the framing shifted to mapping-only. This Phase 3 decision re-enables them under a disciplined workflow (per-page audit tracking via frontmatter, mandatory cross-links, per-batch log entries, code-first verification, authority-hierarchy fix-tier derivation, non-retroactive application). It is NOT a reversal of the Phase 2 walkback — it is the next phase doing what Phase 2 deliberately deferred. The walkback's preservation of mapping-phase purity enabled Phase 3 to start from a clean baseline.
+
+→ [CLAUDE.md](CLAUDE.md), [log.md:158](log.md)
+
+## [2026-04-14] decision | Phase 3 retroactive cleanup of 2026-04-14 drift-found entries
+
+Two `[2026-04-14] drift-found` entries exist earlier in this log (lines 1476 and 1480), written BEFORE the Phase 3 plan existed:
+
+1. `[2026-04-14] drift-found | docs/agent-provider-integration.md vs code` (log.md:1476)
+2. `[2026-04-14] drift-found | docs/CLEANUP.md vs code` (log.md:1480)
+
+Neither matches the batch-entry format defined in the Phase 3 plan's "Batch entry format" section — they lack the mandatory "Source files re-read at the new release tag" column, lack per-finding fix-tier tags, lack cross-link discipline confirmation, and lack beads accounting. They were drift-found sketches written during an informal Phase 3 start, not batch-discipline audit trail.
+
+This entry records how they are handled under the new Phase 3 plan.
+
+### Handling
+
+Both historical entries are **grandfathered** per the append-only log rule at [log.md:204-207](log.md) ("Historical log entries above are preserved as written. They describe what happened, including framing that has since been superseded."). The grandfathered entries stay where they are, unedited. Their supersession happens via forward reference: specific Phase 3 batches will re-audit the same subjects under schema v1.2 conventions, and those batches' log entries will cite the grandfathered entries as the pre-plan starting point.
+
+**Per-entry disposition:**
+
+1. **`docs/agent-provider-integration.md vs code`** — no wiki-page annotation was produced by the original entry. The finding text ("Docs accurately describe agent integration tiers … no major drift. Minor: Gas City mentioned as upcoming but no code exists") is preserved as a historical note. The full re-audit happens in **Phase 3 Batch 10 sub-batch 10k** (`docs/agent-provider-integration.md`, 835 lines), which reads the docs file in full, classifies findings per the v1.2 taxonomy, and annotates the affected wiki entity pages. Batch 10k's batch-entry log.md entry will cite log.md:1476 as the pre-plan starting point.
+
+2. **`docs/CLEANUP.md vs code`** — commit `f143813` added `## Docs claim` and `## Drift` sections to [gastown/commands/done.md](gastown/commands/done.md) documenting the `gt done` drift (docs claim "self-nukes worktree, kills own session" but code post-gt-4ac/gt-hdf8 transitions polecat to IDLE with sandbox preserved). These pre-date schema v1.2 and may or may not need reformatting under the new conventions (verbatim quote check, authority-hierarchy fix-tier tag, `phase3_audited` / `phase3_findings` frontmatter fields, non-retroactive application). The full re-audit happens in **Phase 3 Batch 9** (`docs/CLEANUP.md`, 170 lines, 62 command rows). Batch 9 reads every row of CLEANUP.md against the corresponding `gastown/commands/` pages, verifies `done.md`'s existing Phase-3-era sections against the v1.2 conventions (reshape if needed), and row-by-row checks the ~61 CLEANUP.md rows that were asserted to "match" without per-row verification. Batch 9's batch-entry log.md entry will cite log.md:1480 as the pre-plan starting point.
+
+### `wiki-ytq` bead — rehabilitated in place, NOT closed
+
+The `wiki-ytq` bead's description currently conflates the Phase 3 epic scope with the specific `gt done` CLEANUP.md finding. Its title ("Phase 3: Drift Analysis — Compare docs/ claims to code-grounded wiki pages") is already epic-scoped and correct.
+
+**Task 7 of Batch 0 updates `wiki-ytq`'s description in place** to remove the conflated finding and replace it with a clean Phase 3 epic scope pointing at the plan file. `wiki-ytq` **stays `in_progress`** through all 13 Phase 3 batches. It closes ONLY at the final step of Batch 13 (after the consolidated drift index at `gastown/drift/README.md` lands and pushes).
+
+**Principle:** close the epic at the end of the work, always. Never at the start. Closing `wiki-ytq` in Batch 0 would leave Phase 3 without an epic tracker; rehabilitating in place preserves the original bead ID (and its historical link to the pre-plan drift-found entry) while aligning its description with the plan.
+
+### Why grandfather rather than retroactively reformat
+
+Rewriting the two historical entries in-place would violate the append-only log rule and hide the fact that Phase 3 started out-of-process and got formalized mid-stream. That mid-stream formalization is itself information — it documents when the plan crystallized and why the earlier attempts needed a re-audit. The grandfather approach preserves the drift trail while making the Phase 3 plan the authoritative source from Batch 0 onward. Future readers walking the log chronologically will see: informal drift-found sketches → plan crystallization decisions → formalized Phase 3 batches with full audit trail → grandfathered supersession in Batches 9 and 10 → Phase 3 epic closure in Batch 13.
+
+### References
+
+- [log.md:1476](log.md) — grandfathered entry 1 (`agent-provider-integration.md`)
+- [log.md:1480](log.md) — grandfathered entry 2 (`docs/CLEANUP.md`)
+- [log.md:204-207](log.md) — append-only log rule
+- Commit `f143813` — pre-plan work on [gastown/commands/done.md](gastown/commands/done.md)
+- `wiki-ytq` — Phase 3 epic bead, currently `in_progress`
+
+→ [gastown/commands/done.md](gastown/commands/done.md)

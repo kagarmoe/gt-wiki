@@ -4,7 +4,7 @@ type: command
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/polecat.go
   - /home/kimberly/repos/gastown/internal/cmd/polecat_identity.go
@@ -12,6 +12,10 @@ sources:
   - /home/kimberly/repos/gastown/internal/cmd/polecat_cycle.go
   - /home/kimberly/repos/gastown/internal/cmd/polecat_helpers.go
 tags: [command, agents, polecat, worktree, nuke, lifecycle, git, identity]
+phase3_audited: 2026-04-15
+phase3_findings: [wiki-stale]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt polecat
@@ -36,28 +40,38 @@ self-cleaning model, and interaction with refinery/witness/deacon.
 
 The parent `polecatCmd` is defined in
 `/home/kimberly/repos/gastown/internal/cmd/polecat.go:31-60`
-(1786 lines). Subcommands are split across several sibling
-files in the same package:
+(1786 lines). Subcommands are split across **exactly two** sibling
+files in the same package (`polecat.go` and `polecat_identity.go`);
+three other `polecat_*.go` files exist in the same directory but
+register **no** cobra subcommands — they are helper / utility files:
 
 - `polecat.go` — parent cmd plus `list`, `add` (deprecated),
   `remove`, `status`, `git-state`, `check-recovery`, `gc`,
-  `nuke`, `stale`, `prune`, `pool-init` (11 subcommands).
+  `nuke`, `stale`, `prune`, `pool-init` — **11 top-level
+  subcommands** registered in `polecat.go`'s own `init()` at
+  `polecat.go:366-376`.
 - `polecat_identity.go` (1079 lines) — the entire
-  `gt polecat identity` sub-tree with 5 subcommands (`add`,
-  `list`, `show`, `rename`, `remove`).
-- `polecat_spawn.go` (506 lines) — additional spawn-related
-  subcommands (inspection outside this wiki page's scope —
-  flag this as a follow-up).
-- `polecat_cycle.go` (85 lines) — additional cycle-related
-  subcommands (same — follow-up).
+  `gt polecat identity` sub-tree with 6 entries: the `identity`
+  group parent plus 5 children (`add`, `list`, `show`, `rename`,
+  `remove`). The group parent is registered on `polecatCmd` via
+  `polecat_identity.go:159` (`polecatCmd.AddCommand(polecatIdentityCmd)`)
+  inside this file's own `init()`.
+- `polecat_spawn.go` (506 lines) — package comment
+  (`polecat_spawn.go:1`) is explicit: `"Package cmd provides
+  polecat spawning utilities for gt sling."` Exposes
+  `SpawnedPolecatInfo` and helper functions used by `gt sling`.
+  Contains **no** cobra command variables and **no** `init()`
+  function — nothing is registered from this file.
+- `polecat_cycle.go` (85 lines) — helper functions for polecat
+  cycle detection. **No** cobra commands, **no** `init()`.
 - `polecat_helpers.go` (270 lines) — shared helpers
   (`resolvePolecatTargets`, `checkPolecatSafety`,
   `polecatBeadIDForRig`, `purgeClosedEphemeralBeads`, etc.).
+  **No** cobra commands, **no** `init()`.
 
-This page documents the user-facing subcommands grounded in
-`polecat.go` + `polecat_identity.go`. Commands defined in
-`polecat_spawn.go` / `polecat_cycle.go` are listed but not
-enumerated in depth here.
+Total: **17 user-facing subcommands** (11 top-level + 6 identity),
+all registered from `polecat.go` and `polecat_identity.go`. This
+page enumerates all of them.
 
 The parent `polecatCmd` uses `RunE: requireSubcommand` — bare
 `gt polecat` prints the subcommand list.
@@ -115,8 +129,9 @@ gt polecat identity rename <rig> <old> <new>
 gt polecat identity remove <rig> <name>       [-f|--force]
 ```
 
-(Additional subcommands exist in `polecat_spawn.go` and
-`polecat_cycle.go`; see "Follow-up" in Notes.)
+(All 17 user-facing subcommands are listed above; the tree is
+complete. `polecat_spawn.go`, `polecat_cycle.go`, and
+`polecat_helpers.go` are helper-only files with no cobra commands.)
 
 ### Top-level subcommands
 
@@ -525,13 +540,31 @@ set to `idle` via `mgr.SetAgentState(name, "idle")`
 
 ## Notes / open questions
 
+- **Phase 3 wiki-stale fix (2026-04-15).** The Phase 2 page body said
+  the sibling files `polecat_spawn.go` and `polecat_cycle.go` "register
+  additional subcommands" and parked them as a "follow-up to enumerate"
+  item. Re-read at current HEAD (and at `v1.0.0`) shows neither file
+  contains any cobra command variable or `init()` function —
+  `polecat_spawn.go`'s package comment at `:1` is explicit (`"Package
+  cmd provides polecat spawning utilities for gt sling."`), and both
+  files are pure helpers consumed by the command handlers in
+  `polecat.go` and by `gt sling`. The actual subcommand tree is 17
+  entries total, all registered from `polecat.go` (11 top-level) and
+  `polecat_identity.go` (6 identity). Body rewritten to enumerate the
+  sibling-file contents definitively rather than speculatively. The
+  Phase 2 speculation was wrong at Phase 2 time — the sibling files
+  had no cobra registrations on `2026-04-11` either (verified via
+  `git show v1.0.0:internal/cmd/polecat_spawn.go` and
+  `polecat_cycle.go`, both of which pre-date Phase 2). **Phase 2
+  root cause:** `phase-2-incomplete` (heuristic — Phase 2 skipped the
+  sibling-file `init()` check and parked a speculation instead of a
+  verified claim). Drift index: [../drift/README.md](../drift/README.md).
 - **This file is 1786 lines.** The largest CLI file in the
   Agents group. Six command files in the package share the
   `polecat_*` prefix (`polecat.go`, `polecat_identity.go`,
   `polecat_spawn.go`, `polecat_cycle.go`, `polecat_helpers.go`,
-  plus tests). A follow-up read of `polecat_spawn.go` and
-  `polecat_cycle.go` is warranted — they register additional
-  subcommands that this page does not enumerate yet.
+  plus tests). All cobra subcommand registration is in `polecat.go`
+  and `polecat_identity.go`; the other three are helper files only.
 - **`gt polecat add` is deprecated but still there.** The
   deprecation warning prints to stderr (`polecat.go:547-551`),
   and the Long help explicitly says "will be removed in v1.0"

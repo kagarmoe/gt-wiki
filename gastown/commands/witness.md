@@ -4,10 +4,14 @@ type: command
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/witness.go
 tags: [command, agents, witness, tmux, per-rig, polecat-monitor, lifecycle]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift, implementation-status-vestigial]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt witness
@@ -176,6 +180,63 @@ any previous foreground state. Comparable in shape to
 | `--env KEY=VALUE`   | []string | `nil` | `start`, `restart` | `witness.go:126,133` (`StringArrayVar`, repeatable) |
 | `--json`            | bool   | `false` | `status` | `witness.go:129` |
 
+## Docs claim
+
+### Source
+- `/home/kimberly/repos/gastown/internal/cmd/witness.go:50-63` — Cobra `Long` text on `witnessStartCmd`.
+- `/home/kimberly/repos/gastown/internal/cmd/witness.go:124` — flag registration + description for `--foreground` on `witnessStartCmd`.
+
+### Verbatim
+
+From `witness.go:50-63` (`witnessStartCmd.Long`):
+
+> Start the Witness for a rig.
+>
+> Launches the monitoring agent which watches for stuck polecats and orphaned
+> sandboxes, taking action to keep work flowing.
+>
+> Self-Cleaning Model: Polecats nuke themselves after work. The Witness handles
+> crash recovery (restart with hooked work) and orphan cleanup (nuke abandoned
+> sandboxes). There is no "idle" state - polecats either have work or don't exist.
+>
+> Examples:
+>   gt witness start greenplace
+>   gt witness start greenplace --agent codex
+>   gt witness start greenplace --env ANTHROPIC_MODEL=claude-3-haiku
+>   gt witness start greenplace --foreground
+
+From `witness.go:124` (the flag definition):
+
+> witnessStartCmd.Flags().BoolVar(&witnessForeground, "foreground", false, "Run in foreground (default: background)")
+
+## Drift
+
+See forward-link: [../drift/README.md](../drift/README.md).
+
+### `witness start --foreground` is advertised as functional in `Long` + flag description, but is a no-op notice
+
+- **Claim source:** Cobra `Long` text at `/home/kimberly/repos/gastown/internal/cmd/witness.go:63` (last Examples row) and flag description at `/home/kimberly/repos/gastown/internal/cmd/witness.go:124`.
+- **Docs claim:** the `Long` Examples block lists `gt witness start greenplace --foreground` as a normal invocation mode alongside `--agent` and `--env`, and the flag registration line declares the description as `"Run in foreground (default: background)"`. Together these present `--foreground` as a real mode that runs the Witness in the foreground (with, by implication, the patrol loop in the foreground — the historical meaning the user would infer from the name).
+- **Code does:** `runWitnessStart` at `witness.go:156-189` passes `witnessForeground` through to `mgr.Start(witnessForeground, ...)`, and then at `witness.go:179-183` short-circuits before the success block: `if witnessForeground { fmt.Printf("%s Note: Foreground mode no longer runs patrol loop\n", ...); fmt.Printf("  %s\n", ...("Patrol logic is now handled by mol-witness-patrol molecule")); return nil }`. The patrol logic has moved out of the CLI start path entirely into the `mol-witness-patrol` molecule; `--foreground` no longer produces the foreground semantics the flag name implies. There is no error and no non-zero exit — the command prints the notice, returns nil, and the operator may believe it succeeded.
+- **Category:** `cobra drift` — the flag description and `Long` Examples row are both claims that contradict the runtime notice. This is paired with an `implementation-status: vestigial` entry below, per the compound pattern: the code itself has the vestige callout, but the Cobra surface does not yet acknowledge it.
+- **Severity:** `wrong`
+- **Fix tier:** `code` — edit `witnessStartCmd.Long` to either drop the `--foreground` Examples row or annotate it as `"(no-op: patrol loop moved to mol-witness-patrol molecule)"`, and rewrite the flag description at `witness.go:124` to `"(deprecated no-op — patrol logic moved to mol-witness-patrol molecule)"` or similar. A more thorough fix removes the flag entirely; a minimal fix edits the two text claims so the Cobra surface matches what `:179-183` already prints.
+- **Release position:** `in-release` — `witness.go:50-63`, `:124`, and `:179-183` are all byte-identical at `v1.0.0`.
+
+## Implementation status
+
+See forward-link: [../drift/README.md](../drift/README.md).
+
+### `witness start --foreground` — patrol-loop code removed, flag kept as a runtime notice
+
+- **Status:** `vestigial`
+- **Severity:** `wrong`
+- **Docs describe:** `witnessStartCmd.Long` at `witness.go:50-63` lists `gt witness start greenplace --foreground` in its Examples block as a normal invocation. The flag description at `witness.go:124` reads `"Run in foreground (default: background)"`. Neither mentions that the foreground mode is now a no-op.
+- **Code provides:** The flag still exists and parses, and `mgr.Start(witnessForeground, ...)` still receives the value, but `runWitnessStart` at `witness.go:179-183` intercepts the foreground branch before printing the normal "Witness started" message and prints `"Note: Foreground mode no longer runs patrol loop"` followed by `"Patrol logic is now handled by mol-witness-patrol molecule"`, then returns nil. The notice is acknowledgement that the flag is vestigial: the patrol loop that `--foreground` used to drive has been moved to the `mol-witness-patrol` molecule, invoked by the Witness agent itself, so there is no foreground patrol loop for the CLI to run any more.
+- **Release position:** `in-release` — the vestige + runtime notice shipped in `v1.0.0`.
+- **Fix tier:** `code` — paired with the `cobra drift` fix above. The `Long` / flag description should either (a) be rewritten to match the runtime notice (preserving the flag as a parseable no-op with clear deprecation wording) or (b) deleted alongside the flag itself. The choice between (a) and (b) depends on whether any scripts / tests / molecule definitions still pass `--foreground` unconditionally; a grep pass over the gastown tree is in order before deletion.
+- **Resolution:** `reframe with status callout` (short-term — annotate the flag + Example as vestigial in `Long`), or `delete` (long-term — drop the flag entirely once callers are audited). Not `preserve-as-vision` — this is not aspirational; the foreground patrol mode is a past state, not a future one.
+
 ## Related commands
 
 - [../binaries/gt.md](../binaries/gt.md) — root.
@@ -215,10 +276,13 @@ any previous foreground state. Comparable in shape to
 
 ## Notes / open questions
 
-- **`--foreground` is vestigial.** The flag still parses but no
-  longer drives a foreground patrol loop (`witness.go:179-182`).
-  Anyone using it in scripts or docs expecting the old behavior
-  will be surprised.
+- **`--foreground` is vestigial.** → promoted to `## Drift` (as
+  `cobra drift`, because the `Long` Examples row at `witness.go:63` and
+  the flag description at `:124` both still advertise it as functional)
+  AND `## Implementation status` (as `vestigial`, because the code at
+  `:179-183` explicitly acknowledges the patrol loop has moved to
+  `mol-witness-patrol`). Compound finding. See
+  [../drift/README.md](../drift/README.md).
 - **`witnessAgentOverride` is a shared global** across start,
   attach, and restart flag definitions (`witness.go:125,132`).
   Attach wires it into its flag set but `runWitnessAttach` never

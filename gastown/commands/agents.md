@@ -4,10 +4,15 @@ type: command
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/agents.go
+  - /home/kimberly/repos/gastown/internal/cmd/agent_state.go
 tags: [command, agents, tmux, session, menu, collision-check]
+phase3_audited: 2026-04-15
+phase3_findings: [wiki-stale]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt agents
@@ -27,16 +32,20 @@ identity-collision diagnostics for worker locks.
 
 Source: `/home/kimberly/repos/gastown/internal/cmd/agents.go` (781
 lines). Registration: `agents.go:139-148` registers four subcommands
-plus a parent fallback on `rootCmd`.
+(`list`, `menu`, `check`, `fix`) plus a parent fallback on `rootCmd`.
+A **fifth** subcommand — `agents state` — is registered in the sibling
+file `agent_state.go:85` via `agentsCmd.AddCommand(agentStateCmd)` in
+that file's own `init()`.
 
 ### Invocation
 
 ```
-gt agents                 # list (same as `gt agents list`)
-gt agents list            # plain list to stdout
-gt agents menu            # tmux display-menu popup
-gt agents check [--json]  # identity-collision report
-gt agents fix             # clean stale locks; report collisions
+gt agents                   # list (same as `gt agents list`)
+gt agents list              # plain list to stdout
+gt agents menu              # tmux display-menu popup
+gt agents check [--json]    # identity-collision report
+gt agents fix               # clean stale locks; report collisions
+gt agents state <bead> ...  # get / set / incr / del operational-state labels on agent beads
 ```
 
 ### Parent behavior
@@ -56,10 +65,18 @@ list` to see them).
 
 | subcommand | var | source | purpose |
 |---|---|---|---|
-| `list`  | `agentsListCmd`  | `agents.go:89-94`   | Plain stdout listing via `runAgentsList`. |
-| `menu`  | `agentsMenuCmd`  | `agents.go:96-101`  | Interactive tmux popup via `runAgents`. |
-| `check` | `agentsCheckCmd` | `agents.go:103-117` | Find identity collisions and stale locks. |
-| `fix`   | `agentsFixCmd`   | `agents.go:119-132` | Clean stale locks; report collisions for manual intervention. |
+| `list`  | `agentsListCmd`  | `agents.go:89-94`       | Plain stdout listing via `runAgentsList`. |
+| `menu`  | `agentsMenuCmd`  | `agents.go:96-101`      | Interactive tmux popup via `runAgents`. |
+| `check` | `agentsCheckCmd` | `agents.go:103-117`     | Find identity collisions and stale locks. |
+| `fix`   | `agentsFixCmd`   | `agents.go:119-132`     | Clean stale locks; report collisions for manual intervention. |
+| `state <bead>` | `agentStateCmd` | `agent_state.go:26-72` | Get / set / increment / delete operational-state labels on agent beads. Registered on `agentsCmd` by `agent_state.go:85` in that file's own `init()`. |
+
+`agents state` exposes a label-based operational state surface on agent beads
+(e.g. `idle:<n>`, `backoff:<d>`, `last_activity:<ts>`). `--set key=value` and
+`--del key` are repeatable; `--incr key` increments a numeric label (creating
+it at 1 if missing); `--json` switches to JSON output. See the subcommand's own
+`Long` text at `agent_state.go:31-67` for the full label vocabulary and
+examples.
 
 ### Agent type taxonomy
 
@@ -176,6 +193,16 @@ close duplicate sessions or remove lock files manually.
 
 ## Notes / open questions
 
+- **Phase 3 wiki-stale fix (2026-04-15).** The Phase 2 page body said
+  `agentsCmd` has "four subcommands" and listed only `list` / `menu` /
+  `check` / `fix`, because Phase 2 read `agents.go` in isolation and
+  missed the sibling file `agent_state.go` that wires a fifth subcommand
+  `agents state` via its own `init()` at `agent_state.go:85`. Body and
+  invocation block rewritten to reflect the five-subcommand reality.
+  **Phase 2 root cause:** `phase-2-incomplete` (heuristic — `agent_state.go`
+  is byte-identical at `v1.0.0` with its `agentsCmd.AddCommand` line
+  intact, so Phase 2 running on 2026-04-11 had access to it). Drift
+  index: [../drift/README.md](../drift/README.md).
 - **Personal sessions** (`AgentPersonal`) are listed from the
   `default` tmux socket but only when it differs from the town
   socket. Machines where the town socket *is* `default` will not see

@@ -4,10 +4,15 @@ type: command
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/boot.go
+  - /home/kimberly/repos/gastown/internal/dog/manager.go
 tags: [command, agents, boot, deacon, watchdog, triage, daemon]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt boot
@@ -130,6 +135,43 @@ Mechanical steps:
 | `--degraded` | bool | `false` | `triage` | `boot.go:92` |
 | `--agent <alias>` | string | `""` | `spawn` | `boot.go:93` |
 
+## Docs claim
+
+### Source
+- `/home/kimberly/repos/gastown/internal/cmd/boot.go:31-45` — Cobra `Long` text on the parent `bootCmd`.
+
+### Verbatim
+
+> Manage Boot - the daemon's watchdog for Deacon triage.
+>
+> Boot is a special dog that runs fresh on each daemon tick. It observes
+> the system state and decides whether to start/wake/nudge/interrupt the
+> Deacon, or do nothing. This centralizes the "when to wake" decision in
+> an agent that can reason about it.
+>
+> Boot lifecycle:
+>   1. Daemon tick spawns Boot (fresh each time)
+>   2. Boot runs triage: observe, decide, act
+>   3. Boot cleans inbox (discards stale handoffs)
+>   4. Boot exits (or handoffs in non-degraded mode)
+>
+> Location: ~/gt/deacon/dogs/boot/
+> Session: gt-boot
+
+## Drift
+
+See forward-link: [../drift/README.md](../drift/README.md).
+
+### Boot is "a special dog" per Cobra `Long`, but is explicitly NOT a dog in the kennel
+
+- **Claim source:** Cobra `Long` text at `/home/kimberly/repos/gastown/internal/cmd/boot.go:33`.
+- **Docs claim:** the `Long` text opens with `"Boot is a special dog that runs fresh on each daemon tick."` The framing is introduced as the canonical mental model for what Boot is.
+- **Code does:** `internal/dog/manager.go:300` is explicit: in `Manager.Get()`, if `loadState(name)` fails (no `.dog.json`) the function returns `ErrDogNotFound` with the inline comment `"No .dog.json means this isn't a valid dog worker (e.g., "boot" is the boot watchdog using .boot-status.json, not a dog)"`. A matching branch in `internal/dog/manager_lifecycle_test.go:326-332` ("Create dog directory but no `.dog.json` (e.g., boot watchdog)") confirms this is deliberate. Boot also has **no `AgentDog` entry** in the `AgentType` enum at `/home/kimberly/repos/gastown/internal/cmd/agents.go:24-33` (there is no `AgentDog` type in the code tree at all), and `bootCmd` lives in `GroupAgents` rather than being registered as a subcommand of `dogCmd`. The only thing Boot shares with dogs is the `~/gt/deacon/dogs/boot/` filesystem path (which the dog manager explicitly excludes from dog enumeration). Boot's persistence state lives in `.boot-status.json`, not `.dog.json`; its lifecycle is daemon-tick-driven (fresh per tick) rather than kennel-managed (reusable idle→working→idle); and its agent bead is created via a different path. The `"special dog"` framing is an intuition pump that directly contradicts the code's dog-manager exclusion.
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — edit the `Long` text in `boot.go` to drop or reframe the "special dog" metaphor. Candidate replacements: `"Boot is a daemon-tick watchdog"`, `"Boot is a short-lived triage agent that runs fresh on each daemon tick"`, or `"Boot is a special-purpose agent under ~/gt/deacon/dogs/boot/ but is not a kennel dog"`. Any replacement that preserves the "fresh per daemon tick" semantics without inviting the "it's a dog" mental model is acceptable.
+- **Release position:** `in-release` — `boot.go:31-45` is byte-identical at `v1.0.0`; `internal/dog/manager.go:300` "not a dog" exclusion is present at `v1.0.0`.
+
 ## Related commands
 
 - [../binaries/gt.md](../binaries/gt.md) — root.
@@ -149,13 +191,11 @@ Mechanical steps:
 
 ## Notes / open questions
 
-- **"Special dog" vs [dog.md](dog.md).** The Long help calls Boot
-  "a special dog", but Boot is not registered in the `dog.Manager`
-  kennel, has no `AgentDog` type in [agents.md](agents.md), and
-  lives under `~/gt/deacon/dogs/boot/` rather than inside a
-  rig worktree. The only thing Boot shares with dogs is the
-  `deacon/dogs/` filesystem prefix. Worth reconciling when the
-  role/concept page for Dog is written in Batch 6.
+- **"Special dog" vs [dog.md](dog.md).** → promoted to `## Drift` as
+  `cobra drift`: the `Long` text at `boot.go:33` calls Boot "a special
+  dog" but `internal/dog/manager.go:300` explicitly excludes Boot from
+  the kennel, and no `AgentDog` type exists anywhere in the code tree.
+  See [../drift/README.md](../drift/README.md).
 - **`boot spawn` in non-degraded mode** claims to run the agent in a
   fresh tmux session, but the actual behavior depends on
   `boot.Spawn` in the `internal/boot` package — not visible from

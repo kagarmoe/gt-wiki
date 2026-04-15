@@ -4,10 +4,14 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/session.go
 tags: [command, agents, session, tmux, polecat-session, lifecycle]
+phase3_audited: 2026-04-15
+phase3_findings: [wiki-stale]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt session
@@ -228,8 +232,14 @@ names don't collide.
   management. `gt session` is the low-level tmux layer under
   `gt polecat`.
 - [nudge.md](nudge.md) — the preferred message-injection path.
-  `session inject` is explicitly deprecated in favor of nudge
-  per the Long help at `session.go:48-49,116-121`.
+  `session inject`'s `Short` text at `session.go:115` reads
+  `"Send message to session (prefer 'gt nudge')"` and its `Long`
+  at `:116-123` recommends `gt nudge` for Claude-session messages
+  while preserving `inject` as "a low-level primitive for
+  file-based injection or cases where you need raw tmux send-keys
+  behavior." The parent `sessionCmd.Long` at `:48-49` echoes the
+  same "prefer `gt nudge`" TIP. `inject` is **not** deprecated —
+  it is preserved for file injection and raw send-keys use cases.
 - [seance.md](seance.md) — higher-level "resume a dead session"
   helper; uses session metadata `gt session status` exposes.
 - [resume.md](resume.md) — another resume path.
@@ -255,6 +265,22 @@ names don't collide.
 
 ## Notes / open questions
 
+- **Phase 3 wiki-stale fix (2026-04-15).** The Phase 2 Related-commands
+  cross-link to `nudge.md` characterized `session inject` as "explicitly
+  deprecated in favor of nudge." Re-read at current HEAD: neither
+  `sessionCmd.Long` at `session.go:43-49` nor `sessionInjectCmd.Long`
+  at `session.go:116-127` uses the word "deprecated." Both recommend
+  `gt nudge` for Claude-session messages but explicitly preserve
+  `inject` as "a low-level primitive for file-based injection or cases
+  where you need raw tmux send-keys behavior." The `prefer-nudge`
+  relationship is a preference, not a deprecation — the primitive is
+  intentionally kept for file-injection (`-f`) use cases. Cross-link
+  text rewritten to match the actual framing. **Phase 2 root cause:**
+  `phase-2-incomplete` (heuristic — the Long text was byte-identical
+  at `v1.0.0`, so Phase 2 had access to the "prefer" wording on
+  2026-04-11 and overstated it). This is a small cross-link polish
+  rather than a substantive body rewrite. Drift index:
+  [../drift/README.md](../drift/README.md).
 - **Both `--lines` flag and positional `count`.** The positional
   overrides the flag if present. Surprising if a user writes
   `gt session capture rig/cat -n 50 200` expecting 50 lines.

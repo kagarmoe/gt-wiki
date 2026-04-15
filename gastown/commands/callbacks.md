@@ -4,10 +4,14 @@ type: command
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/callbacks.go
 tags: [command, agents, mail, callbacks, mayor, routing, escalation]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt callbacks
@@ -140,6 +144,44 @@ the mailbox. Unknown-type messages stay in the inbox.
 Verbose mode prints the message `From:` and `Subject:` under each
 processed entry (`callbacks.go:169-172`).
 
+## Docs claim
+
+### Source
+- `/home/kimberly/repos/gastown/internal/cmd/callbacks.go:88-103` — Cobra `Long` text on `callbacksProcessCmd`.
+
+### Verbatim
+
+> Process all pending callbacks in the Mayor's inbox.
+>
+> Reads unread messages from the Mayor's inbox and handles each based on
+> its type:
+>
+>   POLECAT_DONE       - Log completion, update stats
+>   MERGE_COMPLETED    - Notify worker, close source issue
+>   MERGE_REJECTED    - Notify worker of rejection reason
+>   HELP:              - Route to human or handle if possible
+>   ESCALATION:        - Log and route to human
+>   SLING_REQUEST:     - Spawn polecat for the work
+>
+> Note: Witnesses and Refineries handle routine operations autonomously.
+> They only send escalations for genuine problems, not status reports.
+>
+> Unknown message types are logged but left unprocessed.
+
+## Drift
+
+See forward-link: [../drift/README.md](../drift/README.md).
+
+### `SLING_REQUEST` handler does not "spawn polecat for the work" — it only logs
+
+- **Claim source:** Cobra `Long` text at `/home/kimberly/repos/gastown/internal/cmd/callbacks.go:98`.
+- **Docs claim:** the `Long`'s per-type table says `SLING_REQUEST: - Spawn polecat for the work`. Alongside the neighbouring rows (`POLECAT_DONE - Log completion, update stats`, `MERGE_COMPLETED - Notify worker, close source issue`), which accurately describe what the handlers do, this framing presents `SLING_REQUEST` as the row that causes `gt callbacks process` to dispatch work to a polecat.
+- **Code does:** `handleSling` at `callbacks.go:471-502` parses the bead ID from the subject and the target rig from the body, then calls `logCallback` with `"sling_request: bead %s to rig %s"` and returns the action string `"logged sling request: %s to %s (execute with: gt sling %s %s)"`. The in-file comment at `callbacks.go:498-499` is explicit: `"Note: We don't actually spawn here - that would be done by the Deacon executing the sling command based on this request."` No `runSling` / `sling.Dispatch` / `exec.Command("gt", "sling", ...)` call exists anywhere in this file. The callback loop also archives the handled message after the "handled" return (`callbacks.go:246-251`), so the logged-but-not-spawned row disappears from the Mayor's inbox with nothing having been dispatched. A user reading the `Long` and running `gt callbacks process` on a mailbox containing `SLING_REQUEST:` rows would observe the rows disappear and reasonably conclude that polecats had been spawned for them, when in fact the spawn step is the Deacon's separate responsibility and happens asynchronously (if at all).
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — edit the `Long` row to describe what `handleSling` actually does. Candidate replacement: `"SLING_REQUEST: - Log the request (Deacon executes the actual sling)"` or `"SLING_REQUEST: - Log and archive (spawn is Deacon's responsibility via gt sling)"`. The row should make the logged-only nature clear so operators understand `gt callbacks process` does not itself drain the sling queue.
+- **Release position:** `in-release` — `callbacks.go:88-103` `Long` text and `callbacks.go:471-502` `handleSling` body are both byte-identical at `v1.0.0`.
+
 ## Related commands
 
 - [../binaries/gt.md](../binaries/gt.md) — root.
@@ -167,11 +209,12 @@ processed entry (`callbacks.go:169-172`).
   inbox. This is consistent with the Mayor being the router but
   means non-Mayor agents who accidentally run it will mutate the
   Mayor's mailbox.
-- **`handleSling` doesn't sling.** The action string leaks the
-  exact `gt sling <bead> <rig>` invocation into the log but never
-  runs it. Callers relying on `gt callbacks process` to drain the
-  sling queue will be surprised if the Deacon isn't separately
-  executing slings.
+- **`handleSling` doesn't sling.** → promoted to `## Drift` as
+  `cobra drift`: the `Long` text at `callbacks.go:98` says
+  `SLING_REQUEST: - Spawn polecat for the work`, but `handleSling` at
+  `callbacks.go:471-502` only logs; the in-file comment at `:498-499`
+  spells out that the actual spawn is Deacon's responsibility. See
+  [../drift/README.md](../drift/README.md).
 - **`handleMergeCompleted` uses `cwd` for beads.** Line
   `callbacks.go:343` calls `beads.New(cwd)` rather than
   `beads.New(townRoot)`. If the operator runs `gt callbacks

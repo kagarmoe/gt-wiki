@@ -245,10 +245,30 @@ Every Phase 3+ finding fits exactly one primary category (with `compound drift` 
 | `implementation-status: partial` | Docs describe partially-implemented behavior. | `## Implementation status` tagged `partial` | **None** (preserve + status callout) |
 | `implementation-status: vestigial` | Code exists but is explicitly documented or commented as superseded / dead / "no longer runs". | `## Implementation status` tagged `vestigial` | **Code** (remove dead code) OR **Docs** (document the vestige) — per finding |
 | `gap` | Docs describe something real that has no wiki page yet (Phase 2 missed it or deferred it). | New `wants-wiki-entry` bead + `## Notes / open questions` entry pointing at the gap. | **Wiki** (Phase 2 coverage extension) |
-| `wiki-stale` | Phase 2 wiki page body disagrees with current source — our own synthesis has drifted. | Fix inline in `## What it actually does`. Log under `lint` verb, not `drift-found`. | **Wiki** (our synthesis) |
+| `wiki-stale` | Phase 2 wiki page body disagrees with current source — our own synthesis has drifted or was never accurate. | Fix inline in `## What it actually does`. Log under `lint` verb, not `drift-found`. | **Wiki** (our synthesis) |
 | `neutral` | Notes that on review turn out NOT to be drift (naming observations, curiosities, future considerations). | Stays in `## Notes / open questions`. No promotion. | **None** |
 
 **The critical distinction:** `drift` / `cobra drift` / `compound drift` mean *something needs to be corrected*. `implementation-status` means *docs are aspirationally correct and the reader should be told the feature isn't built yet*. Mixing these up is the single biggest risk during audits. Phase 6 (Implementation) treats them differently: drift gets factually rewritten; implementation-status gets a "not yet implemented" callout preserved as-is.
+
+### `wiki-stale` sub-distinction: churn vs Phase-2-incomplete
+
+A `wiki-stale` finding has one of two root causes. **Tag every wiki-stale finding with one of these two values** in its inline body via a `**Phase 2 root cause:**` line:
+
+| Sub-type | Meaning | Signal |
+|---|---|---|
+| **`churn`** | The Phase 2 wiki page body was correct AT PHASE 2 TIME, but the gastown source has since changed. The wiki is stale because gastown moved. | The cited `file:line` at the Phase 2 reading date matched what Phase 2 wrote; only the current HEAD differs. Determine via `git -C ~/repos/gastown show <phase2-date-or-commit>:<file>`. |
+| **`phase-2-incomplete`** | The Phase 2 wiki page body was wrong AT PHASE 2 TIME — Phase 2 missed sibling-file registrations, took a parent file in isolation, skipped a code path, or otherwise produced a synthesis that the source did not back up at the time of writing. | The cited `file:line` at the Phase 2 reading date ALSO contradicted what Phase 2 wrote. Both Phase 2's HEAD and current HEAD disagree with the wiki body. |
+
+**Why this matters:** `phase-2-incomplete` findings are not just lint cleanup — they are evidence that Phase 2's mapping methodology had blind spots. Aggregating `phase-2-incomplete` count across batches tells us which Phase 2 sub-batches need re-audit and informs Phase 4 (Coverage / Completeness) scope. `churn` findings are routine maintenance.
+
+**Determination procedure:** for each wiki-stale finding, after the inline fix:
+1. Find the Phase 2 commit that created or last touched the wiki page: `git -C ~/repos/gt-wiki log --diff-filter=AM -1 --format=%H -- <wiki-page>` gives the SHA. The corresponding gastown commit is at the date of the wiki commit (use `git -C ~/repos/gastown rev-list -1 --before='<date>' main`).
+2. Re-read the cited gastown file at that gastown commit: `git -C ~/repos/gastown show <gastown-sha>:<file>`.
+3. If Phase 2's wiki body matches what the file said at the gastown commit → tag `churn`. If not → tag `phase-2-incomplete`.
+
+For Sweep 1 batches where this procedure adds substantial overhead, a heuristic is acceptable: if the finding comes from a missed sibling-file `init()` registration, a missed code path, or a parent-only-file misread, default to `phase-2-incomplete` and note "heuristic determination" in the finding body. The Sweep 1 retrospective gate (between Batches 4 and 5) revisits any heuristic determinations that look borderline.
+
+**Decision history:** added 2026-04-15 mid-Phase-3 after Batch 1b surfaced two `phase-2-incomplete` cases (`directive`, `hooks`) that Phase 2 produced by reading parent .go files in isolation without checking sibling files for subcommand wiring. Kimberly: "capture Phase-2-time-vs-churn wiki-stale, because that signals our stage 2 was incomplete." Findings filed before this clarification (Batch 1b) may be retroactively tagged at the Sweep 1 retrospective gate.
 
 **Release position (orthogonal):** every finding carries a release position alongside its category.
 
@@ -266,33 +286,6 @@ git show "$last_tag:<cited-file>" 2>/dev/null | grep -n "<symbol>"
 ```
 
 The release position is recorded inline in the finding body. Frontmatter summarizes via `phase3_findings_post_release: true` iff the page has any post-release finding.
-
-## Severity (orthogonal to category, docs convention)
-
-Alongside category and release position, every finding carries a **severity** tag. Legal values follow the docs convention, least → most severe:
-
-- **`ambiguous`** (least severe) — the claim is too vague to verify against code; reader has to guess what's meant. Phase 3 Sweep 2 flags this opportunistically when reading docs files, but the dedicated audit is Phase 7 (Correctness). Rare in Phase 3.
-- **`incomplete`** — the claim covers the topic but leaves out important details. `implementation-status: partial` findings default to this. Phase 4 (Coverage/Completeness) owns the full audit.
-- **`wrong`** — the claim actively contradicts code. **Phase 3's primary severity.** Every `cobra drift`, `drift`, `compound drift`, and `implementation-status: unbuilt` / `vestigial` finding defaults to `severity: wrong`.
-- **`missing`** (most severe) — the code has a feature that no claim exists for anywhere. NOT Phase 3 scope; Phase 4 owns this entirely. If you're about to write a `missing` severity in Phase 3, you're in the wrong phase — file a `wants-wiki-entry` bead or escalate to Kimberly.
-
-**Why severity is separate from category:** category tells you WHAT the finding looks like (drift vs implementation-status vs wiki-stale vs gap); severity tells you HOW BAD it is for docs consumers. A `cobra drift` finding and a `drift` finding are both `wrong` — same severity, different fix tier. A `partial` implementation-status finding is `incomplete` — less severe than `wrong` but more severe than `ambiguous`.
-
-**Phase 7 feedback loop:** Phase 7 (Correctness) re-evaluates severity tags after Phase 6 ships. Findings that Phase 3 tagged `wrong` but Phase 6 couldn't cleanly fix may get re-tagged `ambiguous` — the root cause turned out to be "code does something unclear, not something measurably different from the docs." This is how the audit adapts when implementation reveals audit errors.
-
-## PR reference (optional, populated over time)
-
-Alongside the release-position and severity tags, each finding can carry an optional **PR reference** field pointing at the upstream gastown PR that addresses it. The field is absent by default — **Phase 3 does not populate it**. Phase 6 (Implementation) adds it when it files or discovers a PR; release-sync updates it when the PR merges.
-
-States:
-
-- **Absent (default)** — no upstream PR has been filed or discovered yet. The finding body simply omits the `**PR reference:**` line.
-- **`gastown#<N> (open)`** — an upstream PR exists, either filed by Phase 6 or discovered during release-sync. The PR is open, not yet merged.
-- **`gastown#<N> (merged in v<X>)`** — the upstream PR has merged in release `v<X>`. The finding is resolved; it moves to an archived section of `gastown/drift/README.md` (or gets removed with a `lint` log entry).
-
-**Why this matters:** without the PR reference field, the corrections list goes stale as PRs land upstream between Phase 3 and Phase 6. With it, the list becomes a living work-tracker that survives multiple release-syncs — findings archive themselves as they resolve, and Phase 6 can see which findings already have open PRs before filing duplicates.
-
-**Phase 3's responsibility is just to create findings with a slot where a PR ref can later live.** Do NOT populate `**PR reference:**` during a Phase 3 audit. That's Phase 6's job.
 
 ## Cross-link discipline (10 rules)
 

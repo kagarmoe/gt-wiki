@@ -1857,3 +1857,43 @@ Both `wiki-stale` findings (directive, hooks) point at code that existed at v1.0
   [gastown/commands/shell.md](gastown/commands/shell.md),
   [gastown/commands/theme.md](gastown/commands/theme.md),
   [gastown/commands/uninstall.md](gastown/commands/uninstall.md)
+
+## [2026-04-15] decision | Schema clarification: wiki-stale sub-distinction (churn vs phase-2-incomplete)
+
+Phase 3 Batch 1b (commit 8ac505d, Configuration sub-batch) surfaced two `wiki-stale` findings on `gastown/commands/directive.md` and `gastown/commands/hooks.md`. The 1b subagent flagged that both findings are NOT "wiki page was correct at Phase 2 time and gastown has since changed." Both are "Phase 2 read the parent `.go` file (`directive.go` / `hooks.go`) in isolation and missed the sibling files (`directive_show.go`, `directive_edit.go`, `directive_list.go`, `hooks_base.go`, `hooks_override.go`, `hooks_sync.go`, `hooks_diff.go`, `hooks_list.go`, `hooks_scan.go`, `hooks_registry.go`, `hooks_install.go`, `hooks_init.go`) that wire the advertised subcommands." The wiki body was wrong AT PHASE 2 TIME — both Phase 2's HEAD and current HEAD contradict the wiki body the same way.
+
+Kimberly's ruling: capture this distinction in the schema. *"Capture Phase-2-time-vs-churn wiki-stale, because that signals our stage 2 was incomplete."*
+
+### Change
+
+The `wiki-stale` row of the drift taxonomy in [.claude/skills/writing-entity-pages/SKILL.md](.claude/skills/writing-entity-pages/SKILL.md) now requires every wiki-stale finding to carry a sub-type tag in its inline body via a `**Phase 2 root cause:**` line:
+
+- **`churn`** — wiki was correct at Phase 2 time; gastown has moved since.
+- **`phase-2-incomplete`** — wiki was wrong at Phase 2 time (Phase 2 missed sibling files / code paths / registrations).
+
+Determination procedure documented in the skill: re-read the cited gastown file at the gastown commit corresponding to the wiki page's Phase 2 commit date, and compare against current Phase 2 wiki body. A heuristic fallback is allowed for Sweep 1 batches where the per-finding archeology is disproportionate to the audit-trail value; heuristic determinations get noted in the finding body and revisited at the Sweep 1 retrospective gate.
+
+### Why this is not a v1.2 → v1.3 schema bump
+
+This is a clarification of an existing taxonomy category, not a new finding category, new frontmatter field, or new section. The `wiki-stale` row already existed; the addition is a discriminator within it. Per the schema evolution policy in [.claude/skills/maintaining-wiki-schema/SKILL.md](.claude/skills/maintaining-wiki-schema/SKILL.md), this is a "minor wording refinement" that does not bump the version. v1.2 stays v1.2.
+
+### Why this matters for Phase 4 / Phase 7
+
+`phase-2-incomplete` count is a quality signal on Phase 2's mapping methodology. If `phase-2-incomplete` accumulates across multiple Sweep 1 batches, Phase 4 (Coverage / Completeness) should re-scope to include "re-audit Phase 2 sub-batches with X+ phase-2-incomplete count." Phase 7 (Correctness) closes the loop by checking whether the re-audits caught everything.
+
+`churn` count is routine wiki maintenance — interesting for "how fast is the wiki bit-rotting," but not a Phase 2 quality signal.
+
+### Retroactive tagging
+
+Findings filed BEFORE this clarification (Batch 1b's two `wiki-stale` findings on `directive` and `hooks`) are NOT retroactively edited in-place — the append-only rule applies. The Sweep 1 retrospective gate (between Batches 4 and 5) is the natural moment to revisit them and either:
+(a) Append a `lint`-verb log entry tagging both as `phase-2-incomplete` based on the 1b subagent's already-recorded determination,
+(b) Re-read both pages and tag in place via a follow-up commit + lint log entry,
+(c) Decide retroactive tagging is unnecessary because the audit trail already implies the determination via the subagent's report.
+
+Decision deferred to the retrospective gate.
+
+### Wiki-stale log placement (separate decision deferred)
+
+The 1b subagent also flagged that wiki-stale findings should log under the `lint` verb per the skill, not `drift-found`. Batch 1b folded its wiki-stale findings into the `drift-found` Batch 1b entry to preserve audit-trail continuity. Kimberly's ruling: defer the placement question to the Sweep 1 retrospective gate as well. Do not re-classify or re-log Batch 1b's entries until then.
+
+→ [.claude/skills/writing-entity-pages/SKILL.md](.claude/skills/writing-entity-pages/SKILL.md), [.claude/plans/2026-04-14-phase3-drift.md](.claude/plans/2026-04-14-phase3-drift.md), `gastown/commands/directive.md`, `gastown/commands/hooks.md`

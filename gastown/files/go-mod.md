@@ -4,10 +4,14 @@ type: file
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-14
 sources:
   - /home/kimberly/repos/gastown/go.mod
 tags: [file, go, modules, dependencies]
+phase3_audited: 2026-04-14
+phase3_findings: [wiki-stale, drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # go.mod
@@ -58,7 +62,7 @@ Only the Nix path exactly matches the `go.mod` declaration.
 
 ### Direct requires
 
-`go.mod:5-36` — 31 direct `require` entries (no `// indirect`
+`go.mod:5-36` — 30 direct `require` entries (no `// indirect`
 comment). Grouped below by rough functional category:
 
 **CLI framework:**
@@ -207,19 +211,35 @@ Build paths that specifically touch `go.sum`:
   enumeration of packages within the module (not the external
   dependencies).
 
+## Drift
+
+### Go version disagrees across three build paths
+
+- **Claim source:** `go.mod:3` declares `go 1.25.8` as the module's
+  required Go version. Three build paths in the same repo each use a
+  different Go version.
+- **Docs claim:** `go.mod:3` — `go 1.25.8`.
+- **Code does:** [Dockerfile](dockerfile.md):5 pins `GO_VERSION=1.25.6`
+  (one patch behind). [Dockerfile.e2e](dockerfile-e2e.md):12 uses
+  `golang:1.26-alpine` (one minor ahead). [flake.nix](flake-nix.md):24
+  overlays to `1.25.8` (matches).
+- **Category:** `drift`
+- **Severity:** `wrong`
+- **Fix tier:** `docs` — the Dockerfile `GO_VERSION` should be updated
+  to match `go.mod`, or `go.mod` should document which version is
+  canonical. Dockerfile.e2e using 1.26 is a forward-compatibility choice
+  that's less concerning.
+- **Release position:** `in-release`
+
+See also: [gastown/drift/README.md](../drift/README.md) (when the
+consolidated index exists).
+
 ## Notes / open questions
 
 - The beads library version here (`v0.63.3`) disagrees with
   [flake.nix](flake-nix.md)'s overlay comment ("beads v0.60.0 deps").
   The Nix overlay may no longer be necessary under the current beads
   version.
-- Three Go version declarations across the repo disagree with this
-  file's `go 1.25.8`:
-  - `Dockerfile: 1.25.6` (behind)
-  - `Dockerfile.e2e: 1.26` (ahead)
-  - `flake.nix: 1.25.8` (matches)
-  Reproducibility concern: a feature added in 1.25.7 or 1.25.8 would
-  break the primary Dockerfile build.
 - 95 indirect dependencies is a large surface area. `testcontainers-go`
   alone pulls in the entire Docker / containerd Go client stack.
 - `github.com/shirou/gopsutil/v4` showing up indirectly suggests some

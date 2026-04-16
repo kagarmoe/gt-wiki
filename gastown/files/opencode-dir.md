@@ -10,6 +10,10 @@ sources:
   - /home/kimberly/repos/gastown/.opencode/commands/handoff.md
   - /home/kimberly/repos/gastown/.opencode/plugins/gastown.js
 tags: [file, agent-facing, opencode]
+phase3_audited: 2026-04-14
+phase3_findings: [none]
+phase3_severities: []
+phase3_findings_post_release: false
 ---
 
 # .opencode/

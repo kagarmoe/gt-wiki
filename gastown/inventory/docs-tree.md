@@ -4,10 +4,14 @@ type: note
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-14
 sources:
   - /home/kimberly/repos/gastown/docs/
 tags: [inventory, enumeration, docs, batch-12]
+phase3_audited: 2026-04-14
+phase3_findings: [wiki-stale]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gastown `docs/` tree inventory
@@ -142,9 +146,9 @@ stated subject, not our interpretation of it.
 ## Totals
 
 - **60 files total** under `docs/`.
-- **10 subdirectories** (`concepts`, `design`, `design/convoy`,
+- **11 subdirectories** (`concepts`, `design`, `design/convoy`,
   `design/convoy/stage-launch`, `design/otel`, `examples`, `gas-city`,
-  `guides`, `research`, `skills`).
+  `guides`, `research`, `skills`, `skills/convoy`).
 - **Line count total:** ~23,600 lines of documentation (sum of all
   line counts above).
 - **Largest single file:** `docs/guides/mvgt-integration.md` at 1,217

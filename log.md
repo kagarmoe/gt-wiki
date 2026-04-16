@@ -2911,3 +2911,103 @@ Batch 2 overall yield (8%) is below the plan's 15-25% estimate, confirming that 
   [gastown/packages/state.md](gastown/packages/state.md),
   [gastown/packages/templates.md](gastown/packages/templates.md),
   [gastown/packages/tui.md](gastown/packages/tui.md)
+
+## [2026-04-14] lint | Batch 3 wiki-stale findings (docker-entrypoint.md line count, go-mod.md require count, docs-tree.md subdir count)
+
+Three wiki-stale fixes applied inline:
+
+1. **docker-entrypoint.md** — wiki body said "23-line POSIX shell script"; actual file is 22 lines at HEAD (`wc -l docker-entrypoint.sh` = 22). Fixed to "22-line". **Phase 2 root cause:** phase-2-incomplete (heuristic determination — the file has not changed since Phase 2).
+2. **go-mod.md** — wiki body said "31 direct `require` entries"; actual count is 30 (lines 6-35 of `go.mod`). Fixed to "30". **Phase 2 root cause:** phase-2-incomplete (heuristic determination).
+3. **docs-tree.md** — Totals section said "10 subdirectories"; actual count is 11 (Phase 2 missed `docs/skills/convoy/` as a separate subdirectory). Fixed to "11" and added the missing entry. **Phase 2 root cause:** phase-2-incomplete (heuristic determination).
+
+All three are in-release (zero commits between v1.0.0 and HEAD across all audited files).
+
+-> [gastown/files/docker-entrypoint.md](gastown/files/docker-entrypoint.md),
+  [gastown/files/go-mod.md](gastown/files/go-mod.md),
+  [gastown/inventory/docs-tree.md](gastown/inventory/docs-tree.md)
+
+## [2026-04-14] drift-found | Batch 3 (Sweep 1 files/ + inventory/ — 17 pages)
+
+**Scope:** Phase 3 Sweep 1 sub-batch 3: audited 12 files/ pages and 5 inventory/ pages. Single batch (not sub-batched).
+
+**Churn:** Zero commits between v1.0.0 and HEAD across all 17 source files (`git log --oneline v1.0.0..HEAD -- <file>` returned empty for every file). All findings are in-release.
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/go.mod` (lines 1-36 direct requires, line 134 end)
+- `/home/kimberly/repos/gastown/.goreleaser.yml` (lines 151-180 release section, grep for `brews`)
+- `/home/kimberly/repos/gastown/Dockerfile` (line 5 GO_VERSION)
+- `/home/kimberly/repos/gastown/Dockerfile.e2e` (line 12 base image)
+- `/home/kimberly/repos/gastown/flake.nix` (lines 20-26 Go overlay)
+- `/home/kimberly/repos/gastown/docker-entrypoint.sh` (full, 22 lines)
+- `/home/kimberly/repos/gastown/docker-compose.yml` (full, 44 lines)
+- `/home/kimberly/repos/gastown/.golangci.yml` (full, 111 lines)
+- `/home/kimberly/repos/gastown/Makefile` (lines 1-50)
+- `/home/kimberly/repos/gastown/.claude/` (directory listing)
+- `/home/kimberly/repos/gastown/.opencode/` (directory listing)
+- `/home/kimberly/repos/gastown/templates/agents/` (directory listing)
+- `/home/kimberly/repos/gastown/docs/` (recursive file count + subdirectory enumeration)
+- `find /home/kimberly/repos/gastown/internal/ -maxdepth 1 -type d` (package count)
+- `find /home/kimberly/repos/gastown -maxdepth 1` (top-level file + dir count)
+
+**Docs files read:** none (Sweep 1).
+
+**Wiki pages audited (17):**
+
+| Page | phase3_findings | Notes |
+|---|---|---|
+| [go-mod.md](gastown/files/go-mod.md) | `[wiki-stale, drift]` | Require count fixed (31->30). Go version disagreement promoted from Notes to v1.2 Drift section. |
+| [goreleaser-yml.md](gastown/files/goreleaser-yml.md) | `[drift]` | No `brews:` block vs `brew install gastown` in release header. Promoted from Notes to v1.2 Drift section with Docs claim. |
+| [docker-entrypoint.md](gastown/files/docker-entrypoint.md) | `[wiki-stale]` | Line count fixed (23->22). |
+| [docs-tree.md](gastown/inventory/docs-tree.md) | `[wiki-stale]` | Subdirectory count fixed (10->11, missed `skills/convoy/`). |
+| [claude-dir.md](gastown/files/claude-dir.md) | `[none]` | Layout matches HEAD. 3 commands + 4 skills confirmed. |
+| [docker-compose.md](gastown/files/docker-compose.md) | `[none]` | 44-line file matches wiki description. |
+| [dockerfile-e2e.md](gastown/files/dockerfile-e2e.md) | `[none]` | 74-line file matches. Go 1.26-alpine, BD v0.57.0, Dolt v1.82.4 all confirmed. |
+| [dockerfile.md](gastown/files/dockerfile.md) | `[none]` | 56-line file matches. GO_VERSION=1.25.6 confirmed. |
+| [flake-nix.md](gastown/files/flake-nix.md) | `[none]` | Go overlay to 1.25.8, version 0.8.0 hardcoded, all confirmed. |
+| [golangci-yml.md](gastown/files/golangci-yml.md) | `[none]` | 111-line file, 5 linters, exclusion list all confirmed. |
+| [makefile.md](gastown/files/makefile.md) | `[none]` | 167-line file matches. All targets, LDFLAGS, line numbers confirmed. |
+| [opencode-dir.md](gastown/files/opencode-dir.md) | `[none]` | 1 command + 1 plugin confirmed. |
+| [templates-agents.md](gastown/files/templates-agents.md) | `[none]` | 2 files confirmed (opencode.json.tmpl 754B, opencode-models.json 1924B). |
+| [auxiliary.md](gastown/inventory/auxiliary.md) | `[none]` | 9 directories confirmed. |
+| [go-packages.md](gastown/inventory/go-packages.md) | `[none]` | 67 internal packages, 1088 .go files confirmed. |
+| [README.md](gastown/inventory/README.md) | `[none]` | Sub-index pages all present. |
+| [repo-root.md](gastown/inventory/repo-root.md) | `[none]` | 24 files, 15 directories confirmed at HEAD. |
+
+**Findings by category:**
+- **drift:** 2 findings on 2 pages. goreleaser-yml.md: release header advertises `brew install gastown` but no `brews:` block exists (`.goreleaser.yml:164-167`). go-mod.md: Go version `1.25.8` disagrees with Dockerfile `1.25.6` and Dockerfile.e2e `1.26` (`go.mod:3`, `Dockerfile:5`, `Dockerfile.e2e:12`).
+- **wiki-stale:** 3 findings on 3 pages (all phase-2-incomplete, heuristic). docker-entrypoint.md: line count 23->22. go-mod.md: require count 31->30. docs-tree.md: subdir count 10->11.
+- **none:** 13 pages audited with no findings.
+
+**Yield:** 4/17 pages (24%). 2 drift + 3 wiki-stale across 4 pages.
+
+**New beads filed:** none.
+**Beads closed:** none.
+**Cross-link discipline:** 2 new `## Drift` sections added (go-mod.md, goreleaser-yml.md). 1 new `## Docs claim` section added (goreleaser-yml.md). All `file:line` refs are current (freshly read from HEAD). Forward links to `gastown/drift/README.md` noted as pending (drift index does not yet exist — created in Batch 13).
+
+**Pre-flagged findings — disposition:**
+
+| Pre-flagged item | Page | Disposition |
+|---|---|---|
+| Go version disagreement (Phase 2 noted) | go-mod.md | **Promoted to drift.** Three build paths disagree with go.mod's `go 1.25.8`. v1.2 Drift section added. |
+| No brews block vs README brew claim (Phase 2 noted) | goreleaser-yml.md | **Promoted to drift.** Release header at `.goreleaser.yml:164-167` advertises `brew install gastown` with no mechanism to fulfill it. v1.2 Drift + Docs claim sections added. |
+| Makefile existing 2-item Drift section | makefile.md | **No existing Drift section found.** Phase 2 Notes bullets about BuildTime and desktop-build are neutral observations, not drift. No promotion needed. |
+
+**Next batch:** Batch 4 (roles/, concepts/, workflows/, binaries/, plugins/). Tracked in bead wiki-vxl.
+
+-> [gastown/files/go-mod.md](gastown/files/go-mod.md),
+  [gastown/files/goreleaser-yml.md](gastown/files/goreleaser-yml.md),
+  [gastown/files/docker-entrypoint.md](gastown/files/docker-entrypoint.md),
+  [gastown/files/claude-dir.md](gastown/files/claude-dir.md),
+  [gastown/files/docker-compose.md](gastown/files/docker-compose.md),
+  [gastown/files/dockerfile-e2e.md](gastown/files/dockerfile-e2e.md),
+  [gastown/files/dockerfile.md](gastown/files/dockerfile.md),
+  [gastown/files/flake-nix.md](gastown/files/flake-nix.md),
+  [gastown/files/golangci-yml.md](gastown/files/golangci-yml.md),
+  [gastown/files/makefile.md](gastown/files/makefile.md),
+  [gastown/files/opencode-dir.md](gastown/files/opencode-dir.md),
+  [gastown/files/templates-agents.md](gastown/files/templates-agents.md),
+  [gastown/inventory/auxiliary.md](gastown/inventory/auxiliary.md),
+  [gastown/inventory/docs-tree.md](gastown/inventory/docs-tree.md),
+  [gastown/inventory/go-packages.md](gastown/inventory/go-packages.md),
+  [gastown/inventory/README.md](gastown/inventory/README.md),
+  [gastown/inventory/repo-root.md](gastown/inventory/repo-root.md)

@@ -606,3 +606,30 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 - none — lessons are purely informational
 
 **Batch 2 cumulative yield:** 6/61 pages (10%), driven by wiki-stale findings (3), cobra-drift (1), drift (1), and implementation-status (1). Notes-section promotion produced 1 drift finding across all 6 package sub-batches (health.md in 2d). The dominant finding source was package-file audit (frontmatter completeness errors) and pre-flagged Phase 2 cross-references, not Notes review. Packages without Cobra Long text have structurally low drift surfaces.
+
+## [2026-04-14 23:45] stage | Phase3.Batch3 — files/ + inventory/ sweep
+
+**Actor:** wiki-curator subagent (single dispatch)
+**Unit:** 17 pages audited (12 files/, 5 inventory/). 15+ source files re-read at HEAD. 2 drift sections added, 3 wiki-stale fixes applied inline. 1 commit.
+**Duration:** one dispatch
+
+**What went well:**
+
+- Zero-churn fast path applied correctly: `git log --oneline v1.0.0..HEAD` returned empty for all 17 source files, so release-position determination was trivial (all in-release).
+- Pre-flagged items from the dispatch prompt had a 67% promotion rate (2 of 3 promoted: go-mod Go version disagreement, goreleaser brew claim). The third (makefile.md "existing 2-item Drift section") turned out to be a dispatch-prompt mischaracterization -- there was no existing Drift section, only Notes bullets that are neutral.
+- Single-batch decision was correct for this page set. 17 pages with low drift surface finished comfortably in one dispatch.
+
+**What didn't:**
+
+- The dispatch prompt said makefile.md had an "existing 2-item Drift section already captured." It does not. This caused brief confusion during audit. Pre-flagged claims in dispatch prompts should be verified against the actual page before being stated as fact.
+- Three wiki-stale findings were all phase-2-incomplete (off-by-one line count, off-by-one require count, missed subdirectory). These are trivial errors that Phase 2's methodology would have caught with stricter verification (e.g., always running `wc -l` to verify line counts stated in wiki body).
+
+**What to change next time:**
+
+- Dispatch prompts should not assert "existing Drift section" without verifying. State as "Phase 2 Notes mention X; check if promotion is warranted."
+- For Batch 4 (roles/, concepts/, workflows/, binaries/, plugins/ -- 22 pages), many pages reference `docs/design/` files that Sweep 2 will audit independently. Avoid duplicating Sweep 2 scope: annotate entity-page drift from code-side only; defer docs-side drift to the Sweep 2 batch that reads the specific docs file.
+
+**Follow-ups filed:**
+- none -- lessons are purely informational
+
+**Batch 3 yield:** 5 findings on 4/17 pages (24%). 2 drift + 3 wiki-stale. All in-release. Within the plan's 10-20% estimate (slightly above). The two pre-flagged drift items (Go version disagreement, goreleaser brew claim) were the only substantive findings; the three wiki-stale items were minor counting errors.

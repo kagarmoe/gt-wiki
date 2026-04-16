@@ -9,6 +9,10 @@ sources:
   - /home/kimberly/repos/gastown/flake.nix
   - /home/kimberly/repos/gastown/flake.lock
 tags: [file, nix, flake, build, devshell]
+phase3_audited: 2026-04-14
+phase3_findings: [none]
+phase3_severities: []
+phase3_findings_post_release: false
 ---
 
 # flake.nix

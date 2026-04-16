@@ -4,17 +4,21 @@ type: file
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-14
 sources:
   - /home/kimberly/repos/gastown/docker-entrypoint.sh
   - /home/kimberly/repos/gastown/Dockerfile
   - /home/kimberly/repos/gastown/docker-compose.yml
 tags: [file, docker, entrypoint, init, shell]
+phase3_audited: 2026-04-14
+phase3_findings: [wiki-stale]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # docker-entrypoint.sh
 
-23-line POSIX shell script that runs as PID 1 inside the primary
+22-line POSIX shell script that runs as PID 1 inside the primary
 container image. Lives at
 `/home/kimberly/repos/gastown/docker-entrypoint.sh`. Referenced by the
 primary [Dockerfile](dockerfile.md):55 as `ENTRYPOINT ["tini", "--",

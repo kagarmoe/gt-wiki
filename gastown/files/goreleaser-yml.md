@@ -4,10 +4,14 @@ type: file
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-14
 sources:
   - /home/kimberly/repos/gastown/.goreleaser.yml
 tags: [file, release, goreleaser, build, ldflags]
+phase3_audited: 2026-04-14
+phase3_findings: [drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # .goreleaser.yml
@@ -252,13 +256,42 @@ off unless explicitly configured, so this is effectively a no-op).
 - [../inventory/repo-root.md](../inventory/repo-root.md) — inventory
   row for this file.
 
+## Docs claim
+
+### Source
+- `/home/kimberly/repos/gastown/.goreleaser.yml` (lines 164-167)
+
+### Verbatim
+> **Homebrew (macOS/Linux):**
+> ```bash
+> brew install gastown
+> ```
+
+## Drift
+
+### Release header advertises `brew install gastown` but no `brews:` block exists
+
+- **Claim source:** `.goreleaser.yml:164-167` — release header template
+  tells users to run `brew install gastown`.
+- **Docs claim:** "Homebrew (macOS/Linux): `brew install gastown`"
+- **Code does:** The `.goreleaser.yml` file defines no `brews:` block.
+  GoReleaser cannot produce a Homebrew formula without this block.
+  No separate `homebrew-tap` repository has been identified in the
+  gastown GitHub org. The release header promise is unsubstantiated
+  by any mechanism in this file.
+- **Category:** `drift`
+- **Severity:** `wrong`
+- **Fix tier:** `docs` — either add a `brews:` block to goreleaser
+  (making the claim true) or remove the brew install line from the
+  release header. The README also advertises Homebrew install.
+- **Release position:** `in-release`
+
+See also: [gastown/drift/README.md](../drift/README.md) (when the
+consolidated index exists).
+
 ## Notes / open questions
 
-- Where is the Homebrew formula? Not in this file. Likely lives in a
-  `homebrew-tap` repo or `homebrew-core`. Whoever maintains it sets
-  `Build=Homebrew` per the existing note in
-  [../binaries/gt.md](../binaries/gt.md), but this wiki can't confirm
-  without reading the formula itself.
+- → Homebrew formula location question promoted to `## Drift` above.
 - `npm-package/` exists at `/home/kimberly/repos/gastown/npm-package/`
   per [../inventory/repo-root.md](../inventory/repo-root.md), but the
   release flow here doesn't reference it. The npm release path

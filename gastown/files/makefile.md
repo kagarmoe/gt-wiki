@@ -8,6 +8,10 @@ updated: 2026-04-11
 sources:
   - /home/kimberly/repos/gastown/Makefile
 tags: [file, build, ldflags, makefile]
+phase3_audited: 2026-04-14
+phase3_findings: [none]
+phase3_severities: []
+phase3_findings_post_release: false
 ---
 
 # Makefile

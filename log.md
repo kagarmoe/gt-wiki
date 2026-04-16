@@ -3548,3 +3548,29 @@ Both findings are in-release (code unchanged since v1.0.0).
 **Next sub-batch:** Batch 8b — docs/design/convoy/spec.md.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 8b (Sweep 2: docs/design/convoy/spec.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/convoy/spec.md` (640 lines).
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/convoy/spec.md` (in full, 640 lines)
+
+**Source files re-read at current HEAD:**
+- None — the spec's claims (ConvoyManager goroutines, CheckConvoysForIssue, story statuses) were all verified in Batches 5a, 7a, and 8a against the actual code. The spec is an implementation tracking document with all stories marked DONE or REMOVED.
+
+**Wiki pages audited:**
+- [gastown/concepts/convoy.md](gastown/concepts/convoy.md) — no new findings (spec is consistent with wiki)
+- [gastown/packages/convoy.md](gastown/packages/convoy.md) — no new findings
+- [gastown/packages/daemon.md](gastown/packages/daemon.md) — no new findings
+
+**Findings by category:**
+- **none:** The spec is a comprehensive implementation tracking document. All 18 stories are accounted for (DONE or REMOVED with rationale). Key architectural decisions (SDK polling not CLI streaming, single observer after S-04/S-05 removals, one-issue-per-feed-per-scan, idempotent check) are all consistent with the code and wiki. The file map accurately lists implementation files. No drift against code or wiki.
+
+**New beads filed:** none
+**Beads closed:** none
+**Cross-link discipline:** No wiki pages touched.
+
+**Next sub-batch:** Batch 8c — docs/design/convoy/mountain-eater.md.
+
+-> (no wiki pages touched)

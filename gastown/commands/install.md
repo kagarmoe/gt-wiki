@@ -9,7 +9,7 @@ sources:
   - /home/kimberly/repos/gastown/internal/cmd/install.go
 tags: [command, workspace, setup, install, hq, dolt, beads]
 phase3_audited: 2026-04-15
-phase3_findings: [cobra-drift]
+phase3_findings: [cobra-drift, drift]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 ---
@@ -262,6 +262,15 @@ None. `gt install` is a leaf command.
 - **Severity:** `wrong`
 - **Fix tier:** `code` — either create `docs/hq.md` or remove the reference from `installCmd.Long`
 - **Release position:** `in-release` — reference present at v1.0.0
+
+### docs/INSTALLING.md shows `rigs/` in the gt install tree, but rigs are top-level directories
+- **Claim source:** `/home/kimberly/repos/gastown/docs/INSTALLING.md:112-117`
+- **Docs claim:** The install tree diagram shows `~/gt/` containing `├── rigs/  # Project containers (initially empty)`. This implies `gt install` creates a `rigs/` subdirectory.
+- **Code does:** `runInstall` (`install.go:204-499`) does not create a `rigs/` directory. Rigs are added later via `gt rig add <name> <url>` which creates `~/gt/<rigname>/` as a top-level directory under the town root. The rig registry is `mayor/rigs.json` (a JSON file, not a directory). grep of `install.go` for "rigs/" returns zero hits outside `rigs.json`.
+- **Category:** `drift`
+- **Severity:** `wrong`
+- **Fix tier:** `docs` — remove `rigs/` from the INSTALLING.md tree diagram; replace with a note that rigs are created at the top level via `gt rig add`
+- **Release position:** `in-release` — the `rigs/` directory has never existed at any release tag
 
 See [gastown/drift/README.md](../drift/README.md) for the consolidated corrections list.
 

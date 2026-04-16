@@ -3851,3 +3851,28 @@ Both findings are in-release (code unchanged since v1.0.0).
 - **none:** Rationale/marketing document. Two features (Capability-Based Routing, Federation) are explicitly self-labeled as "Status: Planned" with honest disclaimers about being unimplemented. Other features (attribution, work history, validation, activity feed) describe general capabilities that are real. Most code examples reference `bd` commands (not `gt`), which are outside gt-wiki scope. No code behavior claims to contradict.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 10d (Sweep 2: docs/INSTALLING.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/INSTALLING.md` (321 lines). Installation guide covering prerequisites, install steps, directory structures, minimal vs full stack mode, troubleshooting.
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/INSTALLING.md` (in full, 321 lines)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/cmd/install.go` (grep for "rigs/" — zero hits outside `rigs.json`; confirmed install does NOT create a `rigs/` directory)
+- `/home/kimberly/repos/gastown/internal/cmd/rig.go` (grep for "rigs/" — zero hits; rigs are top-level directories)
+- `/home/kimberly/repos/gastown/internal/config/agents.go` (lines 21-33 — verified 8 built-in agent presets match INSTALLING.md list)
+
+**Wiki pages annotated:**
+- [gastown/commands/install.md](gastown/commands/install.md) — added drift finding: INSTALLING.md shows `rigs/` in the install tree, but no such directory is created. Rigs are top-level directories under the town root. `phase3_findings` updated from `[cobra-drift]` to `[cobra-drift, drift]`.
+
+**Findings by category:**
+- **drift:** 1 finding. INSTALLING.md line 115 shows `rigs/` in the `gt install` tree diagram, but `runInstall` does not create this directory. Rigs are created as top-level directories via `gt rig add`. The rig registry is `mayor/rigs.json` (a JSON file). Fix tier: docs. Severity: wrong. Release position: in-release.
+- **none (verified):** Prerequisites table, install steps, agent list (8 built-in presets match code), minimal vs full stack mode descriptions, troubleshooting all consistent with code and wiki.
+
+**New beads filed:** none
+**Beads closed:** none
+**Cross-link discipline:** install.md forward-links to drift/README.md already present.
+
+-> [gastown/commands/install.md](gastown/commands/install.md)

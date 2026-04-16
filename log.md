@@ -3139,3 +3139,27 @@ Both findings are in-release (code unchanged since v1.0.0).
 **Next sub-batch:** Batch 5b — docs/research/macos-sandbox-exec.md.
 
 -> [gastown/concepts/convoy.md](gastown/concepts/convoy.md)
+
+## [2026-04-15] drift-found | Batch 5b (Sweep 2: docs/research/macos-sandbox-exec.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/research/macos-sandbox-exec.md` (315 lines).
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/research/macos-sandbox-exec.md` (in full, 315 lines)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/config/loader.go` (grep for sandbox/ExecWrapper — confirmed gastown has sandbox-exec integration in config, but the research doc doesn't make claims about it)
+
+**Wiki pages audited:**
+- None — the research doc describes macOS platform capabilities (sandbox-exec SBPL syntax, filesystem/network/process restrictions, Node.js compatibility), not gastown code behavior. No gastown-specific claims to verify. Gastown's sandbox-exec integration lives in `internal/config/` (ExecWrapper) but this docs file doesn't reference it.
+
+**Findings by category:**
+- **none:** Pure external research document with zero gastown-specific code behavior claims. Out of scope for wiki entity page annotation per Phase 3 Sweep 2 discipline (focus on gastown-specific claims).
+
+**New beads filed:** none
+**Beads closed:** none
+**Cross-link discipline:** No wiki pages touched.
+
+**Next sub-batch:** Batch 5c — docs/research/w-gc-004-agent-framework-survey.md.
+
+-> (no wiki pages touched)

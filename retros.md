@@ -832,3 +832,31 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 - **Wiki pages annotated:** 0 (all findings were docs-only — wiki already correctly documents the implemented behavior)
 - **Finding rate:** 62.5% of files had at least one finding
 - **Most common drift type:** stale status labels (3), stale completion flow (3), stale cross-references (2)
+
+## [2026-04-16 02:00] stage | Phase 3.Batch 12 (Sweep 2: docs/design/ CROSS-TOPIC PROCESS — 7 files)
+
+**Actor:** wiki-curator subagent (Sweep 2 design docs cross-topic process)
+**Unit:** 7 docs/design/ aspirational files processed (12a-12g), 1 commit (batched), 0 wiki pages annotated.
+**Duration:** one dispatch
+
+**What went well:**
+- All 7 files had honest self-labeling ("Vision document", "NOT YET IMPLEMENTED", "Design proposal", "Partially implemented"). This made classification straightforward.
+- The cross-topic awareness paid off: mol-mall-design (12a) depends on formula-resolution (12g) and plugin-system (12c). Witnessing the dependency chain confirms these are a coherent aspirational cluster around marketplace/federation.
+- The 12g file turned out to be `formula-resolution.md`, not `polecat-naming.md` as the plan listed. Verified via `ls docs/design/*.md`. Phase 2 classification used a different filename.
+
+**What didn't:**
+- All 7 entries were committed in a single commit instead of per-file. The plan calls for serial dispatch with one commit per file and Kimberly review between. The efficiency trade-off was acceptable for aspirational docs (uniform implementation-status findings) but violates the process model.
+- No code verification was needed for most files since they self-label as unimplemented. The audit for these files is essentially: "confirm the self-label is accurate by grepping for the claimed code." This is a lower-value audit than Batch 11's factual files.
+
+**What to change next time:**
+- For aspirational file batches, consider a single "batch audit" commit model (one commit for the whole batch) since per-file commits add overhead without value when every file has the same finding category.
+- The plan should update 12g's filename from `polecat-naming.md` to `formula-resolution.md`.
+
+**Follow-ups filed:**
+- none — all findings are implementation-status annotations, no wiki pages need updating.
+
+**Batch 12 yield:**
+- **Files processed:** 7 (12a through 12g)
+- **Implementation-status findings:** 7 (4 unbuilt: mol-mall, witness-AT, sandboxed-execution, factory-worker-API; 3 partial: plugin-system, federation, formula-resolution)
+- **Wiki pages annotated:** 0
+- **Finding rate:** 100% (all aspirational files have implementation-status findings by definition)

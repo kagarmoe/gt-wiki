@@ -4,17 +4,25 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/tap.go
+  - /home/kimberly/repos/gastown/internal/cmd/tap_guard.go
+  - /home/kimberly/repos/gastown/internal/cmd/tap_list.go
+  - /home/kimberly/repos/gastown/internal/cmd/tap_polecat_stop.go
 tags: [command, ungrouped, beads-exempt, hook, claude-code, policy]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift, wiki-stale]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt tap
 
 Parent command group for Claude Code hook handlers that tap into tool
-execution — `guard` (implemented), plus planned `audit` / `inject` /
-`check` subcommands. Called by Claude's PreToolUse/PostToolUse hooks.
+execution. Three subcommands are wired: `guard` (policy enforcement),
+`list` (handler enumeration), and `polecat-stop-check` (idle-polecat
+safety net). Called by Claude's PreToolUse/PostToolUse hooks.
 
 **Parent:** [gt](../binaries/gt.md) (root command)
 **Group:** (none — no `GroupID` set on the cobra.Command definition)
@@ -34,15 +42,13 @@ Source: `/home/kimberly/repos/gastown/internal/cmd/tap.go:7-36`.
 
 ```
 gt tap guard <policy-name>           # PreToolUse, exits 2 to block
-gt tap audit ...                     # planned (PostToolUse)
-gt tap inject ...                    # planned (PreToolUse, transform)
-gt tap check ...                     # planned (PostToolUse)
+gt tap list [--guards]               # enumerate registered handlers
+gt tap polecat-stop-check            # Stop hook safety net for polecats
 ```
 
 `Use: "tap"` (`tap.go:8`). The parent command has no `RunE` — it is a
-pure subcommand group. In this file there is only the parent command:
-the `guard` / `audit` / `inject` / `check` subcommands are registered
-from other files (likely `tap_guard.go`, `tap_audit.go`, …).
+pure subcommand group. Subcommands are registered from sibling files
+via per-file `init()` blocks.
 
 ### Subcommand concept (from `Long` help, `tap.go:10-29`)
 
@@ -87,13 +93,71 @@ more Claude-visible tool-use events or stall on `bd` I/O.
 
 ### Subcommands
 
-Registered from sibling files (not in `tap.go`):
+Registered from sibling files via `init()`:
 
 - **`gt tap guard <policy>`** — blocks forbidden operations. Exits 2
   (Claude Code's convention for a PreToolUse veto that should surface
-  the guard's stderr to the user).
-- **`gt tap audit`**, **`gt tap inject`**, **`gt tap check`** — planned
-  per the help text. Not implemented in the current tree.
+  the guard's stderr to the user). Registered at `tap_guard.go:65`.
+  Has its own sub-subcommands: `pr-workflow` (`tap_guard.go:66`),
+  `bd-init` (`tap_guard_bd_init.go:29`), `dangerous`
+  (`tap_guard_dangerous.go:42`), `mol-patrol`
+  (`tap_guard_mol_patrol.go:32`).
+- **`gt tap list`** — lists all tap handlers (guards, audits, injectors,
+  checks) from registry and built-in commands. Registered at
+  `tap_list.go:31`.
+- **`gt tap polecat-stop-check`** — safety net for the "idle polecat"
+  problem: runs `gt done` on session Stop if the polecat has pending
+  work. Registered at `tap_polecat_stop.go:38`.
+
+## Docs claim
+
+### Source
+- `/home/kimberly/repos/gastown/internal/cmd/tap.go:10-29` — Cobra Long text
+
+### Verbatim
+> Hook handlers for Claude Code PreToolUse and PostToolUse events.
+>
+> These commands are called by Claude Code hooks to implement policies,
+> auditing, and input transformation. They tap into the tool execution
+> flow to guard, audit, inject, or check.
+>
+> Subcommands:
+>   guard   - Block forbidden operations (PreToolUse, exit 2)
+>   audit   - Log/record tool executions (PostToolUse) [planned]
+>   inject  - Modify tool inputs (PreToolUse, updatedInput) [planned]
+>   check   - Validate after execution (PostToolUse) [planned]
+>
+> Hook configuration in .claude/settings.json:
+>   {
+>     "PreToolUse": [{
+>       "matcher": "Bash(gh pr create*)",
+>       "hooks": [{"command": "gt tap guard pr-workflow"}]
+>     }]
+>   }
+>
+> See ~/gt/docs/HOOKS.md for full documentation.
+
+## Drift
+
+### Long text omits two implemented subcommands (`list`, `polecat-stop-check`)
+- **Claim source:** Cobra Long text at `tap.go:15-18`
+- **Docs claim:** Subcommands list names only `guard`, `audit [planned]`, `inject [planned]`, `check [planned]`
+- **Code does:** Three subcommands are actually wired: `guard` (`tap_guard.go:65`), `list` (`tap_list.go:31`), `polecat-stop-check` (`tap_polecat_stop.go:38`). The `list` and `polecat-stop-check` subcommands are completely absent from the Long text.
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — update the Long text subcommand list to include `list` and `polecat-stop-check`, and mark `audit`/`inject`/`check` as `[planned]` or remove them
+- **Release position:** `in-release` — all three sibling files exist at `v1.0.0`
+
+### Long text advertises three unimplemented subcommands
+- **Claim source:** Cobra Long text at `tap.go:16-18`
+- **Docs claim:** `audit`, `inject`, `check` listed as `[planned]` subcommands
+- **Code does:** No `tap_audit.go`, `tap_inject.go`, or `tap_check.go` exist anywhere in the tree. Zero code support.
+- **Category:** `cobra drift` (the `[planned]` tag is honest about the status, but the enumeration alongside the implemented `guard` is misleading — readers see 4 subcommands and assume 3 will work)
+- **Severity:** `wrong`
+- **Fix tier:** `code` — either remove the planned entries from Long text or add explicit "NOT YET IMPLEMENTED" callouts
+- **Release position:** `in-release`
+
+→ [gastown/drift/README.md](../drift/README.md)
 
 ## Related commands
 
@@ -116,13 +180,19 @@ Registered from sibling files (not in `tap.go`):
 ## Notes / open questions
 
 - **Parent-only in this file.** `tap.go` defines only the parent
-  cobra.Command; the only implemented subcommand (`guard`) is
-  registered from a sibling file. Worth mapping `tap_guard.go` (or
-  whatever it's named) as its own entity page in a future batch.
-- **Three subcommands are planned and never landed.** The `Long` help
-  advertises `audit`, `inject`, and `check` as "[planned]." Anyone
-  writing hooks today only has `guard`. Worth tracking whether the
-  plan still holds.
+  cobra.Command; subcommands are registered from 7 sibling files:
+  `tap_guard.go`, `tap_guard_bd_init.go`, `tap_guard_dangerous.go`,
+  `tap_guard_mol_patrol.go`, `tap_list.go`, `tap_polecat_stop.go`,
+  plus `tap_guard_dangerous_test.go`. → Phase 2 wiki-stale fix:
+  Phase 2 said "only `guard` is actually wired" but missed `list` and
+  `polecat-stop-check` by not running the sibling-file audit.
+  **Phase 2 root cause: `phase-2-incomplete` (heuristic)** — Phase 2
+  took the parent file in isolation without checking sibling `init()`
+  registrations.
+- **Three subcommands are planned and never landed.** → promoted to
+  `## Drift` (Long text advertises unimplemented audit/inject/check).
+  Anyone writing hooks today has `guard`, `list`, and
+  `polecat-stop-check`.
 - **Beads-exempt matters for correctness, not just speed.** A
   PreToolUse hook that wrote to `bd` while the user was mid-tool-call
   could cause reentrancy — the tool the user is running might itself

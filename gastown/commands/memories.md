@@ -9,6 +9,10 @@ sources:
   - /home/kimberly/repos/gastown/internal/cmd/memories.go
   - /home/kimberly/repos/gastown/internal/cmd/remember.go
 tags: [command, work, memory, beads, kv-store]
+phase3_audited: 2026-04-15
+phase3_findings: [none]
+phase3_severities: []
+phase3_findings_post_release: false
 ---
 
 # gt memories

@@ -4,10 +4,14 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/warrant.go
 tags: [command, ungrouped, lore, termination, escalation, triage]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt warrant
@@ -168,6 +172,38 @@ Maps target paths to tmux session names via five cases:
 **`list`:** `--all`/`-a`.
 **`execute`:** `--force`/`-f`.
 
+## Docs claim
+
+### Source
+- `/home/kimberly/repos/gastown/internal/cmd/warrant.go:40-52` — Cobra Long text
+
+### Verbatim
+> Manage death warrants for agents that need termination.
+>
+> Death warrants are filed when an agent is stuck, unresponsive, or needs
+> forced termination. Boot handles warrant execution during triage cycles.
+>
+> The warrant system provides a controlled way to terminate agents:
+> 1. Deacon/Witness files a warrant with a reason
+> 2. Boot picks up the warrant during triage
+> 3. Boot executes the warrant (terminates session, updates state)
+> 4. Warrant is marked as executed
+>
+> Warrants are stored in ~/gt/warrants/ as JSON files.
+
+## Drift
+
+### Long text hardcodes `~/gt/warrants/` but code uses `<townRoot>/warrants/`
+- **Claim source:** Cobra Long text at `warrant.go:52`
+- **Docs claim:** "Warrants are stored in ~/gt/warrants/ as JSON files."
+- **Code does:** `getWarrantDir()` at `warrant.go:122-128` returns `filepath.Join(townRoot, "warrants")` where `townRoot` is resolved dynamically via `workspace.FindFromCwd()`. For the default installation `townRoot` happens to be `~/gt`, but the path is workspace-relative, not hardcoded. A non-default `$GT_ROOT` installation would store warrants elsewhere.
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — change `~/gt/warrants/` to `<town-root>/warrants/` in the Long text
+- **Release position:** `in-release` — `getWarrantDir()` exists at `v1.0.0`
+
+→ [gastown/drift/README.md](../drift/README.md)
+
 ## Related commands
 
 - [boot](boot.md) — the "triage" component that the Long help says
@@ -190,9 +226,9 @@ Maps target paths to tmux session names via five cases:
 
 ## Notes / open questions
 
-- **Location drift in the help text.** `Long` says `~/gt/warrants/`
-  but `getWarrantDir` returns `<townRoot>/warrants/`. Minor but
-  misleading.
+- **Location drift in the help text.** → promoted to `## Drift`.
+  `Long` says `~/gt/warrants/` but `getWarrantDir` returns
+  `<townRoot>/warrants/`.
 - **No cleanup of executed warrants.** `gt warrant list` without
   `--all` hides them, but the files stay. A rolling `--older-than`
   or `prune` subcommand may be worth adding.

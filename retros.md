@@ -395,3 +395,37 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 
 - **The `phase-2-incomplete` pattern has shifted.** Prior batches (1b-1f) found phase-2-incomplete exclusively in missed sibling-file registrations. Batch 1g's `init.md` is a different subspecies: Phase 2 trusted the Long text for structural claims instead of reading the defining code. This suggests Phase 2 had TWO blind spots: (1) not auditing sibling `init()` blocks, and (2) treating Cobra Long text as authoritative for claims that should be verified against code. Both are violations of the code-first principle, but they have different mitigation strategies for Phase 4.
 - **Dead reference in Long text (docs/hq.md) is a new finding category worth tracking.** If it recurs in Batch 1h, it may warrant a named sub-pattern in the drift taxonomy.
+
+## [2026-04-15 21:00] stage | 3.1.1h — Ungrouped Sweep 1 (Batch 1 final)
+
+**Actor:** general-purpose subagent dispatched by main orchestrator for Phase 3 Batch 1h
+**Unit:** 15 ungrouped command pages audited; 3 cobra-drift findings + 1 wiki-stale finding across 2 pages (`tap`, `warrant`); 13 pages tagged `phase3_findings: [none]`; one commit. **This is the final sub-batch of Batch 1. All 111 command pages now have `phase3_audited` frontmatter.**
+**Duration:** one dispatch
+
+**What went well:**
+
+- **The `tap` sibling-file audit was the critical check and it paid off immediately.** The dispatch prompt correctly flagged this as the highest-priority verification. Running `ls tap*.go` before reading any wiki content instantly showed `tap_list.go` and `tap_polecat_stop.go` — two implemented subcommands that Phase 2 missed entirely. This is the exact same class of finding as `directive` and `hooks` in Batch 1b: Phase 2 took the parent file in isolation and missed sibling `init()` registrations. The sibling-file audit discipline established in 1b continues to be the single highest-value check in Phase 3.
+- **The `warrant` path-hardcoding finding was exactly as predicted.** Phase 2 already noted the mismatch between `~/gt/warrants/` in Long and `<townRoot>/warrants/` in `getWarrantDir()`. Re-reading the source confirmed the mismatch is still present. Clean classification: cobra-drift, wrong, in-release, fix tier code.
+- **The five GroupWork commands (`commit`, `forget`, `memories`, `remember`, `show`) required no wiki-stale fixup.** Phase 2 already had the correct Group attribution with batch-plan correction notes. This saved significant time — no source re-reading needed beyond confirming the GroupID lines.
+- **Low-yield batches are still valuable.** 13 of 15 pages were `[none]`, but those 13 `phase3_audited` frontmatter entries are the audit trail proving the pages were checked. The 2 finding pages produced 4 findings including a novel compound (cobra-drift + wiki-stale on the same page for `tap`).
+
+**What didn't:**
+
+- **The dispatch prompt's `krc` sibling-file prediction was wrong.** It predicted "7 subcommands, verify Phase 2 covered all" and flagged `krc` for sibling-file audit. But `krc.go` is a single file with all 7 subcommands registered in one `init()` block. No siblings. The prediction cost about 30 seconds of unnecessary checking — minimal, but it shows the dispatch prompt's "expected high-yield" calibration assumes parent-like commands always scatter registrations, which is not true for commands that keep everything in one file.
+- **The dead-doc-reference check (from 1g's `install` finding) found nothing new.** Only `tap.go` references a docs file (`~/gt/docs/HOOKS.md`), and `docs/HOOKS.md` exists at HEAD. The reference is to a runtime path (`~/gt/docs/`) not a repo path (`docs/`), and it's a valid file — so no dead reference. The 1g finding was an outlier, not a pattern.
+- **The `tap` finding classification required a judgment call about `[planned]` tags.** The Long text explicitly marks `audit`, `inject`, `check` as `[planned]`. This could be classified as `implementation-status: unbuilt` (docs acknowledge the feature is not built) rather than `cobra-drift` (Long text contradicts code). I chose cobra-drift because: (a) the Long text presents these in a flat "Subcommands:" list alongside the implemented `guard`, not in a "Future" section; (b) the same Long text completely OMITS two implemented subcommands (`list`, `polecat-stop-check`), making the entire list factually wrong; (c) the fix is clearly code (rewrite the Long text) not docs. The borderline nature of `[planned]` tags is worth noting for the retrospective gate.
+
+**What to change next time (Batch 2: packages/):**
+
+- **The sibling-file audit is now validated across 8 sub-batches.** It should be a mandatory first step in the dispatch template for every batch, not just commands. Package pages may have similar patterns where Phase 2 read one file in isolation.
+- **The GroupWork misclassification pattern (5 commands labeled "ungrouped" by the batch plan but actually in GroupWork) suggests the Phase 2 cobra-group inventory had gaps.** For Batch 2, verify the batch plan's scoping against actual `GroupID` assignments before auditing, not during.
+- **`[planned]` tags in Long text should be classified consistently.** Recommendation: if the Long text presents unbuilt features in a flat list with implemented features, that's cobra-drift (the list is wrong). If the Long text puts unbuilt features in a separate "Planned" or "Future" section, that's implementation-status:unbuilt (the docs are aspirational). This distinction should be added to the skill taxonomy.
+
+**Follow-ups filed:**
+
+- none (bd beads) — all observations are informational for the Sweep 1 retrospective gate.
+- skill edit suggestion: `.claude/skills/writing-entity-pages/SKILL.md` drift taxonomy | add clarification for `[planned]` tags in Long text: flat-list = cobra-drift, separate-section = implementation-status:unbuilt
+
+**For Kimberly retro discussion:**
+
+- **Batch 1 is complete. The Sweep 1 retrospective gate should assess:** (a) the sibling-file audit methodology that surfaced the highest-value findings; (b) the `[planned]` tag classification question; (c) whether the 32% finding rate across 111 pages is within expectations; (d) whether the wiki-stale sub-distinction (churn vs phase-2-incomplete) has enough data to inform Phase 4 scoping. The 12 wiki-stale pages are overwhelmingly `phase-2-incomplete` (sibling-file blind spot), not `churn`.

@@ -2382,3 +2382,89 @@ Release-position: all source files present at v1.0.0. All findings `in-release`.
   [gastown/commands/namepool.md](gastown/commands/namepool.md),
   [gastown/commands/rig.md](gastown/commands/rig.md),
   [gastown/commands/worktree.md](gastown/commands/worktree.md)
+
+## [2026-04-15] drift-found | Batch 1h (Sweep 1 commands/ Ungrouped — 15 pages; Batch 1 complete)
+
+**Scope:** Sweep 1 promotion across all 15 ungrouped command pages (`agent-log`, `commit`, `cycle`, `forget`, `health`, `krc`, `memories`, `nudge-poller`, `proxy-subcmds`, `remember`, `show`, `status-line`, `tap`, `town`, `warrant`). Every page received `phase3_audited` / `phase3_findings` / `phase3_severities` / `phase3_findings_post_release` frontmatter. `tap.md` received `## Docs claim` + `## Drift` sections with verbatim quotes, current `file:line` refs, and v1.2 fix-tier + severity + release-position fields, plus a wiki-stale inline fix. `warrant.md` received `## Docs claim` + `## Drift` sections. 13 pages tagged `phase3_findings: [none]`.
+
+**Source files re-read at current HEAD** (current gastown HEAD `9f962c4af068fe9da9f4bd3624e7b66351121fdf`):
+
+- `/home/kimberly/repos/gastown/internal/cmd/tap.go` (lines 7-35 — `tapCmd.Long` at `:10-29`; `init()` at `:33-34`)
+- `/home/kimberly/repos/gastown/internal/cmd/tap_guard.go` (`:64-66` — `init()` registering `tapGuardCmd` + `tapGuardPRWorkflowCmd`)
+- `/home/kimberly/repos/gastown/internal/cmd/tap_guard_bd_init.go` (`:28-29` — `init()`)
+- `/home/kimberly/repos/gastown/internal/cmd/tap_guard_dangerous.go` (`:41-42` — `init()`)
+- `/home/kimberly/repos/gastown/internal/cmd/tap_guard_mol_patrol.go` (`:31-32` — `init()`)
+- `/home/kimberly/repos/gastown/internal/cmd/tap_list.go` (`:16-31` — `tapListCmd` definition + `init()`)
+- `/home/kimberly/repos/gastown/internal/cmd/tap_polecat_stop.go` (`:16-38` — `tapPolecatStopCmd` definition + `init()`)
+- `/home/kimberly/repos/gastown/internal/cmd/warrant.go` (`:38-52` Long; `:122-128` `getWarrantDir()`)
+- `/home/kimberly/repos/gastown/internal/cmd/agent_log.go` (`:22-37` — no Long)
+- `/home/kimberly/repos/gastown/internal/cmd/commit.go` (`:17-44` — Long + GroupID)
+- `/home/kimberly/repos/gastown/internal/cmd/cycle.go` (`:23-83` — parent + subcommand Long)
+- `/home/kimberly/repos/gastown/internal/cmd/forget.go` (`:11-28` — GroupID + Long)
+- `/home/kimberly/repos/gastown/internal/cmd/health.go` (`:86-104` — Long; 6 sections match code)
+- `/home/kimberly/repos/gastown/internal/cmd/krc.go` (`:17-152` — Long + 7 subcommands match)
+- `/home/kimberly/repos/gastown/internal/cmd/memories.go` (`:14-39` — GroupID + Long)
+- `/home/kimberly/repos/gastown/internal/cmd/nudge_poller.go` (`:22-44` — Long accurate)
+- `/home/kimberly/repos/gastown/internal/cmd/proxy_subcmds.go` (`:23-44` — Long accurate)
+- `/home/kimberly/repos/gastown/internal/cmd/remember.go` (`:36-65` — GroupID + Long)
+- `/home/kimberly/repos/gastown/internal/cmd/show.go` (`:10-30` — GroupID + Long)
+- `/home/kimberly/repos/gastown/internal/cmd/statusline.go` (`:25-39` — Long terse but accurate)
+- `/home/kimberly/repos/gastown/internal/cmd/town_cycle.go` (`:32-71` — Long + subcommands)
+
+**Sibling-file audit:**
+
+- `tap` -> 7 siblings. **Phase 2 missed `list` and `polecat-stop-check`.** All register via per-file `init()`.
+- `show` -> `show_unix.go` + `show_windows.go` (platform helpers, no AddCommand).
+- `town` -> file is `town_cycle.go` (not `town.go`). No siblings.
+- `krc` -> single file. All 7 subcommands in `init()` at `:138-146`.
+- All other commands: no sibling AddCommand registrations found.
+
+Release-position: all source files present at v1.0.0. All findings `in-release`.
+
+**Docs files read:** none (Sweep 1).
+
+**Wiki pages audited:**
+- [tap](gastown/commands/tap.md) — `phase3_findings: [cobra-drift, wiki-stale]`
+- [warrant](gastown/commands/warrant.md) — `phase3_findings: [cobra-drift]`
+- 13 pages tagged `phase3_findings: [none]`: `agent-log`, `commit`, `cycle`, `forget`, `health`, `krc`, `memories`, `nudge-poller`, `proxy-subcmds`, `remember`, `show`, `status-line`, `town`
+
+**Findings by category:**
+
+- **cobra drift:** 3 findings across 2 pages.
+  - `tap.md` (finding 1) — `tapCmd.Long` subcommand list names `guard`, `audit [planned]`, `inject [planned]`, `check [planned]`; actual wired subcommands are `guard` (`tap_guard.go:65`), `list` (`tap_list.go:31`), `polecat-stop-check` (`tap_polecat_stop.go:38`). Two implemented subcommands completely omitted from Long. `severity: wrong`, `in-release`, `fix tier: code`. Hand-maintained enumeration pattern (11th instance across Batches 1a-1h).
+  - `tap.md` (finding 2) — same Long advertises `audit`, `inject`, `check` as `[planned]` but no source files exist. `severity: wrong`, `in-release`, `fix tier: code`.
+  - `warrant.md` — `warrantCmd.Long` line 52 says "Warrants are stored in ~/gt/warrants/" but `getWarrantDir()` at `warrant.go:122-128` returns `filepath.Join(townRoot, "warrants")` where `townRoot` is dynamic. `severity: wrong`, `in-release`, `fix tier: code`.
+- **wiki-stale:** 1 finding on `tap.md` — Phase 2 said "only `guard` is actually wired" and listed `audit`/`inject`/`check` as not implemented. Sibling-file audit shows `list` and `polecat-stop-check` ARE wired. **Phase 2 root cause: `phase-2-incomplete` (heuristic)** — Phase 2 took `tap.go` in isolation. Fixed inline.
+- **none:** 13 pages.
+
+**Judgment calls:** (1) `tap.Long`'s `[planned]` tags are honest about unbuilt status but classified as cobra-drift (not implementation-status) because the Long text presents them in a flat subcommand list alongside implemented commands. (2) `warrant.Long`'s `~/gt/warrants/` is correct for default installations but the code is workspace-relative — classified as cobra-drift. (3) `proxy-subcmds.Long` accurately describes the `bd` hardcoded list as a maintenance risk — neutral. (4) `health.Long` 6 sections match code exactly — neutral. (5) Five GroupWork commands already had correct Group attribution from Phase 2 — no findings needed.
+
+**Cross-link discipline:** 2 `## Docs claim` + 3 `## Drift` sections (2 on tap.md, 1 on warrant.md) + 1 wiki-stale inline fix. Forward links to [gastown/drift/README.md](gastown/drift/README.md). All `file:line` refs fresh from HEAD `9f962c4a`. `tap.md` sources updated to add 3 sibling files.
+
+**Batch 1 complete.** All 111 command pages now have `phase3_audited` frontmatter. Sweep 1 retrospective gate next — see [retros.md](retros.md).
+
+**Batch 1 aggregate stats (1a-1h):**
+- Pages audited: 111 of 111 commands
+- Pages with findings: 35 (32%)
+- Pages with `[none]`: 76 (68%)
+- cobra-drift: 27 pages
+- wiki-stale: 12 pages
+- drift (docs): 1 page (`done.md`)
+- Yield by sub-batch: 1a 18%, 1b 64%, 1c 27%, 1d 50%, 1e 14%, 1f 36%, 1g 71%, 1h 13%
+
+**Audited pages:**
+  [gastown/commands/agent-log.md](gastown/commands/agent-log.md),
+  [gastown/commands/commit.md](gastown/commands/commit.md),
+  [gastown/commands/cycle.md](gastown/commands/cycle.md),
+  [gastown/commands/forget.md](gastown/commands/forget.md),
+  [gastown/commands/health.md](gastown/commands/health.md),
+  [gastown/commands/krc.md](gastown/commands/krc.md),
+  [gastown/commands/memories.md](gastown/commands/memories.md),
+  [gastown/commands/nudge-poller.md](gastown/commands/nudge-poller.md),
+  [gastown/commands/proxy-subcmds.md](gastown/commands/proxy-subcmds.md),
+  [gastown/commands/remember.md](gastown/commands/remember.md),
+  [gastown/commands/show.md](gastown/commands/show.md),
+  [gastown/commands/status-line.md](gastown/commands/status-line.md),
+  [gastown/commands/tap.md](gastown/commands/tap.md),
+  [gastown/commands/town.md](gastown/commands/town.md),
+  [gastown/commands/warrant.md](gastown/commands/warrant.md)

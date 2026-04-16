@@ -9,6 +9,10 @@ sources:
   - /home/kimberly/repos/gastown/internal/cmd/town_cycle.go
   - /home/kimberly/repos/gastown/internal/cmd/cycle.go
 tags: [command, ungrouped, tmux, session, cycle, navigation, town-level]
+phase3_audited: 2026-04-15
+phase3_findings: [none]
+phase3_severities: []
+phase3_findings_post_release: false
 ---
 
 # gt town

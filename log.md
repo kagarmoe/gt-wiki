@@ -4217,3 +4217,44 @@ Both findings are in-release (code unchanged since v1.0.0).
 - **none (verified):** Watchdog chain (daemon→boot→deacon) fully confirmed. Three-tier architecture, session ownership (Boot in `gt-boot`, Deacon in `hq-deacon`), heartbeat mechanics, Boot decision matrix, handoff flow, degraded mode, fallback chain — all consistent with code and wiki.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 11k (Sweep 2: docs/design/dolt-storage.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/dolt-storage.md` (545 lines). Comprehensive Dolt storage architecture reference: server architecture, env vars, write concurrency, schema, data lifecycle, history compaction, pollution prevention, communication hygiene, remote push, file layout.
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/dolt-storage.md` (in full, 545 lines)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/daemon/lifecycle_defaults.go` (line 4 — confirmed six-stage lifecycle)
+- `/home/kimberly/repos/gastown/internal/daemon/compactor_dog.go` — confirmed compactor implementation
+- `/home/kimberly/repos/gastown/internal/daemon/wisp_reaper.go` — confirmed reaper implementation
+
+**Wiki pages spot-checked:** packages/doltserver.md, commands/dolt.md, concepts/wisp.md
+
+**Findings by category:**
+- **none:** Dense technical reference that is overwhelmingly accurate. Server architecture (port 3307, per-town), env vars (GT_DOLT_HOST/PORT → BEADS_DOLT_SERVER_HOST/PORT), write concurrency (all-on-main, transaction discipline), schema (issues/dependencies/labels/comments/events/interactions + infrastructure tables), six-stage lifecycle, history compaction (flatten + surgical rebase), Dolt GC, pollution prevention (4 vectors, 6 prevention layers), communication hygiene (mail vs nudge), remote push (git SSH protocol, cache management), standalone beads note — all consistent with code and wiki. The doc is remarkably well-maintained for its size.
+
+-> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 11l (Sweep 2: docs/design/mail-protocol.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/mail-protocol.md` (565 lines). Mail protocol reference: message types (POLECAT_DONE, MERGE_READY, MERGED, MERGE_FAILED, REWORK_REQUEST, RECOVERED_BEAD, RECOVERY_NEEDED, HELP, HANDOFF), protocol flows, communication hygiene, beads-native messaging (groups/queues/channels).
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/mail-protocol.md` (in full, 565 lines)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/cmd/done.go` (lines 1158-1189 — confirmed polecat nudges refinery directly AND nudges witness for observability)
+- `/home/kimberly/repos/gastown/internal/beads/beads_channel.go` — confirmed channel support with `gt:channel` label
+- `/home/kimberly/repos/gastown/internal/beads/beads_queue.go` — confirmed queue support with `gt:queue` label
+
+**Wiki pages spot-checked:** commands/mail.md, packages/mail.md, roles/witness.md, roles/refinery.md
+
+**Findings by category:**
+- **drift:** 2 findings.
+  1. Lines 15-29: POLECAT_DONE route shown as "Polecat → Witness" with "Handler: Witness creates a cleanup wisp." Per self-managed completion (gt-1qlg, shipped — see Batch 11i), the polecat now nudges refinery directly AND sets `agent_state=idle` directly. The witness nudge is kept for observability only, not as a required relay. The protocol flow diagram (lines 270-288) showing the Polecat→Witness→Refinery chain is stale. Fix tier: docs. Severity: wrong. Release position: in-release.
+  2. Lines 31-49: MERGE_READY route shown as "Witness → Refinery." With self-managed completion, the polecat now sends MERGE_READY directly to refinery (`done.go:1161`). The witness relay is no longer the primary path. Fix tier: docs. Severity: wrong. Release position: in-release.
+- **none (verified):** Communication hygiene section (mail vs nudge, role-specific guidance) consistent with wiki and code. Beads-native messaging (groups, queues, channels) confirmed in code. Address format, sending/receiving commands, extensibility pattern, retention policy — all consistent.
+
+-> (no wiki pages touched)

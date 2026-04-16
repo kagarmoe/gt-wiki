@@ -954,3 +954,22 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 - Phase 2's self-assessment was overly conservative: `status: partial` mostly reflected "I didn't deep-read every edge case" rather than actual missing content. The pages were substantially complete.
 
 **Stats:** 50 pages audited, 49 upgraded to verified, 1 confirmed incomplete (formula.md — missing overlay subcommand tree, 347 lines of source across 4 files).
+
+## [2026-04-16] stage | Phase 4 Batch 2 — Coverage audit (packages + roles + concepts + other)
+
+**Type:** stage
+**Origin:** subagent, Phase 4 / Batch 2
+
+**What went well:**
+- Batch pattern from Batch 1 (commands/) transferred cleanly. The methodology of checking exported symbols vs page coverage is efficient and repeatable.
+- Role/concept/workflow/binary pages were fast to audit — they're synthesis pages that summarize code pages, so the completeness bar is "does it link to and summarize the right things?" rather than "does it enumerate every export?"
+- 40/44 pages upgraded to verified in a single pass. Phase 2's quality was high.
+
+**What was hard:**
+- The 4 genuinely incomplete packages are the largest in the codebase (beads: 28 files, daemon: 33 files, doltserver: 9 files/13k lines, polecat: 5 files/8.8k lines). Filling these gaps requires substantial reads that a single audit pass can't efficiently do — they're Phase 5 (content-writing) work items.
+- Distinguishing "the page doesn't mention X because X isn't important" from "the page doesn't mention X because Phase 2 didn't read that file" requires reading the source exports, which adds overhead.
+
+**What to change next time:**
+- The incomplete packages share a pattern: Phase 2 read the "main" files and described the architecture, but acknowledged large subsystem files it didn't ground. Phase 5 should prioritize these 4 pages as they represent the largest coverage holes in the wiki.
+
+**Stats:** 44 pages audited, 40 upgraded to verified, 4 confirmed incomplete (beads.md, daemon.md, doltserver.md, polecat.md).

@@ -4509,3 +4509,25 @@ Revisited the wiki-stale log placement question from the Sweep 1 retrospective (
 **Methodology:** Counted flag registrations (`.Flags().`) and `AddCommand` calls in source vs wiki page content for all 50 pages. Phase 2's coverage was overwhelmingly adequate — the `status: partial` tags were conservative self-assessments rather than actual incompleteness. The one genuine gap (formula overlay) is a sibling-file miss: Phase 2 read `formula.go` but not the `formula_overlay_*.go` family.
 
 → gastown/commands/formula.md (incomplete), 49 other command pages (upgraded to verified)
+
+## [2026-04-16] drift-found | Phase 4 Batch 2 (Coverage audit: packages + roles + concepts + other)
+
+**Scope:** 44 `status:partial` pages audited for completeness (22 packages, 8 roles, 7 concepts, 2 workflows, 3 binaries, 1 inventory, 1 plugins).
+
+**Results:**
+- Upgraded to verified: 40 pages
+- Confirmed incomplete: 4 pages (all packages)
+
+**Incomplete findings:**
+
+- **beads.md** — 28 production files (10,300 lines). Page self-reports that only ~10 of 28 files were read in full; per-domain file descriptions are "grounded in file comments and visible exported symbols rather than line-by-line reading." Key uncovered surfaces: merge-slot state machine internals, molecule detach audit schema details, full delegation metadata encoding, channel bead lifecycle, queue bead dispatch logic, group bead address resolution. Severity: `incomplete`.
+
+- **daemon.md** — 33 production files (23,025 lines). Page covers the daemon architecture and patrol loop well but explicitly notes that `dolt.go` (47KB), `compactor_dog.go` (31KB), `convoy_manager.go` (20KB+), and `jsonl_git_backup.go` (20KB+) are "unusually large" and "worth grounding separately." These four files alone are ~130KB of ungrounded source implementing Dolt health monitoring, compaction scheduling, convoy dispatch, and git backup subsystems. Severity: `incomplete`.
+
+- **doltserver.md** — 9 production files (13,366 lines). Page covers the core Dolt server lifecycle and migration system. However, the WLCommons subsystem (wanted-list, stamps, badges) visible in exports (`QueryWanted`, `QueryBadges`, `QueryStampsForSubject`, `QueryAllSubjects`) is not meaningfully covered — these are entire query surfaces for a commons data model that the page doesn't describe. The DoltHub remote management API (`CreateDoltHubRepo`, `AddRemote`, `SetupDoltHubRemote`) is mentioned but not grounded with behavioral detail. Severity: `incomplete`.
+
+- **polecat.md** — 5 production files (8,800 lines). Page covers the Manager, session lifecycle, heartbeat system, and worktree management well. However, `session_manager.go` (the file that builds the actual tmux session, handles startup command construction, agent process monitoring, and session recovery) is referenced but not deeply grounded — the page describes what the session manager does at a high level but doesn't enumerate its significant public methods or cover the startup command builder, the pane monitoring loop, or the session recovery flow. The `AddWithOptions` path's `--sandbox` container-creation flow is also only sketched. Severity: `incomplete`.
+
+**Methodology:** For each package, compared exported function/type/method counts in source against wiki page coverage. For roles/concepts/workflows/binaries, checked whether the page covers the major behavioral aspects documented in the corresponding code pages. Phase 2's `status: partial` was overwhelmingly a conservative self-assessment rather than actual incompleteness — most pages cover their entity's significant API surface thoroughly. The 4 genuinely incomplete packages share a pattern: large file counts (5-33 files) with specific subsystems that Phase 2 acknowledged but didn't fully ground.
+
+→ 4 packages incomplete (beads.md, daemon.md, doltserver.md, polecat.md), 40 pages upgraded to verified

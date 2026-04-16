@@ -1,7 +1,7 @@
 ---
 title: convoy (concept)
 type: concept
-status: partial
+status: verified
 topic: gastown
 created: 2026-04-11
 updated: 2026-04-15
@@ -17,6 +17,8 @@ phase3_audited: 2026-04-14
 phase3_findings: [drift, drift]
 phase3_severities: [wrong, wrong]
 phase3_findings_post_release: false
+phase4_audited: 2026-04-16
+phase4_findings: [none]
 ---
 
 # convoy

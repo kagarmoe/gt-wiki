@@ -39,6 +39,8 @@ phase3_audited: 2026-04-15
 phase3_findings: [wiki-stale]
 phase3_severities: [incomplete]
 phase3_findings_post_release: false
+phase4_audited: 2026-04-16
+phase4_findings: [incomplete]
 ---
 
 # internal/beads

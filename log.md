@@ -3837,3 +3837,17 @@ Both findings are in-release (code unchanged since v1.0.0).
 - **none:** Overview is a high-level conceptual document. All claims (role taxonomy, crew vs polecat semantics, dog vs crew distinction, directory structure with `.repo.git/`, identity attribution, propulsion principle) are consistent with wiki's code-grounded pages. No code behavior claims that contradict wiki or code.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 10c (Sweep 2: docs/why-these-features.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/why-these-features.md` (264 lines). Enterprise AI rationale document describing 7 features.
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/why-these-features.md` (in full, 264 lines)
+
+**Wiki pages audited:** None needed.
+
+**Findings by category:**
+- **none:** Rationale/marketing document. Two features (Capability-Based Routing, Federation) are explicitly self-labeled as "Status: Planned" with honest disclaimers about being unimplemented. Other features (attribution, work history, validation, activity feed) describe general capabilities that are real. Most code examples reference `bd` commands (not `gt`), which are outside gt-wiki scope. No code behavior claims to contradict.
+
+-> (no wiki pages touched)

@@ -3983,3 +3983,25 @@ Both findings are in-release (code unchanged since v1.0.0).
 **No new wiki page annotations.** Both drift findings are either already filed or reference non-existent commands.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 10k (Sweep 2: docs/agent-provider-integration.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/agent-provider-integration.md` (835 lines). Agent provider integration guide covering 4 tiers (Zero, Preset, Hooks, Deep), Gas City forward-looking section.
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/agent-provider-integration.md` (in full, 835 lines)
+
+**Source files re-read at current HEAD:**
+- `grep -rn "gas.city\|Gas.City" /home/kimberly/repos/gastown/internal/` — zero hits. Gas City has no code implementation.
+
+**Wiki pages audited:**
+- [gastown/commands/config.md](gastown/commands/config.md) — agent preset registration, resolution order consistent.
+- [gastown/commands/hooks.md](gastown/commands/hooks.md) — hooks integration patterns consistent.
+- [gastown/packages/config.md](gastown/packages/config.md) — AgentPresetInfo struct fields match the field reference table.
+
+**Findings by category:**
+- **none:** The document is primarily a guide for external agent teams. Tier 0-3 descriptions match the wiki's documentation of how Gas Town orchestrates agents. AgentPresetInfo field reference (lines 109-133) matches the code struct. Gas City section (lines 539-608) is explicitly self-labeled as "Forward-Looking" — no drift because it honestly describes an unimplemented successor. The informal 2026-04-14 drift-found entry noted "Gas City mentioned as upcoming but no code exists" — confirmed: this is aspirational documentation, not a code claim.
+
+**This entry supersedes** the informal `[2026-04-14] drift-found | docs/agent-provider-integration.md` entry earlier in this log.
+
+-> (no wiki pages touched)

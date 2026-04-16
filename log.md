@@ -4194,3 +4194,26 @@ Both findings are in-release (code unchanged since v1.0.0).
 - **none (verified):** Problem statement (witness bottleneck), current vs proposed flow, detailed design (self-transitions, direct refinery notification, cleanup wisp elimination), edge cases (crash during done, push failure, missed nudge), migration strategy — all accurately describe the shipped implementation.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 11j (Sweep 2: docs/design/dog-infrastructure.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/dog-infrastructure.md` (509 lines). Mixed document: first half describes the implemented watchdog chain (daemon→boot→deacon), second half describes an aspirational shutdown dance dog pool architecture.
+
+**Reclassification:** PARTIALLY reclassified. The watchdog chain section (lines 1-186) is factual — all claims verifiable against code. The dog pool/shutdown dance section (lines 188-509) is aspirational — `ShutdownDanceState`, `DogPool` struct, warrant queue, `gt dog dances`, `gt dog warrants`, `gt dog pool status` commands all do NOT exist in code. Findings from the second half classified as `implementation-status: unbuilt`.
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/dog-infrastructure.md` (in full, 509 lines)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/daemon/daemon.go` (line 1185 — confirmed `ensureBootRunning()`)
+- `/home/kimberly/repos/gastown/internal/boot/boot.go` (lines 23-26 — confirmed `MarkerFileName = ".boot-running"`, `StatusFileName = ".boot-status.json"`)
+- `/home/kimberly/repos/gastown/internal/daemon/handler.go` (lines 34-36 — confirmed `maxDogPoolSize` but for helper dogs, NOT shutdown dance dogs)
+- Grep for `ShutdownDanceState|DogPool|warrant.*queue` in internal/ — zero hits
+
+**Wiki pages spot-checked:** roles/dog.md, commands/dog.md, commands/boot.md, roles/deacon.md
+
+**Findings by category:**
+- **implementation-status: unbuilt:** 1 finding. Lines 188-509 describe a Dog Pool Architecture for concurrent shutdown dances — lightweight Go state machines (`ShutdownDanceState`), a `DogPool` with fixed pool of 5, warrant queuing, `RecoverOrphans()`, and CLI commands (`gt dog dances`, `gt dog warrants`, `gt dog pool status`). None of this exists in code. The existing `maxDogPoolSize` in `handler.go` is for Deacon's helper dogs (cross-rig workers), which are Claude AI sessions — not the lightweight Go goroutine dogs described here. Fix tier: preserve-as-vision. Severity: wrong. Release position: in-release (design predates release, code never existed).
+- **none (verified):** Watchdog chain (daemon→boot→deacon) fully confirmed. Three-tier architecture, session ownership (Boot in `gt-boot`, Deacon in `hq-deacon`), heartbeat mechanics, Boot decision matrix, handoff flow, degraded mode, fallback chain — all consistent with code and wiki.
+
+-> (no wiki pages touched)

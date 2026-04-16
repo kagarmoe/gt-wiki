@@ -4041,3 +4041,25 @@ Both findings are in-release (code unchanged since v1.0.0).
 - **none:** All claims verified. Five imperative Go dogs (Doctor, Reaper, JSONL Backup, Dolt Backup, Compactor) match code. Janitor removal confirmed. The `handleDogs()` dispatch path confirmed at `handler.go:41`. The "future dogs default to plugin" and "do not migrate working imperative dogs" principles are architectural guidance consistent with current code. Wiki's dog role page documents the plugin dispatch model correctly.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 11c (Sweep 2: docs/design/persistent-polecat-pool.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/persistent-polecat-pool.md` (203 lines). Design doc describing the persistent polecat pool lifecycle separation (identity/sandbox/session), pool states, and implementation phases with honest SHIPPED/DEFERRED labels.
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/persistent-polecat-pool.md` (in full, 203 lines)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/cmd/polecat.go` (line 298 — confirmed `pool-init` hyphenated command name)
+- `/home/kimberly/repos/gastown/internal/polecat/manager.go` (line 184 — confirmed `GetNamePool`, `FindIdlePolecat`, `ReuseIdlePolecat` exist)
+- `/home/kimberly/repos/gastown/internal/rig/manager.go` (lines 97-100 — confirmed `PolecatPoolSize` and `PolecatNames` config fields)
+
+**Wiki pages spot-checked:** commands/polecat.md (correctly documents `pool-init` hyphenated), roles/polecat.md, workflows/polecat-lifecycle.md
+
+**Findings by category:**
+- **drift:** 1 finding. Design doc line 76 says `gt polecat pool init <rig>` (space-separated) but code registers the command as `pool-init` (hyphenated) at `polecat.go:298`. Wiki's polecat.md already correctly documents the hyphenated form. Fix tier: docs. Severity: wrong. Release position: in-release.
+- **none (verified):** Implementation status table (lines 188-203) is accurately self-labeled: SHIPPED items confirmed in code (`done.go`, `sling.go`, `handoff.go`, `witness/handlers.go`, `refinery/engineer.go`). DEFERRED items (`ReconcilePool`, pool size enforcement, `gt polecat pool init` command) confirmed absent from shipped code — pool-init EXISTS as a command but pool size enforcement is not shipped. Lifecycle separation (identity/sandbox/session), pool states (IDLE/WORKING/DONE), and the "no nuke in the happy path" principle all match wiki documentation.
+
+**No wiki annotation needed** — the wiki already correctly documents the hyphenated `pool-init` command name. The drift is docs-only.
+
+-> (no wiki pages touched)

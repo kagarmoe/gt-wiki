@@ -4258,3 +4258,44 @@ Both findings are in-release (code unchanged since v1.0.0).
 - **none (verified):** Communication hygiene section (mail vs nudge, role-specific guidance) consistent with wiki and code. Beads-native messaging (groups, queues, channels) confirmed in code. Address format, sending/receiving commands, extensibility pattern, retention policy — all consistent.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 11m (Sweep 2: docs/design/model-aware-molecules.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/model-aware-molecules.md` (635 lines). Design doc for per-step model constraints, subscription-aware routing, OpenRouter pricing, meta-model routing, and local usage tracking.
+
+**Reclassification:** RECLASSIFIED to implementation-status. Despite user stories marked [x] (complete) in the doc, no `internal/models/` package exists at HEAD. No `ModelEntry`, `SelectModel`, `ModelDatabase`, `usage.jsonl` (model usage), or `models_pricing_cache.json` found in Go source. The [x] checkboxes appear to be planning artifacts, not implementation confirmation. The entire feature set (US-001 through US-008) is unbuilt.
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/model-aware-molecules.md` (in full, 635 lines)
+
+**Source files re-read at current HEAD:**
+- `ls /home/kimberly/repos/gastown/internal/models/` — directory does not exist
+- Grep for `SelectModel|ModelEntry|models_pricing_cache` across all `.go` files — zero hits in model-related code
+- `/home/kimberly/repos/gastown/internal/cmd/telemetry.go` has `cmd-usage.jsonl` (command usage tracking), NOT model usage tracking
+
+**Wiki pages spot-checked:** concepts/molecule.md, concepts/formula.md
+
+**Findings by category:**
+- **implementation-status: unbuilt:** 1 finding. The entire model-aware molecules feature (8 user stories, per-step model constraints, subscription routing, OpenRouter pricing integration, meta-model router, usage tracking) has no code implementation. `internal/models/` does not exist. The design doc marks US-001 through US-005 as [x] complete, but no corresponding Go code exists at HEAD. Fix tier: preserve-as-vision. Severity: wrong. Release position: in-release (design predates release, code never existed).
+
+-> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 11n (Sweep 2: docs/design/ledger-export-triggers.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/ledger-export-triggers.md` (640 lines). Design doc for the trigger specification governing Level 1→2 and Level 1→3 transitions in the three data planes (operational→ledger). Defines export triggers for bead closure, convoy completion, agent lifecycle, skill derivation.
+
+**Reclassification:** RECLASSIFIED to implementation-status. The doc describes a complete ledger export pipeline with triggers, format specification, skill derivation engine, and CV model that has no code implementation. No `ledger.*export` or `export.*trigger` found in internal/.
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/ledger-export-triggers.md` (in full, 640 lines)
+
+**Source files re-read at current HEAD:**
+- Grep for `ledger.*export|export.*ledger` in internal/ — zero hits
+- The JSONL Dog (`jsonl_git_backup.go`) handles JSONL backup (Operational plane durability), NOT ledger plane export. The doc explicitly distinguishes these: "JSONL backup is the current state. Ledger export is the next step."
+
+**Wiki pages spot-checked:** packages/doltserver.md, commands/dolt.md
+
+**Findings by category:**
+- **implementation-status: unbuilt:** 1 finding. The entire ledger export trigger system (bead closure triggers, convoy completion triggers, agent lifecycle triggers, Level 2/3 format specification, skill derivation engine, CV growth model, HOP economy bootstrapping) has no code implementation. The three data planes concept exists in `dolt-storage.md` and the operational plane is implemented (JSONL Dog handles backup), but the ledger plane export pipeline described here is entirely aspirational. Fix tier: preserve-as-vision. Severity: wrong. Release position: in-release.
+
+-> (no wiki pages touched)

@@ -4,7 +4,7 @@ type: command
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-15
+updated: 2026-04-16
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/formula.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -13,6 +13,8 @@ phase3_audited: 2026-04-15
 phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
+phase4_audited: 2026-04-16
+phase4_findings: [incomplete]
 ---
 
 # gt formula
@@ -139,6 +141,17 @@ Per-subcommand, defined in `init()` at `formula.go:161-185`:
 - [mq](mq.md) — merge-queue formulas are part of the refinery loop
   that consumes the work formulas dispatch.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Coverage gaps
+
+*Phase 4 audit (2026-04-16):* The `overlay` subcommand tree is entirely
+missing from this page. Source: `formula_overlay.go` (parent),
+`formula_overlay_edit.go`, `formula_overlay_list.go`,
+`formula_overlay_show.go` (347 lines total). The page says "four
+subcommands" but there are five top-level registrations (list, show, run,
+create, overlay), and overlay itself has three children (show, edit, list).
+The overlay feature manages per-formula step overrides via TOML files at
+town-level and rig-level paths.
 
 ## Notes / open questions
 

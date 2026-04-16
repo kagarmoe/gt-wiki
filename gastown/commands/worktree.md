@@ -1,10 +1,10 @@
 ---
 title: gt worktree
 type: command
-status: partial
+status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-15
+updated: 2026-04-16
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/worktree.go
 tags: [command, workspace, git, worktree, crew, cross-rig]
@@ -12,6 +12,8 @@ phase3_audited: 2026-04-15
 phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
+phase4_audited: 2026-04-16
+phase4_findings: [none]
 ---
 
 # gt worktree

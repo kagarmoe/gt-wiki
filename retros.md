@@ -938,3 +938,19 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 - Gap enumeration: 68 packages + 384 subcommands + 14 root files + 3 binaries classified (Batch 14)
 - Index integration + close (Batch 15)
 - Deliverables: gastown/drift/README.md (consolidated index), gastown/drift/gaps.md (gap findings), per-page Docs claim/Drift sections on 211 entity pages
+
+## Phase 4 Batch 1: Coverage audit — commands/ (2026-04-16)
+
+**What went well:**
+- Mechanical comparison (source flag/subcommand counts vs wiki content) was highly efficient for 50 pages
+- Phase 2 was much more thorough than its conservative `status: partial` tags suggested — 49 of 50 pages had adequate coverage
+- The single genuine gap (formula overlay tree) is a clean sibling-file miss, consistent with the Phase 3 `phase-2-incomplete` pattern
+
+**What could improve:**
+- Flag count comparison was complicated by commands with subcommands (parent + child flags make raw counts misleading). Needed to read page structure, not just grep counts.
+- Initial regex for counting wiki flags captured noise; had to iterate on the approach
+
+**Key finding:**
+- Phase 2's self-assessment was overly conservative: `status: partial` mostly reflected "I didn't deep-read every edge case" rather than actual missing content. The pages were substantially complete.
+
+**Stats:** 50 pages audited, 49 upgraded to verified, 1 confirmed incomplete (formula.md — missing overlay subcommand tree, 347 lines of source across 4 files).

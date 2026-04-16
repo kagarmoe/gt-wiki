@@ -4494,3 +4494,18 @@ Revisited the wiki-stale log placement question from the Sweep 1 retrospective (
 **Phase 3 final stats:** 271 audited units + systematic gap enumeration. Index now covers: drift (wrong), gaps (missing), and coverage decisions.
 
 → gastown/drift/README.md, gastown/drift/gaps.md
+
+## [2026-04-16] drift-found | Phase 4 Batch 1 (Coverage audit: commands/)
+
+**Scope:** 50 `status:partial` command pages audited for completeness (flag counts, subcommand counts, behavior coverage vs source code).
+
+**Results:**
+- Upgraded to verified: 49 pages
+- Genuine incomplete: 1 page
+
+**Incomplete findings:**
+- **formula.md** — Missing entire `overlay` subcommand tree. Source files `formula_overlay.go`, `formula_overlay_edit.go`, `formula_overlay_list.go`, `formula_overlay_show.go` (347 lines) are not covered. The page says "four subcommands" but five are registered (list, show, run, create, overlay), and overlay has three children (show, edit, list). Severity: `incomplete`.
+
+**Methodology:** Counted flag registrations (`.Flags().`) and `AddCommand` calls in source vs wiki page content for all 50 pages. Phase 2's coverage was overwhelmingly adequate — the `status: partial` tags were conservative self-assessments rather than actual incompleteness. The one genuine gap (formula overlay) is a sibling-file miss: Phase 2 read `formula.go` but not the `formula_overlay_*.go` family.
+
+→ gastown/commands/formula.md (incomplete), 49 other command pages (upgraded to verified)

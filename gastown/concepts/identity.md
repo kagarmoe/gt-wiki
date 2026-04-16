@@ -12,8 +12,8 @@ sources:
   - /home/kimberly/repos/gastown/internal/polecat/manager.go
 tags: [concept, identity, agent, detectsender, env-vars, agent-bead, session-name, whoami]
 phase3_audited: 2026-04-14
-phase3_findings: [none]
-phase3_severities: []
+phase3_findings: [drift]
+phase3_severities: [wrong]
 phase3_findings_post_release: false
 ---
 
@@ -324,6 +324,40 @@ disagree.
 - [`internal/polecat`](../packages/polecat.md)
 - [`internal/config`](../packages/config.md)
 - [`internal/beads`](../packages/beads.md)
+
+## Docs claim
+
+### Source
+- `/home/kimberly/repos/gastown/docs/concepts/identity.md` (lines 96-119)
+
+### Verbatim
+> ```bash
+> # Set automatically for polecat 'toast' in rig 'gastown'
+> export GT_ROLE="polecat"
+> export GT_RIG="gastown"
+> export GT_POLECAT="toast"
+> export BD_ACTOR="gastown/polecats/toast"
+> export GIT_AUTHOR_NAME="gastown/polecats/toast"
+> ```
+> ```bash
+> # Set automatically for crew member 'joe' in rig 'gastown'
+> export GT_ROLE="crew"
+> export GT_RIG="gastown"
+> export GT_CREW="joe"
+> export BD_ACTOR="gastown/crew/joe"
+> export GIT_AUTHOR_NAME="gastown/crew/joe"
+> ```
+
+## Drift
+
+### GIT_AUTHOR_NAME docs claim uses full BD_ACTOR path but code sets it to agent name only
+- **Claim source:** `docs/concepts/identity.md` (lines 102, 116)
+- **Docs claim:** `GIT_AUTHOR_NAME="gastown/polecats/toast"` for polecats and `GIT_AUTHOR_NAME="gastown/crew/joe"` for crew — i.e., GIT_AUTHOR_NAME equals the full BD_ACTOR slash path.
+- **Code does:** `/home/kimberly/repos/gastown/internal/config/env.go:118` (polecat): `env["GIT_AUTHOR_NAME"] = cfg.AgentName` — sets to just the agent name (e.g., `toast`). Line 130 (crew): same pattern, just the agent name (e.g., `joe`). The full slash path is only used for `BD_ACTOR`, not `GIT_AUTHOR_NAME`.
+- **Category:** `drift`
+- **Severity:** `wrong`
+- **Fix tier:** `docs` — the identity docs should show `GIT_AUTHOR_NAME="toast"` for polecats and `GIT_AUTHOR_NAME="joe"` for crew.
+- **Release position:** `in-release`
 
 ## Notes / open questions
 

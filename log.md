@@ -3471,3 +3471,31 @@ Both findings are in-release (code unchanged since v1.0.0).
 **Next sub-batch:** Batch 7e — docs/concepts/identity.md.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 7e (Sweep 2: docs/concepts/identity.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/concepts/identity.md` (286 lines).
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/concepts/identity.md` (in full, 286 lines)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/config/env.go` (lines 79-143, AgentEnv function — BD_ACTOR and GIT_AUTHOR_NAME per role)
+
+**Wiki pages audited:**
+- [gastown/concepts/identity.md](gastown/concepts/identity.md) — `phase3_findings` updated from `[none]` to `[drift]`
+
+**Findings by category:**
+- **drift:** 1 finding. The docs/concepts/identity.md environment examples (lines 96-119) claim `GIT_AUTHOR_NAME="gastown/polecats/toast"` for polecats and `GIT_AUTHOR_NAME="gastown/crew/joe"` for crew — using the full BD_ACTOR slash path. Code at `env.go:118` (polecat) and `env.go:130` (crew) sets `GIT_AUTHOR_NAME = cfg.AgentName` — just the short name (`toast`, `joe`), not the full path. The `BD_ACTOR` format table and all other claims in the docs file are accurate.
+
+**Additional observations (not findings):**
+- The docs' BD_ACTOR format convention table (lines 25-32) is accurate per `env.go:88-138`.
+- The "agent vs owner" distinction, git commit attribution model, and CV/skill accumulation sections describe aspirational features (bd audit, bd stats, bd cv commands) that may not all exist in gastown code — but these are beads-side, out of gastown scope.
+
+**New beads filed:** none
+**Beads closed:** none
+**Cross-link discipline:** Docs claim and Drift sections added to identity concept page.
+
+**Next sub-batch:** Batch 7f — docs/concepts/propulsion-principle.md.
+
+-> [gastown/concepts/identity.md](gastown/concepts/identity.md)

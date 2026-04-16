@@ -3714,3 +3714,30 @@ Both findings are in-release (code unchanged since v1.0.0).
 **Next sub-batch:** Batch 8i — docs/design/otel/otel-data-model.md.
 
 -> [gastown/packages/telemetry.md](gastown/packages/telemetry.md)
+
+## [2026-04-15] drift-found | Batch 8i (Sweep 2: docs/design/otel/otel-data-model.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/otel/otel-data-model.md` (471 lines, first 100 in full).
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/otel/otel-data-model.md` (lines 1-100 in full)
+
+**Source files re-read at current HEAD:**
+- Already verified in Batch 8h — `recorder.go` has all RecordMol*/RecordBeadCreate/RecordAgentInstantiate functions.
+
+**Wiki pages audited:**
+- [gastown/packages/telemetry.md](gastown/packages/telemetry.md) — already annotated with the drift finding in Batch 8h. No additional annotation needed.
+
+**Findings by category:**
+- **none (new to wiki):** The event index table (lines 38-43) marks `agent.instantiate`, `mol.cook`, `mol.wisp`, `mol.squash`, `mol.burn`, and `bead.create` as "❌ Roadmap" — same stale claim as `otel-architecture.md` (Batch 8h). Already filed as drift on the telemetry wiki page. Not double-filed.
+
+**Additional observation:**
+- This file (`docs/design/otel/otel-data-model.md`) may overlap with `docs/otel-data-model.md` in Batch 10 as noted in the plan. The duplication is noted here; Batch 10 will audit the other instance.
+
+**New beads filed:** none
+**Beads closed:** none
+**Cross-link discipline:** No wiki pages touched (drift already annotated in 8h).
+
+**Batch 8 complete.** 9 files processed, 1 new finding (OTel stale implementation status, annotated on telemetry.md). Retro follows.
+
+-> (no wiki pages touched)

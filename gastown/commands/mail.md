@@ -4,7 +4,7 @@ type: command
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/mail.go
   - /home/kimberly/repos/gastown/internal/cmd/mail_send.go
@@ -22,6 +22,10 @@ sources:
   - /home/kimberly/repos/gastown/internal/cmd/mail_queue.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
 tags: [command, communication, mail, durable, polecat-safe, beads, messaging]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift, wiki-stale]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt mail
@@ -92,14 +96,16 @@ bd installed to actually do anything.
 
 ### Subcommands
 
-Registered at `mail.go:523-543`. Each has its own runner in a
-sibling `mail_*.go` file.
+22 subcommands total. 17 registered in `mail.go:524-541`; 5 more
+registered in sibling files via their own `init()` functions.
+
+**Registered in `mail.go:524-541`:**
 
 | subcommand | short | sibling file | notes |
 |------------|-------|--------------|-------|
-| `send` | Send a message | `mail_send.go` (not read) | Positional `<address>` or `--to`; many flags |
-| `inbox` | Check inbox | `mail_inbox.go` (not read) | Default view; `--unread` / `--all` |
-| `read` (alias `show`) | Read a specific message | `mail_thread.go`? | By ID or 1-based index |
+| `send` | Send a message | `mail_send.go` | Positional `<address>` or `--to`; many flags |
+| `inbox` | Check inbox | `mail_inbox.go` | Default view; `--unread` / `--all` |
+| `read` (alias `show`) | Read a specific message | `mail_thread.go` | By ID or 1-based index |
 | `peek` | Show preview of first unread | — | Status-bar preview (exit 1 if none) |
 | `delete` | Delete (ack) messages | — | Closes messages in beads |
 | `archive` | Archive messages | — | `--stale` / `--dry-run` |
@@ -108,12 +114,23 @@ sibling `mail_*.go` file.
 | `check` | Check for new mail (for hooks) | `mail_check.go` | `--inject` for Claude Code hooks; `--identity` |
 | `thread` | View a message thread | `mail_thread.go` | `--json` |
 | `reply` | Reply to a message | — | Auto reply-to / Re: subject |
-| `claim` | Claim a message from a queue | `mail_queue.go`? | Work-queue primitive |
-| `release` | Release a claimed queue message | — | Undo `claim` |
+| `claim` | Claim a message from a queue | — | Work-queue primitive (runner in `mail_queue.go`) |
+| `release` | Release a claimed queue message | — | Undo `claim` (runner in `mail_queue.go`) |
 | `clear` | Clear all messages from an inbox | — | Quiescence reset |
 | `search` | Search messages by content | `mail_search.go` | Regex; `--from`/`--subject`/`--body`/`--archive` |
 | `announces` | List or read announce channels | `mail_announce.go` | Bulletin boards |
-| `drain` | (mailDrainCmd — defined in `mail_drain.go`) | `mail_drain.go` | Batch processing |
+| `drain` | Batch processing | `mail_drain.go` | Batch drain of mail queue |
+
+**Registered in sibling-file `init()` blocks** (Phase 2 missed
+these — see wiki-stale note below):
+
+| subcommand | short | sibling file | children | notes |
+|------------|-------|--------------|----------|-------|
+| `channel` | Manage beads-native channels | `mail_channel.go:149` | `list`, `show`, `create`, `delete`, `subscribe`, `unsubscribe`, `subscribers` (7) | Pub/sub broadcast channels with retention policies |
+| `directory` (aliases: `dir`, `addresses`) | List all valid mail addresses | `mail_directory.go:42` | none | Shows agent, group, queue, channel, and special addresses |
+| `group` | Manage mail groups | `mail_group.go:115` | `list`, `show`, `create`, `add`, `remove`, `delete` (6) | Distribution groups with pattern/nested-group members |
+| `hook` | Attach mail to your hook | `mail_hook.go:45` | none | Alias for `gt hook attach <mail-id>` |
+| `queue` | Manage mail queues | `mail_queue.go:548` | `create`, `show`, `list`, `delete` (4) | Queue CRUD (distinct from `claim`/`release` which operate on messages) |
 
 Not all runners were read for this page; they are future targets.
 
@@ -260,6 +277,34 @@ quiescence - reset all inboxes across workers efficiently." The
 town-wide reset loops externally; `clear` is the per-inbox
 primitive.
 
+## Docs claim
+
+### Source
+- `internal/cmd/mail.go:92-95` — Cobra `Long` text COMMANDS section
+
+### Verbatim
+> COMMANDS:
+>   inbox     View your inbox
+>   send      Send a message
+>   read      Read a specific message
+>   mark      Mark messages read/unread
+
+## Drift
+
+### mailCmd.Long COMMANDS section lists 4 subcommands; 22 are registered
+
+- **Claim source:** Cobra `Long` text at `internal/cmd/mail.go:92-95`
+- **Docs claim:** The COMMANDS block enumerates 4 subcommands: `inbox`, `send`, `read`, `mark`.
+- **Code does:** `mail.go:524-541` registers 17 subcommands in its own `init()` (`send`, `inbox`, `read`, `peek`, `delete`, `archive`, `mark-read`, `mark-unread`, `check`, `thread`, `reply`, `claim`, `release`, `clear`, `search`, `announces`, `drain`). Five more are registered by sibling-file `init()` blocks: `channel` at `mail_channel.go:149`, `directory` at `mail_directory.go:42`, `group` at `mail_group.go:115`, `hook` at `mail_hook.go:45`, `queue` at `mail_queue.go:548`. Total: 22 subcommands. The COMMANDS list is 82% incomplete.
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — update the `Long` text's COMMANDS block to enumerate the actual subcommand set, or remove the hand-maintained list and rely on cobra's auto-generated `Available Commands:` block.
+- **Release position:** `in-release` — `mail.go` COMMANDS section byte-identical at `v1.0.0`; all 5 sibling files present at `v1.0.0` with their `mailCmd.AddCommand(...)` registrations intact.
+
+See also: [gastown/drift/README.md](../drift/README.md) for the consolidated corrections list.
+
+**Wiki-stale inline fix (Phase 3):** Phase 2's Subcommands table listed 17 entries (all from `mail.go`) but missed 5 subcommand groups registered by sibling-file `init()` functions (`channel`, `directory`, `group`, `hook`, `queue`). Phase 2 listed all 13 sibling files in `sources:` frontmatter but did not read their `init()` blocks for AddCommand registrations. Fixed inline above: Subcommands section now enumerates all 22 subcommands in two tables (17 from `mail.go` + 5 from siblings). **Phase 2 root cause: `phase-2-incomplete` (heuristic)** — all 5 sibling files were present at `v1.0.0` with the same registrations; Phase 2 had access to them on 2026-04-11 and listed them in `sources:` but did not verify their command registrations. Same pattern as Batch 1b (`directive`, `hooks`), Batch 1c (`molecule`, `mq`, `wl`), and Batch 1d (`agents`). See also: [gastown/drift/README.md](../drift/README.md).
+
 ## Notes / open questions
 
 - **`mail` is in the beads-exempt preflight** so it can start
@@ -284,15 +329,12 @@ primitive.
 - **Parent RunE is `requireSubcommand`.** Running bare
   `gt mail` with no args errors. There's no default inbox
   view; you must say `gt mail inbox`.
-- **15+ subcommands is a lot.** Most runners are in sibling
-  files (`mail_send.go`, `mail_inbox.go`, `mail_check.go`,
-  `mail_thread.go`, `mail_search.go`, `mail_drain.go`,
-  `mail_group.go`, `mail_announce.go`, `mail_queue.go`,
-  `mail_directory.go`, `mail_identity.go`, `mail_channel.go`,
-  `mail_hook.go`) plus test files. Each sibling likely
-  deserves its own page down the road — especially
-  `mail_drain.go`, which probably runs the queue-draining
-  behavior that connects mail to the hook system.
+- **22 subcommands across 14 source files.** → Phase 3 promoted
+  the sibling-file subcommand discovery to the Subcommands table
+  and filed the incomplete COMMANDS enumeration as cobra drift.
+  Each sibling runner file likely deserves its own page down the
+  road — especially `mail_drain.go`, which probably runs the
+  queue-draining behavior that connects mail to the hook system.
 - **Relationship to `handoff --collect`.** [handoff](handoff.md)
   composes a handoff mail; the `--collect` flag gathers
   state into that mail. Handoff mail is the canonical example

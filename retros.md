@@ -299,3 +299,34 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 - **The `callbacks.md` `handleSling` finding is architecturally interesting because it's the inverse of the `boot` situation.** `boot`'s Long OVER-claims a dog relationship that the code explicitly denies. `callbacks`' Long UNDER-describes the log-and-defer behavior (reads as "we spawn" when the code says "we log and the Deacon spawns"). Both are `cobra drift`, both `severity: wrong`, both `fix tier: code`, but the fix shapes are different: `boot` is "the Long says something false and should be rewritten to say something true"; `callbacks` is "the Long says something true-but-incomplete and should be rewritten to describe the defer pattern." A Phase 6 planner looking at both findings should notice they're different kinds of fix work even though they share a category.
 
 - **`witness --foreground` is the first compound axis the wiki has seen that combines Cobra text with code-comment-marked vestige.** Prior compound cases (`hooks`: `cobra drift + wiki-stale`, `molecule`: same) were about wiki synthesis drift. This one is about cobra-level docs drift AND runtime notice drift, which is a different shape. Worth capturing in the drift index's taxonomy when Batch 13 builds the index: the `cobra drift + implementation-status` compound is a valid pattern and distinct from `cobra drift + drift` and `cobra drift + wiki-stale`. If the retrospective gate decides to add a "compound axis" column to the drift taxonomy, this is the third axis.
+
+## [2026-04-15 22:00] stage | 3.1.1e — Communication Sweep 1
+
+**Actor:** general-purpose subagent dispatched by main orchestrator for Phase 3 Batch 1e
+**Unit:** 7 `GroupComm` command pages audited; 1 cobra-drift finding + 1 wiki-stale finding (both on `mail.md`); 6 pages tagged `phase3_findings: [none]`; one commit
+**Duration:** one dispatch
+
+**What went well:**
+
+- **The `mail` sibling-file audit delivered exactly the finding the dispatch prompt predicted.** The prompt flagged mail's 15+ subcommands and sibling-file audit as "CRITICAL" and "high-leverage." The audit confirmed: 5 of 13 non-test siblings register NEW subcommand groups via their own `init()` blocks (`channel`, `directory`, `group`, `hook`, `queue`), bringing the total from the Phase 2 table's 17 to 22. Phase 2 listed all 13 sibling files in `sources:` but never checked their `init()` blocks. This is now the 5th sub-batch (of 5) to surface a `phase-2-incomplete` wiki-stale finding from sibling-file analysis. The pattern is fully validated: every sub-batch since 1b has found at least one.
+- **The dispatch prompt's detailed per-command predictions were accurate on neutrals.** `broadcast` (no `--force`, honors DND) — neutral, exactly as predicted. `dnd` (verbose-loss) — neutral because the Long says "resume normal" explicitly. `nudge` (`--if-fresh` 60s) — neutral because the flag description mentions the threshold. `escalate` (not beads-exempt) — neutral. `peek` (tmux wrapper) — neutral. All 6 neutrals were classifiable on first read without ambiguity. This is the cleanest set of neutral calls in Batch 1 so far.
+- **The mail COMMANDS cobra drift is the largest instance of the "hand-maintained enumeration" pattern.** Prior instances: `doctor` (curated check list), `repair` (6 targets listed / 2 registered), `account` (4/5), `hooks` (8/9), `molecule` (categorised list omits step-group children). Mail: 4 listed / 22 registered = 82% incomplete. This is the most dramatic instance and the strongest argument for the Phase 6 meta-fix (replace hand-maintained COMMANDS blocks with cobra's auto-generated `Available Commands:`).
+
+**What didn't:**
+
+- **Communication is a low-yield group for drift findings.** 1 page with findings out of 7 = 14% yield, the lowest of any Batch 1 sub-batch (1a: 18%, 1b: 55%, 1c: 23%, 1d: 50%). Most Communication commands are well-scoped single-file commands with accurate Long text. The yield was concentrated entirely on `mail`, which is an outlier in complexity (22 subcommands across 14 source files). Without mail, this would have been a 0% yield sub-batch.
+- **No cobra-drift on `dnd off` verbose-loss.** The dispatch prompt flagged this as a potential finding, but the Long text is actually accurate: it says "resume normal notifications" for `off`, which is exactly what the code does. The verbose-loss is a UX papercut, not a docs lie. Correctly classified as neutral, but it took a careful re-read of the Long to confirm — the prediction was reasonable but wrong.
+
+**What to change next time:**
+
+- **For Batch 1f (Services, 11 cmds): calibrate yield expectations down.** Communication's 14% yield and the pattern of most findings coming from one complex command suggest that smaller, single-file commands rarely produce drift. Services commands (e.g. `convoy`, `feed`, `patrol`) may follow the same pattern: one or two complex parents with sibling files producing findings, the rest neutral. The sibling-file audit remains mandatory but the dispatcher should expect 2-3 findings total, not the 5-7 that Configuration and Agent Management produced.
+- **No skill or plan edits needed from this sub-batch.** The methodology is stable and the findings are clean instances of established patterns. The main observation (mail COMMANDS is the largest hand-maintained enumeration drift) is a data point for the Phase 6 meta-fix discussion, not a process change.
+
+**Follow-ups filed:**
+
+- none (bd beads) — all observations are informational.
+
+**For Kimberly retro discussion:**
+
+- **The `phase-2-incomplete` pattern is now 5-for-5 across sub-batches.** Every sub-batch from 1b onward has found at least one case where Phase 2 read a parent `.go` file in isolation without checking sibling-file `init()` registrations. The cumulative evidence: `directive` (1b), `hooks` (1b), `molecule` (1c), `mq` (1c), `wl` (1c), `agents` (1d), `polecat` (1d), `mail` (1e). That's 8 distinct commands with missed sibling registrations across 4 sub-batches. The mail case is notable because Phase 2 DID list all sibling files in `sources:` — it knew about them, listed them, but still didn't verify their `init()` blocks. This suggests the Phase 2 methodology had a systematic gap: it treated `sources:` as "files I was aware of" rather than "files I read for cobra registrations."
+- **Communication is the cleanest group so far for the Sweep 1 retrospective gate's calibration data.** 6 of 7 pages resolved as neutral on first read. The group's design surface (nudge/peek pair, dnd/notify layering, mail as the durable substrate, broadcast as fan-out, escalate as severity routing) is well-factored and the Cobra Long texts accurately describe what the code does. Phase 6 work on Communication will be concentrated on mail's COMMANDS block and nothing else from Sweep 1.

@@ -2176,3 +2176,68 @@ No post-release surprises in Agent Management. Every finding that surfaced is in
   [gastown/commands/session.md](gastown/commands/session.md),
   [gastown/commands/signal.md](gastown/commands/signal.md),
   [gastown/commands/witness.md](gastown/commands/witness.md)
+
+## [2026-04-15] drift-found | Batch 1e (Sweep 1 commands/ Communication — 7 pages)
+
+**Scope:** Sweep 1 promotion across all 7 pages in the `GroupComm` cobra group (`broadcast`, `dnd`, `escalate`, `mail`, `notify`, `nudge`, `peek`). Every page received `phase3_audited` / `phase3_findings` / `phase3_severities` / `phase3_findings_post_release` frontmatter. `mail.md` received `## Docs claim` + `## Drift` sections with verbatim quotes, current `file:line` refs, and v1.2 fix-tier + severity + release-position fields.
+
+**Source files re-read at current HEAD** (current gastown HEAD `9f962c4af068fe9da9f4bd3624e7b66351121fdf`):
+
+- `/home/kimberly/repos/gastown/internal/cmd/broadcast.go` (lines 27-45 — parent `Long` at `:31-44`)
+- `/home/kimberly/repos/gastown/internal/cmd/dnd.go` (lines 13-40 — parent `Long` at `:18-36`)
+- `/home/kimberly/repos/gastown/internal/cmd/escalate.go` (lines 24-60 — parent `Long` at `:28-56`, 5 subcommands at `:164-169`)
+- `/home/kimberly/repos/gastown/internal/cmd/escalate_impl.go` (grep — zero cobra registrations)
+- `/home/kimberly/repos/gastown/internal/cmd/mail.go` (lines 55-130, 520-543 — parent `Long` COMMANDS block at `:92-95`; `init()` registering 17 subcommands)
+- `/home/kimberly/repos/gastown/internal/cmd/mail_channel.go` (lines 1-50, 123-149 — `init()` registering 7 children + `mailCmd.AddCommand(mailChannelCmd)` at `:149`)
+- `/home/kimberly/repos/gastown/internal/cmd/mail_directory.go` (lines 1-50 — `init()` at `:40-42` registering `mailCmd.AddCommand(mailDirectoryCmd)`)
+- `/home/kimberly/repos/gastown/internal/cmd/mail_group.go` (lines 1-50, 97-115 — `init()` registering 6 children + `mailCmd.AddCommand(mailGroupCmd)` at `:115`)
+- `/home/kimberly/repos/gastown/internal/cmd/mail_hook.go` (lines 1-50 — `init()` at `:39-45` registering `mailCmd.AddCommand(mailHookCmd)`)
+- `/home/kimberly/repos/gastown/internal/cmd/mail_queue.go` (lines 454-548 — `init()` at `:532-548` registering 4 children + `mailCmd.AddCommand(mailQueueCmd)`)
+- `/home/kimberly/repos/gastown/internal/cmd/notify.go` (lines 13-40 — parent `Long` at `:19-35`)
+- `/home/kimberly/repos/gastown/internal/cmd/nudge.go` (lines 62-140 — parent `Long` at `:78-131`, `ifFreshMaxAge` at `:135`)
+- `/home/kimberly/repos/gastown/internal/cmd/nudge_poller.go` (lines 1-25 — `init()` at `:22` registers on `rootCmd`, not `nudgeCmd`)
+- `/home/kimberly/repos/gastown/internal/cmd/peek.go` (lines 22-50 — parent `Long` at `:28-47`)
+
+**Sibling-file audit:**
+
+- `broadcast` → `broadcast.go` only.
+- `dnd` → `dnd.go`, `dnd_test.go`. No AddCommand in test.
+- `escalate` → `escalate.go`, `escalate_impl.go`, `escalate_test.go`. `escalate_impl.go` zero cobra registrations. 5 subcommands in parent, accurate.
+- `mail` → **LOAD-BEARING**: 13 non-test siblings. 5 register NEW subcommand groups: `mail_channel.go:149`, `mail_directory.go:42`, `mail_group.go:115`, `mail_hook.go:45`, `mail_queue.go:548`. Phase 2 listed all siblings in `sources:` but did not verify `init()` blocks — `phase-2-incomplete`.
+- `notify` → `notify.go` only.
+- `nudge` → `nudge_poller.go` registers on `rootCmd` (separate command). No wiki-stale.
+- `peek` → `peek.go` only.
+
+Release-position: `mail.go` COMMANDS section byte-identical at v1.0.0; all 5 sibling files present at v1.0.0. All findings `in-release`.
+
+**Docs files read:** none (Sweep 1).
+
+**Wiki pages audited:**
+- [broadcast](gastown/commands/broadcast.md) — `phase3_findings: [none]`
+- [dnd](gastown/commands/dnd.md) — `phase3_findings: [none]`
+- [escalate](gastown/commands/escalate.md) — `phase3_findings: [none]`
+- [mail](gastown/commands/mail.md) — `phase3_findings: [cobra-drift, wiki-stale]`
+- [notify](gastown/commands/notify.md) — `phase3_findings: [none]`
+- [nudge](gastown/commands/nudge.md) — `phase3_findings: [none]`
+- [peek](gastown/commands/peek.md) — `phase3_findings: [none]`
+
+**Findings by category:**
+
+- **cobra drift:** 1 finding on `mail.md` — `mailCmd.Long` COMMANDS lists 4; 22 registered. `severity: wrong`, `in-release`, `fix tier: code`. Hand-maintained enumeration pattern (6th instance across Batches 1a-1e).
+- **wiki-stale:** 1 finding on `mail.md` — Phase 2 table listed 17; missed 5 sibling-registered groups (`channel`, `directory`, `group`, `hook`, `queue`). **Phase 2 root cause: `phase-2-incomplete` (heuristic)**. Fixed inline.
+- **none:** 6 pages (`broadcast`, `dnd`, `escalate`, `notify`, `nudge`, `peek`).
+
+**Judgment calls:** (1) Mail "durable" wiki characterization vs `--wisp=true` → neutral (wiki editorial, Notes already flags). (2) `nudge --if-fresh` 60s → neutral (flag description accurate). (3) `dnd off` verbose-loss → neutral (Long says "resume normal", correct). (4) `escalate` not beads-exempt → neutral (architectural observation).
+
+**Cross-link discipline:** 1 `## Docs claim` + 1 `## Drift` + 1 wiki-stale inline fix on `mail.md`. Forward links to [gastown/drift/README.md](gastown/drift/README.md). All `file:line` refs fresh from HEAD `9f962c4a`. 6 pages frontmatter-only.
+
+**Next sub-batch:** Batch 1f — Services group (11 cmds). Tracked under `wiki-vxl`.
+
+**Audited pages:**
+  [gastown/commands/broadcast.md](gastown/commands/broadcast.md),
+  [gastown/commands/dnd.md](gastown/commands/dnd.md),
+  [gastown/commands/escalate.md](gastown/commands/escalate.md),
+  [gastown/commands/mail.md](gastown/commands/mail.md),
+  [gastown/commands/notify.md](gastown/commands/notify.md),
+  [gastown/commands/nudge.md](gastown/commands/nudge.md),
+  [gastown/commands/peek.md](gastown/commands/peek.md)

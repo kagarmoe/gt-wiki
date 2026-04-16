@@ -4,7 +4,7 @@ type: command
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/crew.go
   - /home/kimberly/repos/gastown/internal/cmd/crew_add.go
@@ -16,6 +16,10 @@ sources:
   - /home/kimberly/repos/gastown/internal/cmd/crew_maintenance.go
   - /home/kimberly/repos/gastown/internal/cmd/crew_status.go
 tags: [command, workspace, crew, domain-noun, session, tmux, beads-exempt]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt crew
@@ -221,6 +225,35 @@ stored in the shared `crewRig` variable).
   different rig.
 - [handoff.md](handoff.md) / [mail.md](mail.md) — handoff mail
   is what `gt crew refresh` sends internally.
+
+## Docs claim
+
+### Source
+- `internal/cmd/crew.go:50-58` — Cobra `Long` text, "Commands:" block
+
+### Verbatim
+> Commands:
+>   gt crew start <name>     Start session (creates workspace if needed)
+>   gt crew stop <name>      Stop session(s)
+>   gt crew add <name>       Create workspace without starting
+>   gt crew list             List workspaces with status
+>   gt crew at <name>        Attach to session
+>   gt crew remove <name>    Remove workspace
+>   gt crew refresh <name>   Context cycle with handoff mail
+>   gt crew restart <name>   Kill and restart session fresh
+
+## Drift
+
+### crewCmd.Long "Commands:" lists 8; 11 visible subcommands registered
+- **Claim source:** Cobra `Long` text at `internal/cmd/crew.go:50-58`
+- **Docs claim:** The "Commands:" block lists 8 subcommands: start, stop, add, list, at, remove, refresh, restart.
+- **Code does:** `crew.go:412-429` registers 13 subcommands on `crewCmd`. Two (`next`, `prev`) are `Hidden: true` (`crew.go:276,287`). The remaining **11 visible** subcommands are: add, list, at, remove, refresh, **status**, **rename**, **pristine**, restart, start, stop. The Long text omits `status`, `rename`, and `pristine`.
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — update `crewCmd.Long` Commands block to include `status`, `rename`, and `pristine`
+- **Release position:** `in-release` — all three omitted subcommands present at v1.0.0
+
+See [gastown/drift/README.md](../drift/README.md) for the consolidated corrections list.
 
 ## Notes / open questions
 

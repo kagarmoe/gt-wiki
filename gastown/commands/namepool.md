@@ -4,10 +4,14 @@ type: command
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/namepool.go
 tags: [command, workspace, naming, themes, polecat]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt namepool
@@ -175,6 +179,33 @@ touch custom names in settings.
   their names come from positional arguments to
   [crew.md](crew.md) `add`.
 - [config.md](config.md) — for general rig config.
+
+## Docs claim
+
+### Source
+- `internal/cmd/namepool.go:31-38` — Cobra `Long` text, "Examples:" block
+
+### Verbatim
+> Examples:
+>   gt namepool              # Show current pool status
+>   gt namepool --list       # List available themes
+>   gt namepool themes       # Show theme names
+>   gt namepool set minerals # Set theme to 'minerals'
+>   gt namepool add ember    # Add custom name to pool
+>   gt namepool reset        # Reset pool state
+
+## Drift
+
+### namepoolCmd.Long "Examples:" shows 6 operations; 8 subcommands registered
+- **Claim source:** Cobra `Long` text at `internal/cmd/namepool.go:31-38`
+- **Docs claim:** The "Examples:" block demonstrates 6 operations (bare, --list, themes, set, add, reset), implying those are the available subcommands.
+- **Code does:** `namepool.go:111-117` registers 6 named subcommands (themes, set, add, reset, **create**, **delete**) plus the bare RunE. The Examples omit `create` (`namepool.go:83-97`) and `delete` (`namepool.go:99-108`), which are the custom-theme management commands. Users reading only the Long text would not discover they can create or delete custom themes.
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — add `create` and `delete` examples to `namepoolCmd.Long`
+- **Release position:** `in-release` — both subcommands present at v1.0.0
+
+See [gastown/drift/README.md](../drift/README.md) for the consolidated corrections list.
 
 ## Notes / open questions
 

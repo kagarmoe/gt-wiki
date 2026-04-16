@@ -4,10 +4,14 @@ type: command
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/install.go
 tags: [command, workspace, setup, install, hq, dolt, beads]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt install
@@ -221,6 +225,45 @@ None. `gt install` is a leaf command.
 - [rig.md](rig.md) — second "Next steps" hint is `gt rig add
   <name> <git-url>`; the install command itself does not create
   any rigs.
+
+## Docs claim
+
+### Source
+- `internal/cmd/install.go:52-62` — Cobra `Long` text, HQ structure description and `docs/hq.md` reference
+
+### Verbatim
+> The HQ (headquarters) is the top-level directory where Gas Town is installed -
+> the root of your workspace where all rigs and agents live. It contains:
+>   - CLAUDE.md            Mayor role context (Mayor runs from HQ root)
+>   - mayor/               Mayor config, state, and rig registry
+>   - .beads/              Town-level beads DB (hq-* prefix for mayor mail)
+>
+> [...]
+>
+> See docs/hq.md for advanced HQ configurations including beads
+> redirects, multi-system setups, and HQ templates.
+
+## Drift
+
+### installCmd.Long HQ structure lists 3 items; install creates at least 5 directories
+- **Claim source:** Cobra `Long` text at `internal/cmd/install.go:55-58`
+- **Docs claim:** HQ "contains: CLAUDE.md, mayor/, .beads/" (3 items).
+- **Code does:** `runInstall` (`install.go:204-499`) also creates `deacon/` (`install.go:307-318`), `plugins/` (`install.go:327-334`), and `mayor/daemon.json` (`install.go:336-342`). The Deacon is a major agent (daemon lifecycle management); `plugins/` is the town-level plugin directory. Both are unconditionally created by install.
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — add `deacon/` and `plugins/` to the `installCmd.Long` "It contains:" list
+- **Release position:** `in-release` — both directories created at v1.0.0
+
+### installCmd.Long references non-existent docs/hq.md
+- **Claim source:** Cobra `Long` text at `internal/cmd/install.go:61-62`
+- **Docs claim:** "See docs/hq.md for advanced HQ configurations including beads redirects, multi-system setups, and HQ templates."
+- **Code does:** `docs/hq.md` does not exist in the gastown repo at HEAD or at v1.0.0. The Long text references a non-existent document.
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — either create `docs/hq.md` or remove the reference from `installCmd.Long`
+- **Release position:** `in-release` — reference present at v1.0.0
+
+See [gastown/drift/README.md](../drift/README.md) for the consolidated corrections list.
 
 ## Notes / open questions
 

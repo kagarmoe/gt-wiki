@@ -2317,3 +2317,68 @@ Release-position: all source files present at v1.0.0. All findings `in-release`.
   [gastown/commands/start.md](gastown/commands/start.md),
   [gastown/commands/thaw.md](gastown/commands/thaw.md),
   [gastown/commands/up.md](gastown/commands/up.md)
+
+## [2026-04-15] drift-found | Batch 1g (Sweep 1 commands/ Workspace — 7 pages)
+
+**Scope:** Sweep 1 promotion across all 7 pages in the `GroupWorkspace` cobra group (`crew`, `git-init`, `init`, `install`, `namepool`, `rig`, `worktree`). Every page received `phase3_audited` / `phase3_findings` / `phase3_severities` / `phase3_findings_post_release` frontmatter. `crew.md`, `namepool.md`, `install.md`, `git-init.md`, and `init.md` received `## Docs claim` + `## Drift` sections with verbatim quotes, current `file:line` refs, and v1.2 fix-tier + severity + release-position fields. `init.md` also received an inline wiki-stale fix.
+
+**Source files re-read at current HEAD** (current gastown HEAD `9f962c4af068fe9da9f4bd3624e7b66351121fdf`):
+
+- `/home/kimberly/repos/gastown/internal/cmd/crew.go` (lines 29-60 — `crewCmd.Long` at `:35-58`; `init()` at `:363-431` registering 13 subcommands)
+- `/home/kimberly/repos/gastown/internal/cmd/rig.go` (lines 36-50 — `rigCmd.Long` at `:42-50`; `init()` at `:342-355` registering 12 subcommands in parent; 8 more via siblings)
+- `/home/kimberly/repos/gastown/internal/cmd/namepool.go` (lines 22-39 — `namepoolCmd.Long` at `:27-38`; `init()` at `:110-117` registering 6 subcommands)
+- `/home/kimberly/repos/gastown/internal/cmd/install.go` (lines 48-78 — `installCmd.Long` at `:52-73`; `init()` at `:79-92`)
+- `/home/kimberly/repos/gastown/internal/cmd/gitinit.go` (lines 20-47 — `gitInitCmd.Long` at `:25-44`; `init()` at `:48-51`)
+- `/home/kimberly/repos/gastown/internal/cmd/init.go` (lines 22-38 — `initCmd.Long` at `:25-31`; `init()` at `:35-37`)
+- `/home/kimberly/repos/gastown/internal/cmd/worktree.go` (lines 23-49 — `worktreeCmd.Long` at `:29-44`; `init()` at `:87-94`)
+- `/home/kimberly/repos/gastown/internal/rig/types.go` (lines 46-54 — `AgentDirs` slice definition, 5 entries)
+
+**Sibling-file audit:**
+
+- `crew` → `crew.go` + 8 sibling source files (`crew_add.go`, `crew_at.go`, `crew_cycle.go`, `crew_helpers.go`, `crew_lifecycle.go`, `crew_list.go`, `crew_maintenance.go`, `crew_status.go`) + 3 test files. All AddCommand calls in `crew.go:412-429`. No sibling `init()` registrations — all 13 subcommands registered from the parent file. Phase 2 sources already listed all 9 non-test files — **no missed siblings**.
+- `rig` → `rig.go` + 6 sibling source files (`rig_config.go`, `rig_detect.go`, `rig_dock.go`, `rig_park.go`, `rig_quick_add.go`, `rig_settings.go`) + `rig_helpers.go` + 8 test files. Sibling `init()` blocks register 8 subcommands: config (`rig_config.go:91`), detect (`rig_detect.go:45`), dock/undock (`rig_dock.go:70-71`), park/unpark (`rig_park.go:62-63`), quick-add (`rig_quick_add.go:42`), settings (`rig_settings.go:92`). Phase 2 sources already listed all 8 non-test files — **no missed siblings**.
+- `namepool` → `namepool.go` only. 6 subcommands in `init()`, accurate. No siblings.
+- `install` → `install.go` + `install_test.go` + `install_integration_test.go`. No siblings with AddCommand.
+- `gitinit` → `gitinit.go` only. No siblings.
+- `init` → `init.go` only. No siblings.
+- `worktree` → `worktree.go` only. 2 subcommands in `init()`, accurate. No siblings.
+
+Release-position: all source files present at v1.0.0. All findings `in-release`.
+
+**Docs files read:** none (Sweep 1).
+
+**Wiki pages audited:**
+- [crew](gastown/commands/crew.md) — `phase3_findings: [cobra-drift]`
+- [git-init](gastown/commands/git-init.md) — `phase3_findings: [cobra-drift]`
+- [init](gastown/commands/init.md) — `phase3_findings: [cobra-drift, wiki-stale]`
+- [install](gastown/commands/install.md) — `phase3_findings: [cobra-drift]`
+- [namepool](gastown/commands/namepool.md) — `phase3_findings: [cobra-drift]`
+- [rig](gastown/commands/rig.md) — `phase3_findings: [none]`
+- [worktree](gastown/commands/worktree.md) — `phase3_findings: [none]`
+
+**Findings by category:**
+
+- **cobra drift:** 6 findings across 5 pages.
+  - `crew.md` — `crewCmd.Long` COMMANDS lists 8; 11 visible subcommands registered (missing `status`, `rename`, `pristine`). `severity: wrong`, `in-release`, `fix tier: code`. Hand-maintained enumeration pattern (9th instance across Batches 1a-1g).
+  - `namepool.md` — `namepoolCmd.Long` Examples shows 6 operations; `create` and `delete` omitted. `severity: wrong`, `in-release`, `fix tier: code`. Hand-maintained enumeration pattern (10th instance).
+  - `install.md` (finding 1) — `installCmd.Long` HQ "contains:" lists 3 items; code creates at least 5 directories including `deacon/` and `plugins/`. `severity: wrong`, `in-release`, `fix tier: code`.
+  - `install.md` (finding 2) — `installCmd.Long` references `docs/hq.md` which does not exist. `severity: wrong`, `in-release`, `fix tier: code`.
+  - `git-init.md` — `gitInitCmd.Long` lists 3 steps; code performs 4 (omits branch-protection hook installation). `severity: wrong`, `in-release`, `fix tier: code`.
+  - `init.md` — `initCmd.Long` lists 4 directories; code creates 5 with different paths (omits `crew`, says `refinery/` and `mayor/` instead of `refinery/rig` and `mayor/rig`). `severity: wrong`, `in-release`, `fix tier: code`.
+- **wiki-stale:** 1 finding on `init.md` — Phase 2 wiki body at step 3 repeated the Long text's incorrect 4-directory enumeration instead of checking `rig.AgentDirs` at `internal/rig/types.go:48-54`. **Phase 2 root cause: `phase-2-incomplete` (heuristic)**. Fixed inline.
+- **none:** 2 pages (`rig`, `worktree`).
+
+**Judgment calls:** (1) `rig.Long` describes rig structure but does NOT enumerate subcommands — no enumeration drift possible; neutral. (2) `worktree.Long` describes create behavior without enumerating subcommands — neutral; the 2 registered subcommands (list, remove) are discoverable via cobra help. (3) `namepool.Long` uses "Examples:" not "Commands:" — classified as cobra-drift because the examples functionally serve as a capability list and omit create/delete, consistent with prior batch precedent. (4) `install.Long` "It contains:" is a structural description, not merely a hint — missing deacon/ is significant since the Deacon is a major agent. (5) `install.Long` reference to non-existent `docs/hq.md` is a distinct finding from the HQ-structure enumeration.
+
+**Cross-link discipline:** 5 `## Docs claim` + 6 `## Drift` sections (2 on install.md) + 1 wiki-stale inline fix. Forward links to [gastown/drift/README.md](gastown/drift/README.md). All `file:line` refs fresh from HEAD `9f962c4a`. 2 pages frontmatter-only. `init.md` sources updated to add `internal/rig/types.go`.
+
+**Next sub-batch:** Batch 1h — Ungrouped (15 cmds). Tracked under `wiki-vxl`.
+
+**Audited pages:**
+  [gastown/commands/crew.md](gastown/commands/crew.md),
+  [gastown/commands/git-init.md](gastown/commands/git-init.md),
+  [gastown/commands/init.md](gastown/commands/init.md),
+  [gastown/commands/install.md](gastown/commands/install.md),
+  [gastown/commands/namepool.md](gastown/commands/namepool.md),
+  [gastown/commands/rig.md](gastown/commands/rig.md),
+  [gastown/commands/worktree.md](gastown/commands/worktree.md)

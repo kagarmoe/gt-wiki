@@ -4,10 +4,14 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/gitinit.go
 tags: [command, workspace, git, setup, gitignore, branch-protection]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt git-init
@@ -138,6 +142,30 @@ re-installing.
   `install` nor `uninstall` un-writes the `.gitignore` or removes
   the branch-protection hook (worth verifying — out of scope here).
 - [doctor.md](doctor.md) — diagnostics.
+
+## Docs claim
+
+### Source
+- `internal/cmd/gitinit.go:25-30` — Cobra `Long` text, numbered steps
+
+### Verbatim
+> This command:
+>   1. Creates a comprehensive .gitignore for Gas Town
+>   2. Initializes a git repository if not already present
+>   3. Optionally creates a GitHub repository (private by default)
+
+## Drift
+
+### gitInitCmd.Long lists 3 steps; code performs 4 operations
+- **Claim source:** Cobra `Long` text at `internal/cmd/gitinit.go:25-27`
+- **Docs claim:** The Long text lists 3 numbered steps: (1) .gitignore, (2) git init, (3) GitHub repo.
+- **Code does:** `runGitInit` (`gitinit.go:150-206`) performs 4 operations: (1) .gitignore (`gitinit.go:168-170`), (2) git init (`gitinit.go:173-181`), (3) **branch-protection hook installation** via `InstallPreCheckoutHook` (`gitinit.go:184-186`), (4) GitHub repo creation (`gitinit.go:189-193`). Step 3 — the branch-protection post-checkout hook — is omitted from the Long text entirely. This is a significant behavioral feature: the hook auto-reverts the HQ to `main` on any non-main branch checkout.
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — add branch-protection hook installation as step 3 (renumber GitHub to step 4) in `gitInitCmd.Long`
+- **Release position:** `in-release` — `InstallPreCheckoutHook` present at v1.0.0
+
+See [gastown/drift/README.md](../drift/README.md) for the consolidated corrections list.
 
 ## Notes / open questions
 

@@ -4,10 +4,15 @@ type: command
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/init.go
+  - /home/kimberly/repos/gastown/internal/rig/types.go
 tags: [command, workspace, rig, setup, primitive]
+phase3_audited: 2026-04-15
+phase3_findings: [cobra-drift, wiki-stale]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # gt init
@@ -49,11 +54,11 @@ No positional args. Operates on the **current working directory**.
    subdirectory exists and `--force` was not passed, aborts with
    `"rig already initialized (use --force to reinitialize)"`.
 3. **Create agent directories** (`init.go:62-77`). Loops over
-   `rig.AgentDirs` (the canonical list from the `internal/rig`
-   package — contents include `polecats/`, `witness/`, `refinery/`,
-   `mayor/`; see the Long help at `init.go:26-27`). For each, runs
-   `os.MkdirAll(..., 0755)` and drops a `.gitkeep` so the empty
-   directory can be tracked if anyone chooses to.
+   `rig.AgentDirs` (the canonical list from `internal/rig/types.go:48-54`
+   — contents are `polecats`, `crew`, `refinery/rig`, `witness`,
+   `mayor/rig`). For each, runs `os.MkdirAll(..., 0755)` and drops
+   a `.gitkeep` so the empty directory can be tracked if anyone
+   chooses to.
 4. **Update `.git/info/exclude`** via `updateGitExclude`
    (`init.go:122-158`). Appends a `# Gas Town agent directories`
    section with root-anchored patterns (`/polecats/`, `/witness/`,
@@ -109,6 +114,30 @@ See also:
   point).
 - [doctor.md](doctor.md) — diagnostics that report when custom
   beads types are missing.
+
+## Docs claim
+
+### Source
+- `internal/cmd/init.go:26-27` — Cobra `Long` text, agent directory enumeration
+
+### Verbatim
+> This creates the standard agent directories (polecats/, witness/, refinery/,
+> mayor/) and updates .git/info/exclude to ignore them.
+
+## Drift
+
+### initCmd.Long lists 4 directories; code creates 5 (and with different paths)
+- **Claim source:** Cobra `Long` text at `internal/cmd/init.go:26-27`
+- **Docs claim:** Creates "the standard agent directories (polecats/, witness/, refinery/, mayor/)".
+- **Code does:** `init.go:62-77` loops over `rig.AgentDirs` defined at `internal/rig/types.go:48-54`: `polecats`, `crew`, `refinery/rig`, `witness`, `mayor/rig`. Three discrepancies: (1) omits `crew` entirely — crew directories are unconditionally created; (2) says `refinery/` but the actual path is `refinery/rig/`; (3) says `mayor/` but the actual path is `mayor/rig/`.
+- **Category:** `cobra drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — update `initCmd.Long` to list all 5 directories with correct paths
+- **Release position:** `in-release` — `rig.AgentDirs` with all 5 entries present at v1.0.0
+
+**wiki-stale (inline fix applied above):** Phase 2 wiki body at step 3 repeated the Long text's incorrect 4-directory list. Fixed inline to cite the actual `rig.AgentDirs` at `internal/rig/types.go:48-54`. **Phase 2 root cause: `phase-2-incomplete` (heuristic)** — Phase 2 trusted the Long text instead of reading the `rig.AgentDirs` slice definition.
+
+See [gastown/drift/README.md](../drift/README.md) for the consolidated corrections list.
 
 ## Notes / open questions
 

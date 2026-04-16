@@ -362,3 +362,36 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 
 - **The `phase-2-incomplete` pattern is now 6-for-6.** `dolt` joins the list. Every sub-batch from 1b onward has surfaced at least one missed sibling-file registration. The evidence is overwhelming that Phase 2's methodology treated `sources:` as "files I was aware of" rather than "files I read for cobra registrations." This is now the single most reliable predictor of findings in Sweep 1: if a command has sibling `.go` files with `init()` blocks, at least one will register a subcommand that Phase 2 missed.
 - **Services group has a unique finding type: semantic cross-reference drift.** The `down` Long text saying "use gt start" when the real complement is `gt up` is a new pattern not seen in prior sub-batches. It's worth tracking whether this appears in other groups (e.g., does any command reference an obsolete or wrong sibling?).
+
+## [2026-04-15 23:30] stage | 3.1.1g — Workspace Sweep 1
+
+**Actor:** general-purpose subagent dispatched by main orchestrator for Phase 3 Batch 1g
+**Unit:** 7 `GroupWorkspace` command pages audited; 6 cobra-drift findings + 1 wiki-stale finding (across `crew.md`, `namepool.md`, `install.md` x2, `git-init.md`, `init.md`); 2 pages tagged `phase3_findings: [none]`; one commit
+**Duration:** one dispatch
+
+**What went well:**
+
+- **Highest yield sub-batch so far: 71% of pages have findings (5/7), 7 total findings.** This is substantially above prior sub-batches (18/64/27/50/14/36%). The Workspace group is rich in cobra drift because these are the foundational setup commands whose Long text was written early and never updated as features were added.
+- **New finding types beyond enumeration drift.** Prior batches were dominated by "hand-maintained list undercounts subcommands." This batch surfaced three new patterns: (a) `install.Long` references a non-existent `docs/hq.md` file — a dead reference; (b) `git-init.Long` omits a behavioral step (branch-protection hook) from a numbered procedure; (c) `init.Long` uses wrong directory paths (`refinery/` vs `refinery/rig/`) in addition to omitting `crew`. These are qualitatively different from the counting errors and demonstrate that the cobra-drift category covers more than enumeration.
+- **Phase 2 sibling-file audit was COMPLETE for crew and rig.** The dispatch prompt predicted the sibling audit would confirm Phase 2's completeness rather than find new misses. This was correct: Phase 2's `sources:` frontmatter for both `crew.md` and `rig.md` listed all sibling files. The `phase-2-incomplete` pattern breaks its streak at this batch for sibling-file misses specifically — but the `init.md` wiki-stale finding is a different kind of phase-2-incomplete (trusting Long text instead of checking the code).
+- **`install.md` dead reference to `docs/hq.md` is a novel finding type.** No prior batch found a Long text referencing a non-existent file. This is worth flagging in the Phase 6 meta-fix discussion: the fix is either create the doc or delete the reference.
+
+**What didn't:**
+
+- **The `init.md` wiki-stale finding shows Phase 2 had a blind spot beyond sibling files.** Phase 2 trusted the Long text's directory enumeration ("polecats/, witness/, refinery/, mayor/") instead of reading the `rig.AgentDirs` slice at `internal/rig/types.go:48-54`. This is a different root cause than the sibling-file pattern: Phase 2 trusted Cobra text as authoritative for structural claims, violating the code-first principle. The determination is heuristic (`phase-2-incomplete`) because the AgentDirs slice had the same 5 entries at Phase 2 time.
+- **The `namepool` classification is borderline.** The Long text uses "Examples:" which is inherently non-exhaustive. Classifying the omission of `create` and `delete` as cobra-drift follows prior batch precedent (similar to `quota`'s COMMANDS block), but a future reviewer might reasonably argue this is closer to `ambiguous` than `wrong`. Flagged as a judgment call.
+
+**What to change next time:**
+
+- **For Batch 1h (Ungrouped, 15 cmds): expect lower yield.** Ungrouped commands are mostly leaf commands without sibling files or complex Long text. The enumeration-drift pattern requires a parent with subcommands; many ungrouped commands are leaf. Focus audit time on any ungrouped commands that DO have subcommands or structural descriptions in their Long text.
+- **Check for dead references (docs/X.md) in every Long text.** The `install` finding suggests this could be a recurring pattern — Long text referencing planned docs that were never written. Add a quick `ls` check for any `docs/` path mentioned in a Long text.
+- **Check structural claims (directory names, paths) against the actual code, not just the Long text.** The `init.md` wiki-stale finding was caused by Phase 2 propagating the Long text's wrong paths. Phase 3 should catch this for any remaining commands whose Long text describes directory structures.
+
+**Follow-ups filed:**
+
+- none (bd beads) — all observations are informational.
+
+**For Kimberly retro discussion:**
+
+- **The `phase-2-incomplete` pattern has shifted.** Prior batches (1b-1f) found phase-2-incomplete exclusively in missed sibling-file registrations. Batch 1g's `init.md` is a different subspecies: Phase 2 trusted the Long text for structural claims instead of reading the defining code. This suggests Phase 2 had TWO blind spots: (1) not auditing sibling `init()` blocks, and (2) treating Cobra Long text as authoritative for claims that should be verified against code. Both are violations of the code-first principle, but they have different mitigation strategies for Phase 4.
+- **Dead reference in Long text (docs/hq.md) is a new finding category worth tracking.** If it recurs in Batch 1h, it may warrant a named sub-pattern in the drift taxonomy.

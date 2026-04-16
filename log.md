@@ -3499,3 +3499,27 @@ Both findings are in-release (code unchanged since v1.0.0).
 **Next sub-batch:** Batch 7f — docs/concepts/propulsion-principle.md.
 
 -> [gastown/concepts/identity.md](gastown/concepts/identity.md)
+
+## [2026-04-15] drift-found | Batch 7f (Sweep 2: docs/concepts/propulsion-principle.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/concepts/propulsion-principle.md` (102 lines).
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/concepts/propulsion-principle.md` (in full, 102 lines)
+
+**Source files re-read at current HEAD:**
+- None needed. The document is a design philosophy / operating principle, not a code behavior specification. Commands referenced (`gt hook`, `gt prime`, `gt done`, `gt patrol report`) are already verified in other wiki pages.
+
+**Wiki pages audited:**
+- No dedicated wiki page exists for the propulsion principle (it's mentioned in passing in several pages). No wiki annotation needed — the principle is a behavioral norm, not a code behavior claim.
+
+**Findings by category:**
+- **none:** Design philosophy document with no code-verifiable claims beyond CLI command names (all confirmed in other pages). The "propulsion loop" workflow at lines 59-67 mixes old step-closure style (`bd close <step> --continue`, `bd mol current`) with the newer inline formula model (`gt prime` → work → `gt done`), which is internally inconsistent but both patterns exist in code. Not filed as drift since neither claim is wrong — they describe two valid workflows.
+
+**New beads filed:** none
+**Beads closed:** none
+**Cross-link discipline:** No wiki pages touched.
+
+**Batch 7 complete.** 6 files processed, 2 findings (convoy lifecycle states drift, identity GIT_AUTHOR_NAME drift). Retro follows.
+
+-> (no wiki pages touched)

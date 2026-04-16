@@ -4172,3 +4172,25 @@ Both findings are in-release (code unchanged since v1.0.0).
 - **none (verified):** Sling context bead design (ephemeral beads with `gt:sling-context` label) confirmed. Dispatch modes (`max_polecats=-1` direct, `>0` deferred) confirmed. `DispatchCycle` generic orchestrator with callbacks confirmed. Capacity management config keys (`scheduler.max_polecats`, `scheduler.batch_size`, `scheduler.spawn_delay`) confirmed. Circuit breaker (3 failure threshold) confirmed. Convoy integration paths (direct vs deferred dispatch) confirmed. Code layout table accurate — all files confirmed at cited paths.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 11i (Sweep 2: docs/design/polecat-self-managed-completion.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/polecat-self-managed-completion.md` (462 lines). Design proposal (gt-0wkk) for polecat self-managed completion: removing the witness as a bottleneck in the completion lifecycle by having polecats set `agent_state=idle` directly and nudge refinery directly.
+
+**Reclassification assessment:** NOT reclassified. Despite "Status: Design proposal" header, the described behavior has been fully implemented. All three migration phases (dual-signal, self-transition, cleanup) are shipped. This is a factual design doc with a stale status label.
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/polecat-self-managed-completion.md` (in full, 462 lines)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/cmd/done.go` (line 1161 — confirmed `nudgeRefinery` with MERGE_READY, Phase 1 shipped)
+- `/home/kimberly/repos/gastown/internal/cmd/done.go` (line 1185-1189 — confirmed witness nudge kept for observability only, not critical path)
+- `/home/kimberly/repos/gastown/internal/cmd/done.go` (lines 1603-1611 — confirmed `doneState := "idle"` with explicit gt-1qlg self-managed-completion comment, Phase 2 shipped)
+
+**Wiki pages spot-checked:** commands/done.md, roles/polecat.md, roles/witness.md, workflows/polecat-lifecycle.md
+
+**Findings by category:**
+- **drift:** 1 finding. Doc header (line 8) says "Status: Design proposal" but all three migration phases are shipped in code. `gt done` sets `agent_state=idle` directly (Phase 2), nudges refinery directly (Phase 1), and the witness nudge is kept for observability only (Phase 3 pattern). The comments in `done.go` explicitly reference `polecat-self-managed-completion.md Phase 2`. Fix tier: docs (update status to "Shipped"). Severity: wrong. Release position: in-release.
+- **none (verified):** Problem statement (witness bottleneck), current vs proposed flow, detailed design (self-transitions, direct refinery notification, cleanup wisp elimination), edge cases (crash during done, push failure, missed nudge), migration strategy — all accurately describe the shipped implementation.
+
+-> (no wiki pages touched)

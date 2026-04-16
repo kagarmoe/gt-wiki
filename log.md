@@ -3392,3 +3392,29 @@ Both findings are in-release (code unchanged since v1.0.0).
 **Next sub-batch:** Batch 7b — docs/concepts/integration-branches.md.
 
 -> [gastown/concepts/convoy.md](gastown/concepts/convoy.md)
+
+## [2026-04-15] drift-found | Batch 7b (Sweep 2: docs/concepts/integration-branches.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/concepts/integration-branches.md` (590 lines).
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/concepts/integration-branches.md` (in full, 590 lines)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/config/types.go` (lines 1228-1277, merge queue config fields including integration branch settings and 5-command pipeline)
+- `/home/kimberly/repos/gastown/internal/beads/integration.go` (lines 13-19, DefaultIntegrationBranchTemplate = `"integration/{title}"`, LegacyIntegrationBranchTemplate = `"integration/{epic}"`)
+- `/home/kimberly/repos/gastown/internal/cmd/mq_integration.go` (lines 21-22, 29-30, 199-227, branch name resolution; line 357, integration/ prefix warning)
+
+**Wiki pages audited:**
+- [gastown/commands/mq.md](gastown/commands/mq.md) — already Phase 3 audited, `phase3_findings: [wiki-stale]`. No new findings from this docs file. The wiki page's integration branch documentation (create, land, status subcommands, template variables, flags) is accurate and consistent with the docs/concepts file.
+
+**Findings by category:**
+- **none:** The docs/concepts/integration-branches.md is a comprehensive and accurate description of the integration branch system. Key verified claims: (1) 4 config fields (`integration_branch_polecat_enabled`, `integration_branch_refinery_enabled`, `integration_branch_template`, `integration_branch_auto_land`) all exist in `config/types.go:1228-1246` with correct types and defaults; (2) default template `"integration/{title}"` confirmed at `beads/integration.go:13`; (3) 5-command pipeline (`setup`, `typecheck`, `lint`, `test`, `build`) all exist in `config/types.go:1265-1277`; (4) three safety layers (formula, pre-push hook, `GT_INTEGRATION_LAND` env var) accurately described; (5) `--base-branch`, `--force`, `--skip-tests`, `--dry-run` flags confirmed in code. No drift against code or wiki.
+
+**New beads filed:** none
+**Beads closed:** none
+**Cross-link discipline:** No wiki pages touched.
+
+**Next sub-batch:** Batch 7c — docs/concepts/molecules.md.
+
+-> (no wiki pages touched)

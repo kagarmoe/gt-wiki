@@ -4446,3 +4446,13 @@ Both findings are in-release (code unchanged since v1.0.0).
 **Beads closed:** wiki-ytq (Phase 3 epic), wiki-vxl (Batch 1 anchor).
 
 -> [gastown/drift/README.md](gastown/drift/README.md)
+
+## [2026-04-16] decision | Wiki-stale log placement: bundle into drift-found (final ruling)
+
+Revisited the wiki-stale log placement question from the Sweep 1 retrospective (decision #4, option B: separate `lint` entries). The temporary ruling was "separate lint entries, revisit at project end." Revisited now at Phase 3 close.
+
+**Final ruling: option C — bundle everything into `drift-found`.** The category tag on the finding (`wiki-stale`) already distinguishes it from `drift` or `cobra-drift`; the log verb (`drift-found` vs `lint`) doesn't need to duplicate that signal. Phase 3 experience showed: Batch 1 bundled wiki-stale into drift-found naturally; Batches 2-12 had so few wiki-stale findings the split barely mattered; zero churn findings meant the `lint` verb went entirely unused. The overhead of two log entries per sub-batch for interleaved findings was real overhead without reader benefit.
+
+**Effective immediately for all future phases.** Writing-entity-pages skill updated: wiki-stale row now says "Log under `drift-found` verb."
+
+→ [.claude/skills/writing-entity-pages/SKILL.md](.claude/skills/writing-entity-pages/SKILL.md)

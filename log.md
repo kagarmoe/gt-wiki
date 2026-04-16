@@ -3307,3 +3307,28 @@ Both findings are in-release (code unchanged since v1.0.0).
 **Batch 5 complete.** 8 files processed. Retro follows.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 6a (Sweep 2: docs/guides/local-rig-bootstrap.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/guides/local-rig-bootstrap.md` (39 lines).
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/guides/local-rig-bootstrap.md` (in full, 39 lines)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/scripts/bootstrap-local-rig.sh` (lines 1-60, usage and flags)
+- `/home/kimberly/repos/gastown/internal/cmd/rig.go` (line 72-80, `--adopt` Long text; line 362, `--local-repo` flag; line 367-368, `--adopt` related flags)
+
+**Wiki pages audited:**
+- [gastown/commands/rig.md](gastown/commands/rig.md) — already Phase 3 audited with `phase3_findings: [none]`, no changes needed
+
+**Findings by category:**
+- **none:** The guide accurately describes `--adopt` vs clean bootstrap via `gt rig add --local-repo`. The bootstrap script exists at the documented path. Flag names match code. Rig layout description (`.repo.git`, `mayor/rig`, `refinery/rig`, `settings/`, `.beads/`) is correct. No drift against code or wiki.
+
+**New beads filed:** none
+**Beads closed:** none
+**Cross-link discipline:** No wiki pages touched.
+
+**Next sub-batch:** Batch 6b — docs/guides/mvgt-integration.md.
+
+-> (no wiki pages touched)

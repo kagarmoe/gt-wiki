@@ -1,7 +1,7 @@
 ---
 title: Phase 3 drift index
 type: drift
-status: active
+status: complete
 topic: gastown
 created: 2026-04-15
 updated: 2026-04-16
@@ -10,12 +10,14 @@ phase: 3
 
 # Phase 3 Drift Index
 
-Consolidated index of all Phase 3 findings from Batches 1-12. Phase 3 audited 271 units (211 entity pages in Sweep 1 + 60 docs files in Sweep 2) and surfaced findings across 9 drift taxonomy categories.
+Consolidated index of all Phase 3 findings from Batches 1-14. Phase 3 audited 271 units (211 entity pages in Sweep 1 + 60 docs files in Sweep 2) and surfaced ~83 findings across 9 drift taxonomy categories plus systematic gap enumeration (10 gap findings + 9 deliberate exclusions).
 
 **How to read this index:**
 - **Section 1** is the Phase 6 work-list: upstream corrections to the gastown source repo (code edits, docs PRs). Phase 5 (Audience classification) refines it; Phase 6 (Implementation) executes it.
 - **Section 2** is the wiki self-maintenance log: our own synthesis errors, all fixed during Sweep 1. Preserved as an audit trail of what was wrong, not what is wrong.
 - **Section 3** identifies cross-cutting meta-patterns that Phase 6 should batch as single PRs.
+- **Section 4** lists missing entity pages (code entities with no corresponding wiki page).
+- **Section 5** records subcommand coverage decisions (384 subcommands systematically classified).
 
 **Plan:** [../../.claude/plans/2026-04-14-phase3-drift.md](../../.claude/plans/2026-04-14-phase3-drift.md) (gitignored).
 
@@ -173,6 +175,74 @@ The `downCmd.Long` recommends `gt start` as complement when `gt up` is the actua
 
 ---
 
+## Section 4: Missing entity pages (severity: missing)
+
+Code entities with no corresponding wiki page. Surfaced by Batch 14 Sweep G1 (systematic code-to-wiki gap enumeration). Full detail in [gaps.md](gaps.md).
+
+### Fix tier: wiki (we write the page)
+
+| Code path | Description | Severity | Fix tier | Related bead | Notes |
+|---|---|---|---|---|---|
+| `internal/agent` | Shared types and StateManager generic for all agents (witness, refinery, deacon); 62 lines | missing | wiki | | Own API surface, imported by multiple agents |
+| `internal/agent/provider` | JSON-RPC provider types for LLM agent communication (roles, messages, tool definitions); 799 lines | missing | wiki | | Core agent protocol layer |
+| `internal/boot` | Boot watchdog package — daemon entry point for Deacon triage decisions; 237 lines | missing | wiki | | Distinct from `gt boot` command page; package has its own daemon-tick logic |
+| `internal/checkpoint` | Session checkpointing for crash recovery (save/load polecat state); 350 lines | missing | wiki | | Own file format (.polecat-checkpoint.json), recovery API |
+| `internal/connection` | Address parsing for agent/rig/polecat addresses (`[machine:]rig[/polecat]`); 689 lines | missing | wiki | wiki-7u4 | Networking/routing abstraction (bitbucket bead also covers related gap) |
+| `internal/proxy` | mTLS CA management and proxy server for sandboxed polecat execution; 1,363 lines | missing | wiki | | Distinct from the `gt-proxy-*` binary pages |
+
+### Docs file coverage gaps (from bead wiki-w71)
+
+Six new docs files identified during Sweep 2 (Batch 11) that also lack wiki entity page coverage. These were filed under bead wiki-w71 and are listed here for completeness:
+
+| Docs file | Status | Bead |
+|---|---|---|
+| 6 new `docs/` files from Sweep 2 | Coverage pending | wiki-w71 |
+
+*Note: Individual docs file paths are tracked in the wiki-w71 bead. They are upstream documentation files that need wiki synthesis pages, not code packages.*
+
+---
+
+## Section 5: Subcommand coverage decisions
+
+Systematic classification of all 384 non-root subcommands across 62 parent commands. Surfaced by Batch 14 Sweep G2. Full per-parent tables in [gaps.md](gaps.md).
+
+### Coverage summary
+
+| Metric | Count |
+|---|---|
+| Total non-root subcommands | 384 |
+| Covered in parent wiki page | 380 |
+| Gap: needs parent expansion | 4 |
+| Gap: needs own page | 0 |
+| Deliberately excluded | 0 |
+
+**Coverage rate: 98.9%** (380 of 384).
+
+### Subcommand gaps (4 findings)
+
+| Parent command | Missing subcommand(s) | Count | Classification | Action |
+|---|---|---|---|---|
+| `gt formula overlay` | `show`, `edit`, `list` | 3 | gap: needs parent expansion | Expand formula.md with Overlay section |
+| `gt patrol` | `scan` | 1 | gap: needs parent expansion | Expand patrol.md with scan subcommand |
+
+### Deliberately excluded entities (9 total)
+
+Entities systematically evaluated and excluded from wiki coverage with rationale:
+
+| Entity | Rationale |
+|---|---|
+| `internal/cmd` | CLI wiring layer (239 files, 96,500 lines); every command already has its own wiki page under `gastown/commands/` |
+| `internal/scheduler/capacity` | Sub-package; parent `scheduler.md` already covers the scheduler |
+| `internal/templates/commands` | Helper sub-package; parent `templates.md` covers it |
+| `internal/tui/convoy` | UI sub-package; parent `tui.md` covers both TUI sub-packages |
+| `internal/tui/feed` | UI sub-package; parent `tui.md` covers both TUI sub-packages |
+| `codecov.yml` | CI config (108 lines); no runtime behavior, self-documenting YAML |
+| `renovate.json` | Dependency bot config (74 lines); no runtime behavior |
+| `go.sum` | Auto-generated dependency checksums (322 lines); never manually edited |
+| `.gitignore` | Standard gitignore (86 lines); self-documenting |
+
+---
+
 ## Summary statistics
 
 | Metric | Count |
@@ -180,7 +250,12 @@ The `downCmd.Long` recommends `gt start` as complement when `gt up` is the actua
 | **Total units audited** | 271 (211 entity pages + 60 docs files) |
 | **Section 1 rows (upstream corrections)** | 52 |
 | **Section 2 rows (wiki self-maintenance)** | 21 |
-| **Total findings indexed** | 73 |
+| **Section 4 rows (missing entity pages)** | 6 (+6 docs files via wiki-w71) |
+| **Section 5 (subcommand gaps)** | 4 |
+| **Total drift findings (Sections 1-3)** | 73 |
+| **Total gap findings (Sections 4-5)** | 10 |
+| **Grand total findings** | ~83 |
+| **Deliberately excluded entities** | 9 |
 
 ### Section 1 breakdown by category
 

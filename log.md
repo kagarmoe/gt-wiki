@@ -4482,3 +4482,15 @@ Revisited the wiki-stale log placement question from the Sweep 1 retrospective (
 - `codecov.yml`, `renovate.json`, `go.sum`, `.gitignore` — CI/tooling config with no runtime behavior
 
 → [gastown/drift/gaps.md](gastown/drift/gaps.md)
+
+## [2026-04-16] drift-found | Batch 15 (Drift index update: gap integration + Phase 3 close)
+
+**Scope:** Integrated Batch 14 gap findings into gastown/drift/README.md. Phase 3 is now complete.
+
+**Additions to drift index:**
+- Section 4: 6 missing entity pages + 6 new docs files (severity: missing)
+- Section 5: Subcommand coverage (384 total, 380 covered, 4 gaps, 9 deliberately excluded)
+
+**Phase 3 final stats:** 271 audited units + systematic gap enumeration. Index now covers: drift (wrong), gaps (missing), and coverage decisions.
+
+→ gastown/drift/README.md, gastown/drift/gaps.md

@@ -917,3 +917,24 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 - Batch 15: integrate these 10 gap findings into the drift index (gastown/drift/README.md)
 - Future phase: create the 6 missing package pages (agent, agent/provider, boot, checkpoint, connection, proxy)
 - Future phase: expand formula.md and patrol.md to cover their missing subcommands
+
+## [2026-04-16] stage | Phase 3 Batch 15 — Drift index gap integration (Phase 3 close)
+
+**Actor:** wiki-curator subagent
+**Unit:** Integration of Batch 14 gap findings into the drift index + Phase 3 closure.
+**Duration:** One dispatch.
+
+**What went well:**
+- Clean integration. The gap findings from gaps.md translated directly into two new drift index sections (4 and 5) without requiring any re-analysis. The source artifact (gaps.md) was well-structured for downstream consumption.
+- Phase 3 scope held. 271 audited units, ~83 total findings (73 drift + 10 gap), 9 deliberate exclusions with rationale. The three-layer coverage (drift/gaps/decisions) gives Phase 6 a complete work list.
+
+**What didn't:**
+- The "~83" total is approximate because some entity pages carry multiple findings. The exact row count vs finding count distinction (documented in Section 1's footnote) makes a single "total findings" number slightly ambiguous. Future phases should consider whether to count by row or by finding.
+
+**Phase 3 summary:**
+- 15 batches across ~5 sessions
+- Sweep 1: 211 entity pages audited (Batches 1-9)
+- Sweep 2: 60 docs files audited (Batches 10-13)
+- Gap enumeration: 68 packages + 384 subcommands + 14 root files + 3 binaries classified (Batch 14)
+- Index integration + close (Batch 15)
+- Deliverables: gastown/drift/README.md (consolidated index), gastown/drift/gaps.md (gap findings), per-page Docs claim/Drift sections on 211 entity pages

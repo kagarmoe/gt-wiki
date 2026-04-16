@@ -553,3 +553,28 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 - none — lessons are purely informational
 
 **Yield comparison:** 2d 50% (2/4) vs 2c 0% (0/13) vs 2b 25% (2/8) vs 2a 11% (1/9). The Diagnostics batch had the highest yield of any package sub-batch, driven by the two pre-flagged findings from Phase 2 Batch 7. Without pre-flagged findings, yield would have been 0%.
+
+## [2026-04-14 16:00] stage | 3.2.2e — Long-running process packages Sweep 1
+
+**Actor:** wiki-curator subagent (Phase 3 Batch 2e dispatch)
+**Unit:** 3 package pages audited (daemon, tmux, runtime), 0 findings, 1 commit
+**Duration:** one dispatch
+
+**What went well:**
+- The churn check (mandatory first step) immediately narrowed scope: daemon had 1 commit (purge defaults alignment), tmux and runtime had zero. The single daemon commit (`61063982`) touched only `wisp_reaper.go` purge constants, which the wiki page doesn't cite specific values for — no wiki-stale.
+- The HeartbeatInterval dead code verification was thorough and confirmed Phase 2's observation: `types.go:25` defines the field at 5m, `daemon_test.go:22-23` tests it, but the actual heartbeat loop at `daemon.go:389,704` uses `recoveryHeartbeatInterval()` from `operational.go:48` (default 3m). The field is genuinely dead. However, the correct classification is neutral — no docs, no Cobra text, no package doc comment claims the 5m value is operationally used, so there is no claim to contradict.
+- Package-file audit was exact across all 3 packages: daemon 33/33, tmux 11/11, runtime 1/1. Phase 2 Batch 8's file enumeration was thorough for these large packages.
+- The 2d retro's advice ("read Notes in full because complex packages have open questions") was followed but yielded nothing new. All 17 Notes bullets across the 3 pages are genuinely neutral code observations.
+
+**What didn't:**
+- 0% yield continues the pattern from 2c. These are the 5th and 6th consecutive zero-finding package pages in a row (13 from 2c + 3 here = 16 pages with 0 findings), broken only by 2d's pre-flagged findings. Without explicit Phase 2 "check this when mapping X" cross-references (like health.md's doctor_dog note), package Notes sections do not produce drift findings.
+- daemon.md is 639 lines and tmux.md is 509 lines — the page re-read time is substantial for zero findings. The fast-path (frontmatter + Notes section only) was sufficient; full page re-read was unnecessary.
+
+**What to change next time:**
+- For Batch 2f (Supporting libraries: 24 pages), apply the fast-path aggressively. If churn is zero, read only frontmatter + Notes section. The full-page-re-read treatment has been zero-yield for 3 consecutive sub-batches (2c, 2e, and all but the pre-flagged pages of 2d).
+- The HeartbeatInterval dead code is a valuable observation for Phase 6 (code cleanup candidates) but is not actionable in Phase 3. Consider a separate "code cleanup candidates" inventory for Phase 6 input, aggregated from neutral Notes bullets that describe dead code, unused fields, or vestigial patterns.
+
+**Follow-ups filed:**
+- none — lessons are purely informational
+
+**Yield comparison:** 2e 0% (0/3) vs 2d 50% (2/4) vs 2c 0% (0/13) vs 2b 25% (2/8) vs 2a 11% (1/9). Cumulative package Sweep 1 yield: 5/37 pages (14%), driven entirely by frontmatter completeness errors (2a, 2b) and pre-flagged Phase 2 cross-references (2d). Notes-section promotion has produced zero drift findings across all 5 package sub-batches.

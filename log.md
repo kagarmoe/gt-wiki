@@ -2780,3 +2780,34 @@ Phase 3 Sweep 1 sub-batch 2d: audited 4 package pages under `gastown/packages/` 
   [gastown/packages/health.md](gastown/packages/health.md),
   [gastown/packages/keepalive.md](gastown/packages/keepalive.md),
   [gastown/packages/deps.md](gastown/packages/deps.md)
+
+## [2026-04-14] drift-found | Batch 2e (Sweep 1 packages/ Long-running processes — 3 pages)
+
+Phase 3 Sweep 1 sub-batch 2e: audited 3 package pages under `gastown/packages/` covering Phase 2 Batch 8 (Long-running processes).
+
+**Churn:** daemon had 1 commit between v1.0.0 and HEAD (`61063982 fix: align daemon purge defaults to 7 days` — changed `defaultWispDeleteAge` and `defaultMailDeleteAge` from 3d to 7d in `wisp_reaper.go`). tmux and runtime had zero commits. The daemon churn does not affect any wiki claim (the page does not cite specific purge durations).
+
+**Source files re-read:**
+- `/home/kimberly/repos/gastown/internal/daemon/types.go:24-41` (HeartbeatInterval field + DefaultConfig)
+- `/home/kimberly/repos/gastown/internal/daemon/daemon.go:389,392,704,709-714` (recoveryHeartbeatInterval usage)
+- `/home/kimberly/repos/gastown/internal/config/operational.go:48,371-376` (DefaultRecoveryHeartbeatInterval = 3m)
+- `/home/kimberly/repos/gastown/internal/daemon/wisp_reaper.go:18-26` (purge defaults post-churn)
+- Package-file audit: `ls internal/daemon/*.go | grep -v _test.go` (33 files, matches wiki), `ls internal/tmux/*.go | grep -v _test.go` (11 files, matches wiki sources exactly), `ls internal/runtime/*.go | grep -v _test.go` (1 file, matches wiki)
+
+**Pages audited (3):**
+
+| Page | phase3_findings | Notes |
+|---|---|---|
+| [daemon.md](gastown/packages/daemon.md) | `[none]` | 33 non-test files confirmed. 1 post-v1.0.0 commit (purge defaults) does not affect wiki claims. `HeartbeatInterval=5m` dead code confirmed: field defined at `types.go:25` but never referenced by the heartbeat loop (`daemon.go:389,704` uses `recoveryHeartbeatInterval()` from operational config at 3m default). No docs claim the 5m value, so no promotion — stays as neutral code observation. All 7 Notes bullets are genuinely neutral. |
+| [tmux.md](gastown/packages/tmux.md) | `[none]` | 11 non-test files confirmed, all match sources frontmatter. Zero churn. `sessionNudgeLocks` slow leak is a code-internal observation with no docs claim to contradict — stays neutral. All 5 Notes bullets neutral. |
+| [runtime.md](gastown/packages/runtime.md) | `[none]` | 1 non-test file confirmed. Zero churn. All 5 Notes bullets are code observations or naming concerns with no docs claim to contradict. |
+
+**Yield:** 0/3 pages (0%). Consistent with 2c's 0% on agent-runtime packages. Long-running process packages have complex Notes sections but none rise above neutral — they are code-internal observations without docs claims to test against. Cobra-drift is structurally impossible (packages have no Cobra Long text). The HeartbeatInterval dead code is the closest candidate but fails the promotion test: no docs file, no Cobra text, and no package doc comment claims the 5m value is used.
+
+**Finding summary:** No findings. All 17 Notes bullets across the 3 pages are genuinely neutral — code observations, naming concerns, size observations, or limitation notes that do not contradict any docs or Cobra claim.
+
+**Next sub-batch:** Batch 2f — Supporting libraries packages (Phase 2 Batch 9).
+
+-> [gastown/packages/daemon.md](gastown/packages/daemon.md),
+  [gastown/packages/tmux.md](gastown/packages/tmux.md),
+  [gastown/packages/runtime.md](gastown/packages/runtime.md)

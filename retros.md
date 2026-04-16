@@ -801,3 +801,34 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 - none — findings annotated inline or already filed.
 
 **Batch 10 yield:** 3 findings across 11 files (10d: 1 drift on install.md, 10e: 1 drift in HOOKS.md docs-only, 10j: 2 drift in reference.md both pre-existing/docs-only). 1 wiki page annotated (install.md). Finding rate: 27% of files had findings, but only 1 new wiki annotation was needed — most drift was already captured or docs-only.
+
+## [2026-04-16 01:00] stage | Phase 3.Batch 11 (Sweep 2: docs/design/ FACT PROCESS — 16 files)
+
+**Actor:** wiki-curator subagent (Sweep 2 design docs fact process)
+**Unit:** 16 docs/design/ files processed (11a-11p), 14 commits landed (two pairs combined: 11k+11l, 11m+11n), 0 wiki pages annotated.
+**Duration:** one dispatch
+
+**What went well:**
+- The triage between factual and aspirational content was productive. 4 files required reclassification (11j partially, 11m and 11n fully), which validates the plan's "mid-batch reclassification expected" caveat.
+- The self-managed completion (gt-1qlg) finding cascaded across multiple docs: found in 11i (confirmed shipped), then detected as stale flow in 11l (mail-protocol) and 11o (polecat-lifecycle-patrol). Cross-doc pattern recognition was efficient.
+- The largest file (11p, agent-api-inventory, 853 lines) turned out to be the cleanest — a factual inventory with zero drift in current-mechanism descriptions. Confirms that inventory/catalog docs age better than status-tracking docs.
+
+**What didn't:**
+- Two file pairs (11k+11l, 11m+11n) were inadvertently committed together instead of per-file. The plan calls for one commit per file. This happened when appending multiple log entries in a single edit.
+- The stale `watchdog-chain.md` cross-reference appeared in two docs (11g, 11h) but there was no `watchdog-chain.md` to audit. It appears to be an old name for `dog-infrastructure.md`.
+
+**What to change next time:**
+- Strictly append one log entry, stage, and commit before appending the next — never batch two entries in a single append operation.
+- When reclassifying, note the plan's Batch 11 vs 12 split decision in the log entry so the Sweep 2 retrospective has clear data on classification accuracy.
+
+**Follow-ups filed:**
+- none — all findings are docs-only or already captured in prior wiki annotations.
+
+**Batch 11 yield:**
+- **Files processed:** 16 (11a through 11p)
+- **Drift findings:** 12 across 10 files (11a: 0, 11b: 0, 11c: 1, 11d: 2, 11e: 1, 11f: 1, 11g: 1, 11h: 1, 11i: 1, 11j: 0, 11k: 0, 11l: 2, 11m: 0, 11n: 0, 11o: 1, 11p: 0)
+- **Implementation-status findings:** 3 (11j: 1 unbuilt shutdown dance pool, 11m: 1 unbuilt model-aware molecules, 11n: 1 unbuilt ledger export triggers)
+- **Reclassifications:** 3 files (11j partially, 11m and 11n fully reclassified to implementation-status)
+- **Wiki pages annotated:** 0 (all findings were docs-only — wiki already correctly documents the implemented behavior)
+- **Finding rate:** 62.5% of files had at least one finding
+- **Most common drift type:** stale status labels (3), stale completion flow (3), stale cross-references (2)

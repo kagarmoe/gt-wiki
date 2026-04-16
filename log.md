@@ -3741,3 +3741,67 @@ Both findings are in-release (code unchanged since v1.0.0).
 **Batch 8 complete.** 9 files processed, 1 new finding (OTel stale implementation status, annotated on telemetry.md). Retro follows.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 9a (Sweep 2: docs/CLEANUP.md — 62 command rows)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/CLEANUP.md` (170 lines, 62 command/function rows across 14 sections + 1 internal functions section + 1 cleanup layers summary). Each row cross-checked against the corresponding `gastown/commands/<command>.md` wiki page's code-grounded `## What it actually does` section.
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/CLEANUP.md` (in full, 170 lines)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/cmd/orphans.go` (line 172 — verified `--aggressive` is a persistent flag on `orphansProcsCmd`, applying to both `procs list` and `procs kill`)
+- `/home/kimberly/repos/gastown/internal/cmd/namepool.go` (lines 73-80 — verified `reset` subcommand exists and releases all claimed names)
+- `/home/kimberly/repos/gastown/internal/cmd/mail.go` (lines 200-394 — verified `delete`, `archive`, `clear` subcommands match CLEANUP.md descriptions)
+
+**Wiki pages audited (cross-checked against CLEANUP.md rows):**
+- [gastown/commands/cleanup.md](gastown/commands/cleanup.md) — rows 1: match
+- [gastown/commands/orphans.md](gastown/commands/orphans.md) — rows 2-3, 15-16: match
+- [gastown/commands/deacon.md](gastown/commands/deacon.md) — rows 4-5: match
+- [gastown/commands/polecat.md](gastown/commands/polecat.md) — rows 6-12: match
+- [gastown/commands/done.md](gastown/commands/done.md) — row 13: **pre-existing drift confirmed** (CLEANUP.md claims "self-nukes worktree, kills own session"; code transitions to IDLE with sandbox preserved; drift already filed on done.md in Batch 1c, commit 20c997f)
+- [gastown/commands/prune-branches.md](gastown/commands/prune-branches.md) — row 14: match
+- [gastown/commands/rig.md](gastown/commands/rig.md) — rows 17-24: match
+- [gastown/commands/down.md](gastown/commands/down.md) — rows 25-28: match
+- [gastown/commands/shutdown.md](gastown/commands/shutdown.md) — row 29: match
+- [gastown/commands/crew.md](gastown/commands/crew.md) — rows 30-34: match
+- [gastown/commands/compact.md](gastown/commands/compact.md) — row 35: match
+- [gastown/commands/krc.md](gastown/commands/krc.md) — rows 36-38: match
+- [gastown/commands/dolt.md](gastown/commands/dolt.md) — rows 39-41: match
+- [gastown/commands/close.md](gastown/commands/close.md) — row 42: match
+- [gastown/commands/unsling.md](gastown/commands/unsling.md) — rows 43-44: match
+- [gastown/commands/hook.md](gastown/commands/hook.md) — row 44: match
+- [gastown/commands/dog.md](gastown/commands/dog.md) — rows 45-48: match
+- [gastown/commands/convoy.md](gastown/commands/convoy.md) — rows 49-50: match
+- [gastown/commands/mail.md](gastown/commands/mail.md) — rows 51-53: match
+- [gastown/commands/namepool.md](gastown/commands/namepool.md) — row 54: match
+- [gastown/commands/checkpoint.md](gastown/commands/checkpoint.md) — row 55: match
+- [gastown/commands/issue.md](gastown/commands/issue.md) — row 56: match
+- [gastown/commands/doctor.md](gastown/commands/doctor.md) — row 57: match
+- [gastown/commands/disable.md](gastown/commands/disable.md) — row 58: match
+- [gastown/commands/shell.md](gastown/commands/shell.md) — row 59: match
+- [gastown/commands/config.md](gastown/commands/config.md) — row 60: match
+- [gastown/commands/uninstall.md](gastown/commands/uninstall.md) — row 61: match
+
+**Findings by category:**
+- **drift:** 0 new. 1 pre-existing finding confirmed: `done.md` row (CLEANUP.md:28 claims "self-nukes worktree, kills own session" — code transitions to IDLE with sandbox preserved). This drift was already filed on `gastown/commands/done.md` during Batch 1c (commit 20c997f) and reformatted to v1.2 schema. No new annotation needed.
+- **cobra drift:** 0.
+- **implementation-status:** 0.
+- **wiki-stale:** 0.
+- **gap:** 0.
+- **none:** 61 of 62 rows match the wiki's code-grounded descriptions (some are acceptable simplifications; e.g., `gt polecat check-recovery` omits the NEEDS_MQ_SUBMIT verdict, but this is a summary table, not authoritative documentation).
+
+**Judgment calls:**
+1. **Row 11 (`gt polecat check-recovery`)** — CLEANUP.md says "SAFE_TO_NUKE vs NEEDS_RECOVERY" but code has three verdicts (also NEEDS_MQ_SUBMIT). Not filed as drift because CLEANUP.md is a summary reference, not authoritative documentation; the omission doesn't mislead about what the command does.
+2. **Row 7 (`gt polecat nuke`)** — CLEANUP.md says "closes bead" but wiki says "Reset agent bead for reuse." Not filed as drift because "closes" is an acceptable simplification of the reset-for-reuse operation in a summary table.
+3. **Row 13 (`gt done`)** — already-filed drift confirmed, not double-filed.
+4. **Scripts section** (row 62-ish) — `scripts/migration-test/reset-vm.sh` is a test script, not a gt command. No wiki page to cross-check.
+5. **Internal functions section** (7 entries) — internal Go functions, not CLI commands. Cross-referenced against the wiki pages that document the parent commands (done.md, polecat.md, sling.md, unsling.md, signal.md). All match.
+
+**This entry supersedes** the informal `[2026-04-14] drift-found | docs/CLEANUP.md vs code` entry earlier in this log. That entry identified the `gt done` drift finding; this entry is the formal Batch 9 row-by-row re-audit covering all 62 rows.
+
+**New beads filed:** none
+**Beads closed:** none
+**Cross-link discipline:** No new wiki page annotations needed (the sole drift finding was already filed).
+
+-> (no wiki pages touched)

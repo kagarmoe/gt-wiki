@@ -3898,3 +3898,18 @@ Both findings are in-release (code unchanged since v1.0.0).
 **No wiki page annotation needed** — the wiki already correctly documents the `dangerous-command` guard. The stale claim is only in `docs/HOOKS.md`.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 10f (Sweep 2: docs/WASTELAND.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/WASTELAND.md` (469 lines). Wasteland federation getting-started guide.
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/WASTELAND.md` (in full, 469 lines)
+
+**Wiki pages audited:**
+- [gastown/commands/wl.md](gastown/commands/wl.md) — subcommands consistent. No contradictions.
+
+**Findings by category:**
+- **none:** Feature guide with honest Phase 1 status label. All claims consistent with wiki and code.
+
+-> (no wiki pages touched)

@@ -3930,3 +3930,20 @@ Both findings are in-release (code unchanged since v1.0.0).
 - **none:** Data model reference describes attribute shapes and events without contradicting code or wiki. No implementation-status claims. Env vars table is plausible and consistent with telemetry package documentation.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 10h (Sweep 2: docs/proxy-server.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/proxy-server.md` (621 lines). Technical reference for gt-proxy-server and gt-proxy-client binaries.
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/proxy-server.md` (in full, 621 lines)
+
+**Wiki pages audited:**
+- [gastown/binaries/gt-proxy-server.md](gastown/binaries/gt-proxy-server.md) — mTLS architecture, flags, subcommand allowlist, git smart-HTTP, CA management all consistent between docs and wiki.
+- [gastown/binaries/gt-proxy-client.md](gastown/binaries/gt-proxy-client.md) — client-side installation and forwarding mechanism consistent.
+- [gastown/commands/proxy-subcmds.md](gastown/commands/proxy-subcmds.md) — allowlist auto-discovery referenced in docs matches wiki.
+
+**Findings by category:**
+- **none:** Comprehensive technical reference. All architecture claims (mTLS, CA management, /v1/exec, /v1/git, admin API, auto-discovered allowlists) match wiki's code-grounded pages. No contradictions found.
+
+-> (no wiki pages touched)

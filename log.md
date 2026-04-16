@@ -3102,3 +3102,40 @@ Both findings are in-release (code unchanged since v1.0.0).
   [gastown/binaries/gt-proxy-client.md](gastown/binaries/gt-proxy-client.md),
   [gastown/plugins/README.md](gastown/plugins/README.md),
   [gastown/plugins/dolt-snapshots.md](gastown/plugins/dolt-snapshots.md)
+
+## [2026-04-15] drift-found | Batch 5a (Sweep 2: docs/skills/convoy/SKILL.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/skills/convoy/SKILL.md` (390 lines).
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/skills/convoy/SKILL.md` (in full, 390 lines)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/convoy/operations.go` (lines 159-175, slingableTypes)
+- `/home/kimberly/repos/gastown/internal/daemon/convoy_manager.go` (lines 183-247, runEventPoll; lines 436-579, runStrandedScan + feedFirstReady)
+- `/home/kimberly/repos/gastown/internal/cmd/convoy.go` (lines 1493-1595, findStrandedConvoys)
+- `/home/kimberly/repos/gastown/internal/cmd/sling.go` (lines 308-313, batch detection)
+
+**Wiki pages audited:**
+- [gastown/concepts/convoy.md](gastown/concepts/convoy.md) — `phase3_findings: [drift]`
+- [gastown/commands/convoy.md](gastown/commands/convoy.md) — already correct, no changes needed
+- [gastown/packages/convoy.md](gastown/packages/convoy.md) — already correct, no changes needed
+- [gastown/workflows/convoy-launch.md](gastown/workflows/convoy-launch.md) — already correct, no changes needed
+- [gastown/commands/sling.md](gastown/commands/sling.md) — already correct, no changes needed
+- [gastown/packages/daemon.md](gastown/packages/daemon.md) — already correct, no changes needed
+
+**Findings by category:**
+- **drift:** 1 finding on 1 page. SKILL.md architecture section misattributes the 5s event-driven poll loop to `operations.go` when it's actually `daemon/convoy_manager.go:186-247`. The SKILL.md's own "Key source files" table contradicts itself by correctly listing `convoy_manager.go` for `runEventPoll`. Wiki pages already have the attribution correct.
+- **none:** 5 wiki pages audited with no findings — extensive verification of slingableTypes, blocking dep types, feedFirstReady behavior, stage-launch flow, wave computation, status state machine, and staged-convoy daemon safety all confirmed correct.
+
+**Additional observations (not findings):**
+- SKILL.md line 385 says "Batch detection at ~242" in `sling.go` but code is now at ~308-313 (line drift from code churn). Not filed as a finding since line-number staleness in skill docs is routine.
+- The SKILL.md is a remarkably detailed and accurate developer guide — 1 finding out of ~50 verifiable claims is a very low drift rate.
+
+**New beads filed:** none
+**Beads closed:** none
+**Cross-link discipline:** 1 new `## Drift` section added to convoy concept page. All `file:line` refs freshly verified at HEAD.
+
+**Next sub-batch:** Batch 5b — docs/research/macos-sandbox-exec.md.
+
+-> [gastown/concepts/convoy.md](gastown/concepts/convoy.md)

@@ -4,7 +4,7 @@ type: concept
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-14
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/convoy/operations.go
   - /home/kimberly/repos/gastown/internal/convoy/multi_store.go
@@ -13,8 +13,8 @@ sources:
   - /home/kimberly/repos/gastown/internal/cmd/convoy_launch.go
 tags: [concept, convoy, cross-rig, tracking, work-unit, multi-stage, launch]
 phase3_audited: 2026-04-14
-phase3_findings: [none]
-phase3_severities: []
+phase3_findings: [drift]
+phase3_severities: [wrong]
 phase3_findings_post_release: false
 ---
 
@@ -280,6 +280,32 @@ Explicit answer for future readers:
 - [internal/beads](../packages/beads.md) —
   `ParseConvoyFields`, `ExtractPrefix`,
   `GetRigNameForPrefix`, `GetRigPathForPrefix`.
+
+## Docs claim
+
+### Source
+- `/home/kimberly/repos/gastown/docs/skills/convoy/SKILL.md` (lines 38-60)
+
+### Verbatim
+> ```
+> += EVENT-DRIVEN FEEDER (5s) =+
+> |                              |
+> |   GetAllEventsSince (SDK)    |
+> ```
+> "Event-driven (`operations.go`): Polls beads stores every ~5s for close events."
+
+## Drift
+
+### Event-driven feeder misattributed to operations.go
+- **Claim source:** `docs/skills/convoy/SKILL.md` (lines 38-60, architecture diagram and paragraph at line 59)
+- **Docs claim:** The 5s event-driven feeder lives in `operations.go`.
+- **Code does:** The 5s event poll loop is `ConvoyManager.runEventPoll()` at `/home/kimberly/repos/gastown/internal/daemon/convoy_manager.go:186-247`. It calls `GetAllEventsSince` from the beads SDK. `operations.go` provides `CheckConvoysForIssue` (the synchronous close-event handler called from `close.go:273`), not the polling loop. The SKILL.md's own "Key source files" table (lines 380-391) correctly lists `convoy_manager.go` as owning `runEventPoll`, contradicting the architecture section.
+- **Category:** `drift`
+- **Severity:** `wrong`
+- **Fix tier:** `docs` — the architecture diagram and paragraph should attribute the 5s event poll to `daemon/convoy_manager.go`, not `operations.go`.
+- **Release position:** `in-release`
+
+**Note:** The wiki pages for [internal/convoy](../packages/convoy.md) and this concept page already describe the architecture correctly — the wiki is not affected. The drift is docs-internal (the SKILL.md's architecture section contradicts its own source-files table).
 
 ## Notes / open questions
 

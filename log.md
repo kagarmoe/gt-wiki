@@ -4340,3 +4340,97 @@ Both findings are in-release (code unchanged since v1.0.0).
 - **none (factual inventory):** The 28 touch-point inventory is overwhelmingly accurate as a catalog of CURRENT mechanisms. Code references (file paths, function names, line numbers) match the implementation. Flow directions, fragility analyses, and API parity gaps are consistent with the code. The "API mapping" column throughout and the "Factory Worker API" references describe an aspirational replacement (factory-worker-api.md is in Batch 12 as a separate aspirational doc). The inventory's value is in the current-mechanism catalog, which is factual and code-grounded.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 12a (Sweep 2: docs/design/mol-mall-design.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/mol-mall-design.md`. Vision document for Mol Mall — a marketplace for Gas Town formulas. Self-labeled as "Vision document — Phase 1 (local formulas) exists. Phases 2-5 (registry, publishing, federation) are not implemented."
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/mol-mall-design.md` (in full)
+
+**Findings by category:**
+- **implementation-status: unbuilt:** 1 finding. The Mol Mall registry system (public/private/federated registries, HOP URI scheme, formula publishing, version resolution, fork support) has no code implementation. Phase 1 (local formulas) exists as embedded formulas in `internal/formula/formulas/`, but the marketplace infrastructure (Phases 2-5) is entirely aspirational. The doc is honest about this. Fix tier: preserve-as-vision. Severity: wrong. Release position: in-release.
+
+-> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 12b (Sweep 2: docs/design/witness-at-team-lead.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/witness-at-team-lead.md`. Future architecture design for replacing tmux-based polecat session management with Claude Code Agent Teams (AT). Self-labeled: "Future architecture — NOT YET IMPLEMENTED."
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/witness-at-team-lead.md` (in full)
+
+**Findings by category:**
+- **implementation-status: unbuilt:** 1 finding. The entire Witness-as-AT-team-lead architecture (delegate mode, AT teammate spawning, native lifecycle hooks, session management via AT instead of tmux) has no code. Depends on Claude Code Agent Teams integration which doesn't exist in gastown. The doc is honest — status header clearly says "NOT YET IMPLEMENTED." Fix tier: preserve-as-vision. Severity: wrong. Release position: in-release.
+
+-> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 12c (Sweep 2: docs/design/plugin-system.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/plugin-system.md`. Design proposal for the Gas Town plugin system. Self-labeled: "Design proposal — not yet implemented."
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/plugin-system.md` (in full)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/cmd/dog.go` (line 202 — confirmed `gt dog dispatch --plugin` exists)
+- `/home/kimberly/repos/gastown/internal/cmd/plugin.go` — confirmed `gt plugin` command tree exists
+
+**Findings by category:**
+- **implementation-status: partial:** 1 finding. The plugin system is PARTIALLY implemented. `gt dog dispatch --plugin` exists and works (dog.go:202-224). `gt plugin` CLI exists. Plugin dispatch via Deacon patrol cycles works. However, the design doc's stale status label ("not yet implemented") is wrong — the core dispatch mechanism shipped. Advanced features (plugin versioning, dependency resolution, marketplace integration) are not implemented. Fix tier: docs (update status to "Partially implemented"). Severity: incomplete. Release position: in-release.
+
+-> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 12d (Sweep 2: docs/design/sandboxed-polecat-execution.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/sandboxed-polecat-execution.md`. Design proposal for configurable polecat execution backends (exitbox containers + daytona cloud). Self-labeled: "Proposal."
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/sandboxed-polecat-execution.md` (in full)
+
+**Findings by category:**
+- **implementation-status: unbuilt:** 1 finding. The sandboxed execution architecture (exitbox container backend, daytona cloud backend, SandboxAdapter interface, filesystem access matrix, network policy) has no code implementation. All polecat execution is local tmux sessions. Fix tier: preserve-as-vision. Severity: wrong. Release position: in-release.
+
+-> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 12e (Sweep 2: docs/design/federation.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/federation.md`. Federation architecture for multi-workspace coordination. Self-labeled: "Partially implemented — Infrastructure (Dolt remotes) exists. Core federation features (URI scheme, cross-workspace queries, delegation) are not yet implemented."
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/federation.md` (in full)
+
+**Findings by category:**
+- **implementation-status: partial:** 1 finding. Federation infrastructure exists (Dolt remotes via `gt dolt sync`, wasteland commands via `gt wl`). Core federation features (HOP URI scheme, cross-workspace queries, delegation, sovereignty model) are not implemented. The doc's self-labeled "Partially implemented" status is accurate. Fix tier: preserve-as-vision. Severity: incomplete. Release position: in-release.
+
+-> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 12f (Sweep 2: docs/design/factory-worker-api.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/factory-worker-api.md`. Design for a structured API boundary between Gas Town and AI agent runtimes, replacing 28 tmux-based touch points with 7 JSON API endpoints.
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/factory-worker-api.md` (in full)
+
+**Findings by category:**
+- **implementation-status: unbuilt:** 1 finding. The Factory Worker API (7 structured endpoints: /prompt, /lifecycle, /identity, /context, /authorize, /telemetry, /health) has no code implementation. All agent interaction remains tmux-based (28 touch points cataloged in agent-api-inventory.md, Batch 11p). Fix tier: preserve-as-vision. Severity: wrong. Release position: in-release.
+
+-> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 12g (Sweep 2: docs/design/formula-resolution.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/formula-resolution.md`. Design for three-tier formula resolution architecture. Self-labeled: "Partially implemented — Basic formula resolution works. Tier enforcement, Mol Mall integration, and HOP federation are planned."
+
+**NOTE:** The plan listed `polecat-naming.md` as 12g, but this file does not exist. `formula-resolution.md` is the actual 7th file in docs/design/ classified as aspirational (it was `formula-resolution.md` in the Phase 2 classification, likely renamed in the plan).
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/formula-resolution.md` (in full)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/formula/overlay.go` — confirmed formula overlay resolution exists (rig > town precedence)
+- Embedded formulas in `internal/formula/formulas/` confirmed as Tier 3 (system)
+
+**Findings by category:**
+- **implementation-status: partial:** 1 finding. Basic formula resolution exists (embedded formulas in binary, formula overlays with rig > town precedence). The three-tier model (Tier 1: project formulas, Tier 2: town/rig overrides, Tier 3: system/embedded) is partially implemented — Tier 2 overlays and Tier 3 embedded both work. Tier 1 (project-committed formulas) and Mol Mall integration are not implemented. The doc's self-labeled "Partially implemented" is accurate. Fix tier: preserve-as-vision for unbuilt tiers. Severity: incomplete. Release position: in-release.
+
+-> (no wiki pages touched)

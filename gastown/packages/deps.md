@@ -4,12 +4,16 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-14
 sources:
   - /home/kimberly/repos/gastown/internal/deps/beads.go
   - /home/kimberly/repos/gastown/internal/deps/dolt.go
   - /home/kimberly/repos/gastown/internal/deps/version.go
 tags: [package, diagnostics, dependencies, prereqs, versioning, beads, dolt]
+phase3_audited: 2026-04-14
+phase3_findings: [none]
+phase3_severities: []
+phase3_findings_post_release: false
 ---
 
 # internal/deps

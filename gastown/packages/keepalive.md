@@ -4,10 +4,14 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-14
 sources:
   - /home/kimberly/repos/gastown/internal/keepalive/keepalive.go
 tags: [package, diagnostics, keepalive, daemon, sentinel-pattern]
+phase3_audited: 2026-04-14
+phase3_findings: [wiki-stale, implementation-status-partial]
+phase3_severities: [wrong, incomplete]
+phase3_findings_post_release: false
 ---
 
 # internal/keepalive
@@ -22,12 +26,7 @@ or idle.
 **Imports (notable):** stdlib only (`encoding/json`, `os`, `path/filepath`,
 `strings`, `time`) plus [`internal/workspace`](workspace.md) for town-root
 discovery.
-**Imported by:** only `internal/web/api.go` at present. Despite the
-package existing, the expected `gt`-root persistent prerun integration
-that would call `Touch` on every command does not currently import this
-package (see "Notes / open questions"). So "every `gt` invocation touches
-this file" is the intended design; what the code actually does today is
-narrower.
+**Imported by:** **no in-tree importers at HEAD.** `rg '"github.com/steveyegge/gastown/internal/keepalive"'` returns zero results. The expected `gt`-root persistent prerun integration that would call `Touch` on every command does not exist in the import graph (see "Notes / open questions"). The package is defined but unused.
 
 ## What it actually does
 
@@ -92,15 +91,27 @@ Source: `/home/kimberly/repos/gastown/internal/keepalive/keepalive.go`.
 ### Usage pattern
 
 Writer side: any CLI command or daemon-adjacent tool that wants to assert
-"an agent was active" calls `keepalive.Touch("command name")`. The
+"an agent was active" would call `keepalive.Touch("command name")`. The
 intended integration point is the root `gt` cobra `PersistentPreRun`, so
-that **every** subcommand implicitly signals activity — but as of this
-ingest the only in-tree importer is `internal/web/api.go`.
+that **every** subcommand implicitly signals activity — but as of HEAD
+there are **no in-tree importers** of this package. The Phase 2 note
+that `internal/web/api.go` imports it was incorrect: `web/api.go` uses
+a local `keepalive` variable for SSE heartbeat ticking, not the
+`internal/keepalive` package.
 
-Reader side: the daemon loop (seen in `internal/daemon/*` and
-`internal/doctor/*` — not yet mapped) would read the state file on a
-tick, compute `Age()`, and use the result as input to exponential-backoff
-logic during idle periods.
+Reader side: the daemon loop (`internal/daemon/*`) and doctor
+(`internal/doctor/*`) have been mapped (Batches 7-8) and **neither**
+imports `internal/keepalive`. The `Read`/`Age()` API has zero consumers.
+
+## Implementation status
+
+- **Status:** `partial`
+- **Severity:** `incomplete`
+- **Docs describe:** Package doc and API design assume `Touch` is called from every `gt` invocation via `PersistentPreRun`, with `Read`/`Age()` consumed by the daemon for idle detection. The nil-sentinel pattern (`Age()` returning 365 days on nil receiver) is designed for zero-guard daemon consumption.
+- **Code provides:** The package itself is fully implemented (`keepalive.go:46-137`) with Touch/Read/Age API. However, there are zero importers anywhere in the codebase — neither the writer side (`PersistentPreRun`) nor the reader side (`internal/daemon`, `internal/doctor`) has been wired up. The package is a complete library with no consumers.
+- **Release position:** `in-release`
+- **Fix tier:** `preserve-as-vision`
+- **Resolution:** Preserve as vision doc. The package is ready to use; the integration just hasn't been wired. Not a bug, not dead code — it's waiting for the `PersistentPreRun` hookup and daemon-side consumption.
 
 ## Related wiki pages
 
@@ -108,27 +119,27 @@ logic during idle periods.
   invocation.
 - [internal/workspace](workspace.md) — used to locate the town root
   before writing the keepalive file.
-- [internal/doctor](doctor.md) — the diagnostic package that reports
-  agent-idle conditions; `Age()` is designed to feed directly into
-  doctor-style threshold checks.
+- [internal/doctor](doctor.md) — the diagnostic package; `Age()` was
+  designed to feed into doctor-style threshold checks but doctor does
+  not currently import this package.
 - [gt doctor](../commands/doctor.md), [gt health](../commands/health.md),
-  [gt vitals](../commands/vitals.md) — sibling diagnostic CLI surfaces
-  that expose agent-activity state to the user.
+  [gt vitals](../commands/vitals.md) — sibling diagnostic CLI surfaces.
 - [go-packages inventory](../inventory/go-packages.md).
 
 ## Notes / open questions
 
-- **Why only `web/api.go`?** `Touch` is designed to be called from every
-  `gt` invocation via a cobra `PersistentPreRun` wire-up, but the grep
-  for `"github.com/steveyegge/gastown/internal/keepalive"` finds only
-  `internal/web/api.go`. Either the preRun integration lives outside a
-  direct import path (via a small shim in another package), or the
-  integration never landed. Worth checking when mapping `internal/cmd`
-  root wire-up.
-- **Who actually consumes `Read`?** The daemon-side consumer of the
-  365-day sentinel isn't in this package. Its real user must live in
-  `internal/daemon/` or `internal/doctor/` — verify when those pages
-  are built out.
+- **Zero importers at HEAD.** Phase 2 stated `internal/web/api.go`
+  imported this package. That was incorrect — `web/api.go` uses a local
+  `keepalive` variable for SSE heartbeat ticking (`time.NewTicker(15 *
+  time.Second)`), not the `internal/keepalive` package. The grep for
+  `"github.com/steveyegge/gastown/internal/keepalive"` returns zero
+  results. The `Touch`/`Read`/`Age()` API is entirely unused in the
+  codebase. **wiki-stale finding (phase-2-incomplete):** Phase 2
+  mistook a local variable name for a package import.
+- **No daemon consumer of `Read` either.** `internal/daemon/` and
+  `internal/doctor/` have been mapped (Batches 7-8) and neither imports
+  `internal/keepalive`. The 365-day nil-sentinel pattern and the
+  `Read`/`Age()` API have zero consumers anywhere in the import graph.
 - The full-command string built by `TouchWithArgs` is not shell-quoted
   and is stored as-is. Arguments containing spaces or newlines will
   corrupt the `last_command` field. Acceptable because this field is

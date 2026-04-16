@@ -530,3 +530,26 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 - none — lessons are purely informational
 
 **Yield comparison:** 2c 0% (0/13) vs 2b 25% (2/8) vs 2a 11% (1/9). The trend: agent-runtime's same-batch methodology produced the cleanest pages; data-layer's larger packages had more enumeration surface area for errors; platform-services had one missed file. Cobra-drift being structurally impossible for packages keeps the ceiling low across all three.
+
+## [2026-04-14 15:00] stage | 3.2.2d — Diagnostics packages Sweep 1
+
+**Actor:** wiki-curator subagent (Phase 3 Batch 2d dispatch)
+**Unit:** 4 package pages audited (doctor, health, keepalive, deps), 1 drift finding, 1 wiki-stale finding, 1 implementation-status finding, 1 commit
+**Duration:** one dispatch
+
+**What went well:**
+- The pre-flagged health.md doc-drift resolved cleanly: Phase 2's Notes bullet was correct, and the finding promoted to a proper Drift section with fresh verification. The `internal/daemon/` mapping from Batch 8 confirmed doctor_dog.go does not import `internal/health`, closing the "check when mapping daemon" open question.
+- The keepalive.md wiki-stale finding was a genuine Phase 2 error — mistaking a local variable name (`keepalive := time.NewTicker(...)` in `web/api.go`) for a package import. This is a novel error mode: Phase 2 appears to have grepped for the word "keepalive" rather than the full import path. The zero-importer discovery upgraded this from "underused" to "unused" and surfaced the implementation-status: partial finding.
+- Zero churn fast-path worked as expected. All 4 packages unchanged since v1.0.0.
+
+**What didn't:**
+- The 2c retro's suggestion to make this "a 10-minute frontmatter-only pass" would have missed the keepalive finding. The Notes-section review was zero-yield in 2a-2c but 50% yield here. The lesson: pre-flagged findings (health, keepalive) make it worth reading the Notes in full even for zero-churn packages.
+
+**What to change next time:**
+- For Batch 2e (Long-running: daemon, tmux, runtime — 3 pages), the zero-churn fast-path still applies, but Notes sections should be read in full because these are complex packages with open questions from Phase 2.
+- The "local variable name confused for package import" error mode should be watched for in future wiki-stale findings. Phase 2's methodology may have other instances where grep matched a word rather than a full import path.
+
+**Follow-ups filed:**
+- none — lessons are purely informational
+
+**Yield comparison:** 2d 50% (2/4) vs 2c 0% (0/13) vs 2b 25% (2/8) vs 2a 11% (1/9). The Diagnostics batch had the highest yield of any package sub-batch, driven by the two pre-flagged findings from Phase 2 Batch 7. Without pre-flagged findings, yield would have been 0%.

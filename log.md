@@ -2733,3 +2733,50 @@ Release-position verification: 12 packages had zero commits since v1.0.0. Reaper
   [gastown/packages/rig.md](gastown/packages/rig.md),
   [gastown/packages/formula.md](gastown/packages/formula.md),
   [gastown/packages/plugin.md](gastown/packages/plugin.md)
+
+## [2026-04-14] lint | Batch 2d wiki-stale finding (keepalive.md zero importers)
+
+**Page:** [keepalive.md](gastown/packages/keepalive.md)
+
+**Finding:** Phase 2 stated `internal/web/api.go` imports `internal/keepalive`. This was incorrect — `web/api.go` uses a local `keepalive` variable for SSE heartbeat ticking (`time.NewTicker(15 * time.Second)`), not the `internal/keepalive` package. The full import-path grep `rg '"github.com/steveyegge/gastown/internal/keepalive"'` returns zero results. The package has **no in-tree importers at HEAD**.
+
+**Phase 2 root cause:** `phase-2-incomplete` — Phase 2 mistook a local variable name for a package import. The `web/api.go` file was read during Phase 2 Batch 7 but the keepalive reference was a false match on the word "keepalive" rather than the package import path.
+
+**Inline fix applied:** updated keepalive.md intro, "Usage pattern" section, "Related wiki pages", and "Notes / open questions" to reflect zero importers.
+
+## [2026-04-14] drift-found | Batch 2d (Sweep 1 packages/ Diagnostics — 4 pages)
+
+Phase 3 Sweep 1 sub-batch 2d: audited 4 package pages under `gastown/packages/` covering Phase 2 Batch 7 (Diagnostics & health).
+
+**Churn:** zero commits between v1.0.0 and HEAD across all 4 packages (`internal/doctor/`, `internal/health/`, `internal/keepalive/`, `internal/deps/`). Fast-path applied per 2a retro guidance.
+
+**Source files re-read:**
+- `/home/kimberly/repos/gastown/internal/health/health.go:1-4` (package doc comment)
+- `/home/kimberly/repos/gastown/internal/keepalive/keepalive.go:1-15` (package doc comment)
+- `/home/kimberly/repos/gastown/internal/deps/beads.go:17-22` (version constants)
+- `/home/kimberly/repos/gastown/internal/deps/dolt.go:14-19` (version constants)
+- Import-graph verification via `rg` for all 4 package import paths
+
+**Pages audited (4):**
+
+| Page | phase3_findings | Notes |
+|---|---|---|
+| [doctor.md](gastown/packages/doctor.md) | `[none]` | 70 non-test files confirmed. All Notes bullets are genuinely neutral (no dependency graph, no short-circuit, Category/CategoryOrder vestigial under streaming). No promotion. |
+| [health.md](gastown/packages/health.md) | `[drift]` | Package doc claims Doctor Dog imports it; only `gt health` does. Promoted Phase 2 Notes bullet to `## Docs claim` + `## Drift`. Fix tier: code (edit package doc comment). |
+| [keepalive.md](gastown/packages/keepalive.md) | `[wiki-stale, implementation-status-partial]` | Phase 2 claimed `web/api.go` imports it — incorrect (local var confusion). Zero importers at HEAD. Added `## Implementation status: partial`. See separate lint entry above. |
+| [deps.md](gastown/packages/deps.md) | `[none]` | `MinBeadsVersion = "0.57.0"`, `MinDoltVersion = "1.82.4"` match wiki exactly. 3 go files match. |
+
+**Yield:** 2/4 pages (50%). Higher than prior package sub-batches (2a: 11%, 2b: 25%, 2c: 0%) because Diagnostics packages had the pre-flagged health doc-drift and the keepalive false-import.
+
+**Finding summary:**
+
+1. **health.md — drift (wrong, in-release).** Package doc at `health.go:2-3` claims "shared between Doctor Dog and gt health CLI." Code: only `internal/cmd/health.go` imports it. Fix tier: code.
+2. **keepalive.md — wiki-stale (phase-2-incomplete, wrong).** Phase 2 incorrectly claimed `web/api.go` imports the package. Zero importers at HEAD. Inline fix applied.
+3. **keepalive.md — implementation-status: partial (incomplete, in-release).** Package is fully coded but has zero consumers. PersistentPreRun writer and daemon reader integrations never landed. Fix tier: preserve-as-vision.
+
+**Next sub-batch:** Batch 2e — Long-running processes packages (Phase 2 Batch 8).
+
+-> [gastown/packages/doctor.md](gastown/packages/doctor.md),
+  [gastown/packages/health.md](gastown/packages/health.md),
+  [gastown/packages/keepalive.md](gastown/packages/keepalive.md),
+  [gastown/packages/deps.md](gastown/packages/deps.md)

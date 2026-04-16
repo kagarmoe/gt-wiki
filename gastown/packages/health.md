@@ -4,10 +4,14 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-14
 sources:
   - /home/kimberly/repos/gastown/internal/health/health.go
 tags: [package, diagnostics, health, dolt, network]
+phase3_audited: 2026-04-14
+phase3_findings: [drift]
+phase3_severities: [wrong]
+phase3_findings_post_release: false
 ---
 
 # internal/health
@@ -95,6 +99,28 @@ deliberately a toolbox, not a pipeline — each function is independently
 callable so other diagnostic commands could mix-and-match without pulling
 in a `Report` struct.
 
+## Docs claim
+
+### Source
+- `/home/kimberly/repos/gastown/internal/health/health.go:2-3` — package doc comment
+
+### Verbatim
+> Package health provides reusable health check functions for the Gas Town data plane.
+> These checks are shared between the Doctor Dog (daemon/doctor_dog.go) and the
+> gt health CLI command (cmd/health.go).
+
+## Drift
+
+### Package doc claims Doctor Dog shares this package — only gt health imports it
+
+- **Claim source:** package doc comment at `/home/kimberly/repos/gastown/internal/health/health.go:2-3`
+- **Docs claim:** "These checks are shared between the Doctor Dog (daemon/doctor_dog.go) and the gt health CLI command (cmd/health.go)."
+- **Code does:** `rg '"github.com/steveyegge/gastown/internal/health"'` finds exactly one importer: `internal/cmd/health.go`. Neither `internal/daemon/doctor_dog.go` nor any file in `internal/doctor/` imports `internal/health`. The doctor package implements its own Dolt checks via [`internal/deps`](deps.md) and [`internal/doltserver`](doltserver.md).
+- **Category:** `drift`
+- **Severity:** `wrong`
+- **Fix tier:** `code` — the package doc comment should be corrected to remove the Doctor Dog claim
+- **Release position:** `in-release`
+
 ## Related wiki pages
 
 - [gt](../binaries/gt.md) — parent binary.
@@ -111,13 +137,7 @@ in a `Report` struct.
 
 ## Notes / open questions
 
-- **Doc-comment drift.** The package doc says the functions are "shared
-  between the Doctor Dog (daemon/doctor_dog.go) and the gt health CLI
-  command", but `rg '"github.com/steveyegge/gastown/internal/health"'`
-  finds only `internal/cmd/health.go` as an importer. Either doctor-dog
-  used to import this and the coupling was removed, or it was a planned
-  refactor that never landed. Worth checking when mapping `internal/daemon`
-  in a later batch.
+- **Doc-comment drift** → promoted to [## Drift](#package-doc-claims-doctor-dog-shares-this-package--only-gt-health-imports-it) above. Verified at HEAD: `internal/daemon/` was mapped in Batch 8 and does not import `internal/health`. The claim was never true in the import graph.
 - `BackupFreshness` silently ignores walk errors but `DirSize` propagates
   them — minor API inconsistency for otherwise parallel helpers.
 - No test file. The package has zero unit tests, which is plausible given

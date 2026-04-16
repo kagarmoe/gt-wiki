@@ -708,3 +708,25 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 - none — both files were no-finding.
 
 **Batch 6 yield:** 0 findings on 2/2 files (0%). Both files are guides about operational procedures (rig bootstrap, wasteland federation) rather than gastown code behavior claims.
+
+## [2026-04-15 22:00] stage | Phase 3.Batch 7 (Sweep 2: docs/concepts/)
+
+**Actor:** wiki-curator subagent (Sweep 2 docs process)
+**Unit:** 6 docs/concepts/ files processed (7a-7f), 6 commits landed, 2 wiki pages annotated.
+**Duration:** one dispatch
+
+**What went well:**
+- The docs/concepts/ files have tight correspondence to wiki concepts/ pages as predicted by the plan. Cross-referencing was fast because Phase 2 already mapped these concepts.
+- Two genuine drift findings surfaced: convoy lifecycle states omission (7a) and GIT_AUTHOR_NAME format (7e). Both are "docs wrong, code and wiki correct" — the wiki's code-first grounding produced accurate pages that the docs contradict.
+- The "gastown-specific claims" triage question continues to work well. Integration-branches.md (590 lines) processed cleanly despite its length because its claims are all verifiable against config types and mq_integration.go.
+
+**What didn't:**
+- The propulsion-principle.md (7f) mixes old and new workflow patterns (step closures vs inline formulas) which made it unclear whether to file a drift finding. Decided not to since both patterns exist in code — but this is a judgment call that could go either way.
+
+**What to change next time:**
+- For concept docs that describe both old and new patterns (like propulsion-principle.md), note the internal inconsistency in the log entry but don't file as drift unless one pattern is actually removed from code.
+
+**Follow-ups filed:**
+- none — findings annotated inline on existing wiki pages.
+
+**Batch 7 yield:** 2 findings on 2/6 files (33%). 2 drift (docs wrong, wiki correct). The concept docs are generally accurate because they describe the same domain the wiki was grounded in during Phase 2. The 33% finding rate is higher than Batch 5 (12.5%) because concept docs make denser code claims than research/example files.

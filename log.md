@@ -3211,3 +3211,27 @@ Both findings are in-release (code unchanged since v1.0.0).
 **Next sub-batch:** Batch 5e — docs/examples/hanoi-demo.md.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 5e (Sweep 2: docs/examples/hanoi-demo.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/examples/hanoi-demo.md` (169 lines).
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/examples/hanoi-demo.md` (in full, 169 lines)
+
+**Source files re-read at current HEAD:**
+- None needed. Purely illustrative demo document with tutorial commands.
+
+**Wiki pages audited:**
+- None. The document is a tutorial/demo for running a Towers of Hanoi durability test using `bd` (beads) CLI commands. It makes one gastown-adjacent claim: "Parent-child relationships provide hierarchy only — they don't block execution" — already extensively verified as correct across Batch 1 and Batch 5a (convoy SKILL.md). The `bd ready` wisp filter is beads-side code, out of gastown wiki scope.
+
+**Findings by category:**
+- **none:** Tutorial/demo document. No gastown code behavior claims to verify.
+
+**New beads filed:** none
+**Beads closed:** none
+**Cross-link discipline:** No wiki pages touched.
+
+**Next sub-batch:** Batch 5f — docs/examples/agent-validation.formula.toml.
+
+-> (no wiki pages touched)

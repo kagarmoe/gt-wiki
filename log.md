@@ -4088,3 +4088,24 @@ Both findings are in-release (code unchanged since v1.0.0).
 **No wiki annotation needed** — wiki's escalate.md already correctly documents 4 severity levels and the actual flag set. Drift is docs-only.
 
 -> (no wiki pages touched)
+
+## [2026-04-15] drift-found | Batch 11e (Sweep 2: docs/design/directives-and-overlays.md)
+
+**Scope:** Full read of `/home/kimberly/repos/gastown/docs/design/directives-and-overlays.md` (307 lines). Design doc for role directives (Markdown per-role behavior overrides) and formula overlays (TOML per-step modifications). Covers file layout, precedence, TOML format, CLI commands, doctor integration, worked example.
+
+**Docs files read:**
+- `/home/kimberly/repos/gastown/docs/design/directives-and-overlays.md` (in full, 307 lines)
+
+**Source files re-read at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/config/directives.go` (line 19 — confirmed `LoadRoleDirective`)
+- `/home/kimberly/repos/gastown/internal/formula/overlay.go` (confirmed `LoadFormulaOverlay`, `ApplyOverlays`)
+- `/home/kimberly/repos/gastown/internal/cmd/directive.go` (lines 31-34 — confirmed `show`, `edit`, `list` subcommands exist)
+- `/home/kimberly/repos/gastown/internal/cmd/directive_show.go`, `directive_edit.go` — confirmed implementations
+
+**Wiki pages spot-checked:** commands/directive.md, concepts/directive.md, commands/formula.md
+
+**Findings by category:**
+- **drift:** 1 finding. Design doc lines 131-132 say "CLI commands are being added in gt-3kg.5. The interface below reflects the planned design." But `gt directive show/edit/list` and `gt formula overlay show/edit/list` all exist in code at current HEAD. The "planned" status label is stale — the feature shipped. Fix tier: docs. Severity: wrong. Release position: in-release.
+- **none (verified):** File layout (directives at `~/gt/directives/<role>.md` and `~/gt/<rig>/directives/<role>.md`), precedence (concatenate for directives, full replace for overlays), TOML format with 3 override modes (replace/append/skip), skip mode dependency handling, validation rules, doctor `overlay-health` check — all confirmed in code and consistent with wiki.
+
+-> (no wiki pages touched)

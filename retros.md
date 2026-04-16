@@ -687,3 +687,24 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 - none — lessons are informational. The Sweep 2 workflow validated successfully.
 
 **Batch 5 yield:** 1 finding on 1/8 files (12.5%). 1 drift (docs wrong, wiki correct). The finding was in the only claim-rich file (convoy SKILL.md). All example/research/design files had zero findings as expected.
+
+## [2026-04-15 21:00] stage | Phase 3.Batch 6 (Sweep 2: docs/guides/)
+
+**Actor:** wiki-curator subagent (Sweep 2 docs process)
+**Unit:** 2 docs/guides/ files processed (6a-6b), 2 commits landed, 0 wiki pages annotated.
+**Duration:** one dispatch
+
+**What went well:**
+- The triage question "does this file make gastown-specific code behavior claims?" continues to work well. The bootstrap guide (6a) was verified quickly against the actual script + rig.go flags. The mvgt-integration guide (6b) was correctly identified as primarily about external Dolt/wl-commons operations, with a small gastown-specific surface.
+- Despite being 1,217 lines, 6b processed efficiently because the gastown-specific claims were concentrated in a few sections (gt wl join pipeline, troubleshooting). The schema reference tables are about the external wl-commons database, not gastown code.
+
+**What didn't:**
+- The 1,217-line file required reading in 4 chunks. For future large files, pre-scanning for gastown-specific keywords (gt, internal/, cmd/) could focus reading on relevant sections faster.
+
+**What to change next time:**
+- For large docs files, consider a two-pass approach: (1) grep for gastown-specific terms to find relevant sections, (2) read only those sections in full. This would save context on files like mvgt-integration.md where 90%+ of content is about external systems.
+
+**Follow-ups filed:**
+- none — both files were no-finding.
+
+**Batch 6 yield:** 0 findings on 2/2 files (0%). Both files are guides about operational procedures (rig bootstrap, wasteland federation) rather than gastown code behavior claims.

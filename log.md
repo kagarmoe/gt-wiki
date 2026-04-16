@@ -2642,7 +2642,7 @@ Release-position verification: all 8 package directories had zero commits betwee
 
 **Next sub-batch:** Batch 2c — Agent runtime packages (Phase 2 Batch 6).
 
-→ [gastown/packages/beads.md](gastown/packages/beads.md),
+-> [gastown/packages/beads.md](gastown/packages/beads.md),
   [gastown/packages/channelevents.md](gastown/packages/channelevents.md),
   [gastown/packages/doltserver.md](gastown/packages/doltserver.md),
   [gastown/packages/events.md](gastown/packages/events.md),
@@ -2650,3 +2650,86 @@ Release-position verification: all 8 package directories had zero commits betwee
   [gastown/packages/mail.md](gastown/packages/mail.md),
   [gastown/packages/mq.md](gastown/packages/mq.md),
   [gastown/packages/nudge.md](gastown/packages/nudge.md)
+
+## [2026-04-15] drift-found | Batch 2c (Sweep 1 packages/ Agent runtime — 13 pages)
+
+**Scope:** Sweep 1 promotion of Phase 2 notes to v1.2 annotations across all 13 Agent runtime package pages. Every page received `phase3_audited` / `phase3_findings` / `phase3_severities` / `phase3_findings_post_release` frontmatter. All 13 pages audited with `phase3_findings: [none]`.
+
+**Churn check:** 12 of 13 packages had zero commits between v1.0.0 and HEAD. Only `internal/reaper/` had churn (1 commit: `ce5ca7c3 feat(reaper): add close_reason and per-issue logging to auto-close`). However, Phase 2 was written on 2026-04-13, after the churn commit on 2026-04-03, so Phase 2 already incorporated the change. The wiki body is accurate for current HEAD.
+
+**Package-file audit:** All 13 packages matched their wiki `sources:` listings exactly. No missing files, no extra files. Phase 2's file enumeration was thorough for this batch.
+
+**Source files spot-checked at current HEAD:**
+- `/home/kimberly/repos/gastown/internal/mayor/manager.go` (429 lines; `Start`:116, `StartTMUX`:131, `StartACP`:192 — all match wiki)
+- `/home/kimberly/repos/gastown/internal/polecat/manager.go` (2422 lines; wiki says ~2400 — accurate approximation)
+- `/home/kimberly/repos/gastown/internal/crew/manager.go` (937 lines; wiki says ~940 — accurate approximation)
+- `/home/kimberly/repos/gastown/internal/dog/manager.go` (692 lines; wiki function refs verified)
+- `/home/kimberly/repos/gastown/internal/deacon/manager.go` (234 lines; wiki refs verified)
+- `/home/kimberly/repos/gastown/internal/refinery/engineer.go` (2057 lines — exact match)
+- `/home/kimberly/repos/gastown/internal/witness/handlers.go` (2705 lines — exact match; wiki says "2700+" — accurate)
+- `/home/kimberly/repos/gastown/internal/witness/manager.go` (`Start`:110 — matches wiki)
+- `/home/kimberly/repos/gastown/internal/reaper/reaper.go` (952 lines — exact match; `AutoClose`:587, `purgeOldMail`:529, `batchDeleteRows`:709, `ClosePluginReceipts`:778, `ClosePluginDispatches`:862 — all start lines match wiki exactly)
+- `/home/kimberly/repos/gastown/internal/wisp/promotion.go` (`ShouldPromote`:59 — matches wiki)
+- `/home/kimberly/repos/gastown/internal/convoy/operations.go` (`CheckConvoysForIssue`:38 — matches wiki)
+- `/home/kimberly/repos/gastown/internal/rig/manager.go` (1805 lines — exact match)
+- `/home/kimberly/repos/gastown/internal/formula/parser.go` (703 lines — exact match)
+- `/home/kimberly/repos/gastown/internal/plugin/scanner.go` (273 lines — exact match)
+
+Release-position verification: 12 packages had zero commits since v1.0.0. Reaper's 1 commit was pre-Phase-2-read. All source is at release state for audit purposes. All findings are `in-release`.
+
+**Docs files read:** none (Sweep 1).
+
+**Notes promotion review:** All 13 pages' Notes sections were reviewed for drift/implementation-status promotion candidates. No promotions. Key judgments:
+- witness.md and refinery.md vestigial `--foreground` observations are about the CLI flag, not the package code. The package correctly refuses foreground. Any vestigial finding belongs on the command page.
+- formula.md `compose.aspects` parked field is a code observation with no docs claiming the feature works. Not drift.
+- plugin.md "no plugin concept page" is a wiki coverage gap, noted as an observation for Phase 4 but not tagged as a Phase 3 finding (gap/missing is Phase 4 scope).
+
+**Wiki pages audited:**
+- [mayor](gastown/packages/mayor.md) — `phase3_findings: [none]`
+- [polecat](gastown/packages/polecat.md) — `phase3_findings: [none]`
+- [crew](gastown/packages/crew.md) — `phase3_findings: [none]`
+- [dog](gastown/packages/dog.md) — `phase3_findings: [none]`
+- [deacon](gastown/packages/deacon.md) — `phase3_findings: [none]`
+- [refinery](gastown/packages/refinery.md) — `phase3_findings: [none]`
+- [witness](gastown/packages/witness.md) — `phase3_findings: [none]`
+- [reaper](gastown/packages/reaper.md) — `phase3_findings: [none]`
+- [wisp](gastown/packages/wisp.md) — `phase3_findings: [none]`
+- [convoy](gastown/packages/convoy.md) — `phase3_findings: [none]`
+- [rig](gastown/packages/rig.md) — `phase3_findings: [none]`
+- [formula](gastown/packages/formula.md) — `phase3_findings: [none]`
+- [plugin](gastown/packages/plugin.md) — `phase3_findings: [none]`
+
+**Findings by category:**
+
+- **drift:** 0 (Sweep 1; no `docs/` files read).
+- **cobra drift:** 0 (packages have no Cobra Long text — structurally impossible).
+- **compound drift:** 0.
+- **implementation-status:** 0. Vestigial foreground observations noted but properly scoped to command pages, not package pages.
+- **wiki-stale:** 0. All line refs, file counts, and function locations verified against current HEAD.
+- **gap:** 0 tagged (plugin.md concept page gap noted as Phase 4 observation only).
+- **none:** 13 pages.
+
+**Judgment calls:**
+
+1. **Reaper churn (1 commit post-v1.0.0).** The commit added `ClosedEntry` struct and per-issue logging to `AutoClose`. Phase 2 was written 10 days after the commit and already describes the post-churn behavior accurately. NOT wiki-stale.
+2. **Witness/refinery foreground rejection.** Both packages' Notes mention vestigial `--foreground`. The package code correctly refuses foreground mode. The vestigial finding (if any) is about the CLI flag still parsing, which belongs on the command page. NOT promoted on the package page.
+3. **Formula `compose.aspects` parked field.** TOML decodes it, code ignores it. No docs claim it works. This is a code-level implementation note, not docs-vs-code drift. Stays in Notes.
+4. **Plugin concept page gap.** A `concepts/plugin.md` page would consolidate the plugin model. This is wiki coverage, not docs-vs-code drift. Noted for Phase 4 scope. NOT tagged as a Phase 3 finding.
+
+**Yield:** 0/13 pages (0%). Lowest of any sub-batch so far. Expected: Phase 2's agent-runtime package methodology was thorough (same-batch rule, same subagent reading code + writing page), zero code churn for 12/13 packages, and the one churned package was already post-churn at Phase 2 read time. Combined with cobra-drift being structurally impossible for packages, the yield floor is zero.
+
+**Next sub-batch:** Batch 2d — Diagnostics packages (Phase 2 Batch 7).
+
+-> [gastown/packages/mayor.md](gastown/packages/mayor.md),
+  [gastown/packages/polecat.md](gastown/packages/polecat.md),
+  [gastown/packages/crew.md](gastown/packages/crew.md),
+  [gastown/packages/dog.md](gastown/packages/dog.md),
+  [gastown/packages/deacon.md](gastown/packages/deacon.md),
+  [gastown/packages/refinery.md](gastown/packages/refinery.md),
+  [gastown/packages/witness.md](gastown/packages/witness.md),
+  [gastown/packages/reaper.md](gastown/packages/reaper.md),
+  [gastown/packages/wisp.md](gastown/packages/wisp.md),
+  [gastown/packages/convoy.md](gastown/packages/convoy.md),
+  [gastown/packages/rig.md](gastown/packages/rig.md),
+  [gastown/packages/formula.md](gastown/packages/formula.md),
+  [gastown/packages/plugin.md](gastown/packages/plugin.md)

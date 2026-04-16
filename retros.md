@@ -505,3 +505,28 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 - none — lessons are purely informational
 
 **Yield comparison:** 2b 25% (2/8) vs 2a 11% (1/9). Both phase-2-incomplete. The data layer's larger packages (beads at 28 files, events at 30 type constants) had more surface area for Phase 2 enumeration errors.
+
+## [2026-04-15 14:00] stage | 3.2.2c — Agent runtime packages Sweep 1
+
+**Actor:** wiki-curator subagent (Phase 3 Batch 2c dispatch)
+**Unit:** 13 package pages audited (mayor, polecat, crew, dog, deacon, refinery, witness, reaper, wisp, convoy, rig, formula, plugin), 0 findings, 1 commit
+**Duration:** one dispatch
+
+**What went well:**
+- The 2a retro's fast-path recommendation (churn check first, frontmatter + spot-check for zero-churn packages) was validated again. 12/13 packages had zero churn; the 1 churned package (reaper) had its churn already incorporated by Phase 2. Fast-path applied to all 13.
+- Package-file audit was 13/13 exact match — Phase 2's Batch 6 "same-batch rule" (one subagent reads code + writes page) produced thorough file enumeration for agent-runtime packages, unlike the Platform services batch where util.md missed a file.
+- All spot-checked line numbers matched current HEAD exactly. Phase 2's agent-runtime citations are the most accurate of any batch audited so far.
+- The 2b retro's prediction ("watch for `status: partial` in Batch 2c's agent-runtime packages") was checked: all 13 pages are `status: partial`, but none had the beads-style frontmatter-vs-body mismatch. Partial here means "deep package, not fully documented" rather than "frontmatter incomplete."
+
+**What didn't:**
+- 0% yield means this sub-batch added no findings — only frontmatter annotations. The 13 pages were already clean. This confirms the 2a retro's suspicion that zero-churn packages with no Cobra text are yield-floor territory. The time spent was essentially a verification pass.
+- The dispatch expected agent-runtime packages (polecat, deacon, convoy) to potentially be more active than the boring Platform/Data packages. They were not. v1.0.0 is recent enough that even the agent runtime hasn't moved.
+
+**What to change next time:**
+- For Batch 2d (Diagnostics: doctor, health, keepalive, deps — 4 pages), if churn is zero again, this can be a 10-minute frontmatter-only pass with 1-2 spot-checks per page. The full Notes-section review is useful but was zero-yield across all three package sub-batches so far.
+- Consider batching the remaining package sub-batches (2d, 2e, 2f) into a single dispatch if they're all zero-churn. The overhead of separate dispatches exceeds the finding yield.
+
+**Follow-ups filed:**
+- none — lessons are purely informational
+
+**Yield comparison:** 2c 0% (0/13) vs 2b 25% (2/8) vs 2a 11% (1/9). The trend: agent-runtime's same-batch methodology produced the cleanest pages; data-layer's larger packages had more enumeration surface area for errors; platform-services had one missed file. Cobra-drift being structurally impossible for packages keeps the ceiling low across all three.

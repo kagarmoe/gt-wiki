@@ -202,6 +202,56 @@ file and line range.>
 - (optional, populated by Phase 6 or release-sync) **PR reference:**
   `gastown#<N> (open)` | `gastown#<N> (merged in v<X>)`
 
+## Failure modes                    [optional, as discovered]
+
+<populated when failure modes are discovered — via issues, investigation,
+ release sync, or wiki validation testing. Not mandatory on every page;
+ added when a failure mode is known. The absence of this section means
+ "not yet investigated," not "no failure modes exist.">
+
+### Precondition violations (what does it assume?)
+- **<assumption>:** <what breaks when it's violated; `file:line` of the
+  unchecked assumption>
+- **Present / Absent:** does the code check this precondition, or silently
+  assume it?
+
+### Partial completion (what doesn't it clean up?)
+- **<step N fails>:** <what's left dirty — zombie sessions, orphan files,
+  dangling beads, stale locks; `file:line` of the incomplete cleanup>
+- **Present / Absent:** does the code have cleanup/rollback logic, or does
+  it exit leaving partial state?
+
+### Silent suppression (what errors are swallowed?)
+- **<error path>:** <errors caught and discarded without logging or
+  propagation; `file:line` of the suppression>
+- **Present / Absent:** does the code log/propagate, or `_ = err`?
+
+### Cross-platform concerns                [optional]
+- **<platform>:** <behavior difference — e.g., "Windows: tmux unavailable,
+  session layer is a no-op"; `file:line` of the platform shim or stub>
+- **Tested / Untested:** does the platform shim have tests? Phase 2 noted
+  `git.copy_windows.go:14` says "This Windows implementation has not been
+  tested on Windows."
+
+### Release notes cross-reference           [optional]
+- **<release tag>:** <any discrepancy between the release notes and the
+  code/wiki for this entity — e.g., release notes use a different package
+  name, document a flag that doesn't exist, or omit a breaking change>
+```
+
+**The "present vs absent" framing is load-bearing.** A "present" failure mode (code handles the error) is documentation — the code has a `if err != nil` path and we describe what it does. An "absent" failure mode (code DOESN'T handle it) is a prediction — it tells you where the next bug lives before a user finds it. **Absent failure modes are more valuable** because they're the gaps the issue tracker will eventually surface.
+
+The three questions that drive failure-mode discovery:
+1. **What does it assume?** (preconditions — tmux running, Dolt reachable, directory exists)
+2. **What doesn't it clean up on failure?** (partial completion — session killed but worktree left)
+3. **What does it silently swallow?** (error suppression — `_ = os.Remove()`, bare `continue`)
+
+These three map to the bug categories the wiki validation surfaced: assumption violations (#3538 Windows/tmux), partial-completion zombies (#3658 polecat remove, #3604 refinery stall), and silent swallowing (#3554 wisp config spam, #3653 dead handlers).
+
+**Cross-platform concerns** are a special case of precondition violations where the precondition is "running on the expected OS." Gastown has explicit platform shims (`*_unix.go` / `*_windows.go` pairs) that are worth documenting — especially when they're stubs or untested.
+
+**Release notes cross-references** catch drift between what a release ANNOUNCES and what the code DOES. Issue #3651 (incorrect install instructions on 1.0 release) is this category — the release notes used a wrong npm scope that the code doesn't match.
+
 ## Notes / open questions
 
 <neutral observations that are not drift or implementation-status findings.

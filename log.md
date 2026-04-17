@@ -4692,3 +4692,21 @@ Drafted corrections for all 61 drift findings from the drift index Section 1, gr
 **Validation files:** gastown/drift/validation-round{1,2,3,4}.md
 
 → gastown/drift/
+
+## [2026-04-17] decision | Schema: add Failure modes section to entity-page template
+
+Added `## Failure modes` as an optional section in the entity-page scaffold, positioned between `## Implementation status` and `## Notes / open questions`. Three sub-sections with present/absent framing:
+
+1. **Precondition violations** — what does it assume? Present = code checks; absent = silent assumption.
+2. **Partial completion** — what doesn't it clean up on failure? Present = rollback logic; absent = dirty state on exit.
+3. **Silent suppression** — what errors are swallowed? Present = logged/propagated; absent = `_ = err`.
+
+Plus two optional sub-sections:
+- **Cross-platform concerns** — behavior differences per OS, tested vs untested platform shims.
+- **Release notes cross-reference** — discrepancies between release announcements and code/wiki.
+
+**Why now:** wiki validation against 20 open issues scored 60% partial, with 8 of 12 partials caused by "happy-path documented, failure mode missing." The template lacked a home for failure-mode observations — they ended up in `## Notes` where they got lost or never recorded at all.
+
+**Not retroactive.** Existing pages don't need this section added; it populates as failure modes are discovered through issues, investigation, validation testing, or release sync.
+
+→ [.claude/skills/writing-entity-pages/SKILL.md](.claude/skills/writing-entity-pages/SKILL.md)

@@ -4,7 +4,7 @@ type: note
 status: stub
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-14
 sources:
   - /home/kimberly/repos/gastown/
 tags: [landing, index]

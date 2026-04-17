@@ -4,7 +4,7 @@ type: concept
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-15
+updated: 2026-04-16
 audit_log: "Sweep 1 (2026-04-14), Sweep 2 Batch 5a (2026-04-15), Sweep 2 Batch 7a (2026-04-15)"
 sources:
   - /home/kimberly/repos/gastown/internal/convoy/operations.go

@@ -4,7 +4,7 @@ type: note
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-11
+updated: 2026-04-16
 sources:
   - /home/kimberly/repos/gastown/
 tags: [inventory, enumeration, index]

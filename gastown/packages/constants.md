@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-14
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/constants/constants.go
 tags: [package, constants, platform-service, directories, timeouts, roles, emojis]

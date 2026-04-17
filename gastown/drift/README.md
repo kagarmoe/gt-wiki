@@ -4,13 +4,13 @@ type: drift
 status: complete
 topic: gastown
 created: 2026-04-15
-updated: 2026-04-16
-phase: 3-6
+updated: 2026-04-17
+phase: 3-7
 ---
 
 # Drift Index
 
-Consolidated index of findings from Phase 3 (Drift audit, Batches 1-14), Phase 4 (Coverage/Completeness audit, Batches 1-3), Phase 5 (Audience classification of 111 commands), and Phase 6 (Implementation). Phase 3 audited 271 units (211 entity pages in Sweep 1 + 60 docs files in Sweep 2) and surfaced ~83 findings. Phase 4 audited 94 `status:partial` pages: 89 upgraded to `status:verified`, 5 confirmed incomplete. Phase 5 classified all 111 command pages by primary audience (user/agent/dev/internal) for Phase 6 prioritization. Phase 6 executed: 6 new package pages, 5 expanded, 4 subcommand gaps filled, 61 upstream correction drafts.
+Consolidated index of findings from Phase 3 (Drift audit, Batches 1-14), Phase 4 (Coverage/Completeness audit, Batches 1-3), Phase 5 (Audience classification of 111 commands), Phase 6 (Implementation), and Phase 7 (Correctness validation + wiki lint). Phase 3 audited 271 units (211 entity pages in Sweep 1 + 60 docs files in Sweep 2) and surfaced ~83 findings. Phase 4 audited 94 `status:partial` pages: 89 upgraded to `status:verified`, 5 confirmed incomplete. Phase 5 classified all 111 command pages by primary audience (user/agent/dev/internal) for Phase 6 prioritization. Phase 6 executed: 6 new package pages, 5 expanded, 4 subcommand gaps filled, 61 upstream correction drafts. Phase 7 validated 18/61 corrections (all valid), found 12 ambiguity findings, and ran a full wiki lint pass.
 
 **How to read this index:**
 - **Section 1** is the Phase 6 work-list: upstream corrections to the gastown source repo (code edits, docs PRs). Phase 5 (Audience classification) refines it; Phase 6 (Implementation) executes it.
@@ -21,6 +21,7 @@ Consolidated index of findings from Phase 3 (Drift audit, Batches 1-14), Phase 4
 - **Section 6** lists coverage gaps from Phase 4: pages whose wiki content is incomplete relative to their source code surface.
 - **Section 7** summarizes the Phase 5 audience classification across all 111 command pages.
 - **Section 8** summarizes Phase 6 implementation results: wiki-side fixes, upstream correction drafts, and remaining work.
+- **Section 9** records Phase 7 correctness validation, ambiguity findings, and wiki lint results.
 
 **Plan:** [../../.claude/plans/2026-04-14-phase3-drift.md](../../.claude/plans/2026-04-14-phase3-drift.md) (gitignored).
 
@@ -378,3 +379,26 @@ Drift findings by audience (for Phase 6 prioritization):
 - beads.md, daemon.md, doltserver.md, polecat.md still status:partial (large packages)
 - bitbucket package page (bead wiki-7u4) — deferred to release sync
 - 6 new docs file coverage (bead wiki-w71) — deferred to release sync
+
+---
+
+## Section 9: Phase 7 Correctness summary
+
+### Correction validation
+- 18/61 corrections spot-checked against gastown HEAD (`9f962c4a`), all valid
+- Verbatim quotes match, code citations accurate, suggested replacements correct
+- No line-number drift from recent reaper commits
+- Full validation deferred to PR submission time
+
+### Ambiguity findings
+- 12 severity:ambiguous findings (see [corrections-audit.md](corrections-audit.md))
+- 4 are corrections.md gaps (persistent polecat model + reference.md not updated)
+- 8 are docs-wording ambiguity (vague claims, dead links)
+- Notable: reference.md lifecycle section (lines 258-259) and env table (line 284) have stale polecat claims not in corrections.md
+
+### Wiki lint
+- **Orphan pages:** 0 — all 6 new Phase 6 package pages have inbound links (index.md + cross-references)
+- **Broken cross-links:** 0 — all relative links in Phase 6 pages resolve correctly
+- **Stale frontmatter dates:** 82 pages had `updated:` dates older than their last git commit; all fixed
+- **Phase 6 page quality:** all 6 new package pages have proper frontmatter, file:line citations, cross-links, and `## What it actually does` sections
+- **Command page index coverage:** 73 command pages not individually listed in index.md, but all are linked from gastown/commands/README.md (by design — index.md delegates to the commands sub-index)

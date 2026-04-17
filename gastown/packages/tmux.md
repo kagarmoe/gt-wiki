@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-14
+updated: 2026-04-16
 sources:
   - /home/kimberly/repos/gastown/internal/tmux/tmux.go
   - /home/kimberly/repos/gastown/internal/tmux/theme.go

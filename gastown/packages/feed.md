@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-14
+updated: 2026-04-15
 sources:
   - /home/kimberly/repos/gastown/internal/feed/curator.go
 tags: [package, feed, curator, events, dedup, aggregation, zfc, flock]

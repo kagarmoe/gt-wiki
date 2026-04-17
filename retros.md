@@ -1204,3 +1204,39 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 ### Follow-ups filed
 
 - None yet — corrections-audit.md records the findings for Kimberly's review. New corrections for reference.md and witness.go parent Long text should be added to corrections.md if Kimberly approves.
+
+## [2026-04-17] phase | Phase 7 close (Correctness validation + wiki lint)
+
+**Actor:** wiki-curator (main session)
+**Scope:** Entire Phase 7 — correction spot-checking, ambiguity audit, wiki lint pass, phase close.
+
+### What went well
+
+- **Corrections hold up under scrutiny.** 18/61 spot-checked, 100% valid. The Phase 3 investment in exact file:line citations made validation trivial — just read the cited lines and compare.
+- **Wiki lint was mostly clean.** Zero orphan pages, zero broken cross-links. The Phase 6 pages were well-integrated from the start.
+- **Stale date fix was mechanical and safe.** 82 pages had drifted `updated:` dates (caused by Phase 3-6 adding audit fields without bumping dates). A simple script fixed all of them without content changes.
+
+### What didn't go well
+
+- **82 stale frontmatter dates accumulated across Phases 3-6.** Every phase that added frontmatter fields (phase3_audited, phase4_audited, etc.) or drift sections touched pages without updating `updated:`. This should have been caught earlier with periodic lint runs.
+- **Ambiguity findings reveal a gap in Phase 6 correction methodology.** 4 of 12 ambiguity findings are corrections.md gaps (persistent polecat model claims in reference.md and witness.go). These were missed because Phase 6 relied on per-page drift sections rather than grepping for cross-cutting patterns.
+
+### What to change next time
+
+- **Run lint after every phase, not just at close.** The 82 stale dates could have been caught and fixed incrementally. A 5-minute lint pass after each phase would prevent accumulation.
+- **Add a `updated:` bump to the entity-page editing checklist.** Any touch to a page (even adding a frontmatter field) should bump the date. This is a schema discipline issue.
+- **Pattern-level correction passes should complement per-page passes.** Phase 6 found corrections page-by-page. A second pass grepping for known patterns (e.g., "self-nuke", "self-clean") across the entire codebase would catch stragglers.
+
+### Phase 3-7 overall summary
+
+All planned phases complete:
+- **Phase 3:** Drift audit (271 units, ~83 findings)
+- **Phase 4:** Coverage audit (94 pages, 89 upgraded to verified)
+- **Phase 5:** Audience classification (111 commands)
+- **Phase 6:** Implementation (6 new pages, 5 expanded, 4 gaps filled, 61 corrections drafted)
+- **Phase 7:** Correctness (18/61 validated, 12 ambiguity findings, 82 stale dates fixed)
+
+### Follow-ups filed
+
+- Stale frontmatter dates: fixed in this session (82 pages)
+- corrections-audit.md ambiguity findings: awaiting Kimberly's review for potential additions to corrections.md

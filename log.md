@@ -4658,3 +4658,12 @@ Drafted corrections for all 61 drift findings from the drift index Section 1, gr
 **New drift not in corrections.md:** reference.md lifecycle section (lines 258-259) and reference.md env table (line 284) both contain stale claims about polecat behavior. witness.go parent Long text (lines 32-39, 55-57) describes the old self-cleaning model.
 
 → gastown/drift/corrections-audit.md
+
+## [2026-04-17] lint | Phase 7 close (Correctness / lint pass complete)
+
+**Correction validation:** 18/61 spot-checked, all valid.
+**Ambiguity:** 12 findings recorded in corrections-audit.md.
+**Wiki lint:** 0 orphan pages, 0 broken cross-links. 82 stale frontmatter `updated:` dates fixed. All 6 new Phase 6 package pages pass quality checks (frontmatter, citations, cross-links, required sections).
+**Phase 7 complete.** All planned phases (3-7) finished.
+
+→ gastown/drift/README.md, gastown/drift/corrections-audit.md

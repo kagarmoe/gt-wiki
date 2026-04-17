@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/log.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [precondition]
 ---
 
 # gt log
@@ -156,6 +158,25 @@ Defined in `init()` (`log.go:74-79`):
   may convert heartbeat transitions into townlog events.
 - [../binaries/gt.md](../binaries/gt.md) — parent binary.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+- **`log crash` falls back to `$HOME/gt`:** `runLogCrash` at
+  `log.go:361-370` assumes `~/gt` is the town root when
+  `workspace.FindFromCwd` fails. If the town root is at a
+  non-conventional path, the crash event is either lost or written to
+  the wrong workspace. **Absent** — no validation that the fallback
+  directory is actually a Gas Town workspace beyond checking for
+  `$HOME/gt/mayor`.
+- **`followLog` creates empty files:** `followLog` at
+  `log.go:169-176` creates the logs directory and an empty log file
+  if neither exists, then tails it. This silently creates filesystem
+  artifacts in the workspace. **Absent** — no warning that the file
+  was created.
+- **`tail -f` dependency:** `followLog` at `log.go:181` shells out to
+  the external `tail` binary. On minimal containers without coreutils,
+  this fails. **Absent** — no fallback or check for `tail`.
 
 ## Notes / open questions
 

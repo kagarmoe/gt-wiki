@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/version.go
 tags: [command, diagnostics, version, polecat-safe]
@@ -13,6 +13,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt version
@@ -116,6 +118,14 @@ field (what `gt version --help` prints as the long description):
 > Output includes the semantic version, whether this is a dev or
 > release build, and the git revision the binary was built from (if
 > available).
+
+## Failure modes
+
+No significant failure modes. Pure read-only command that prints
+build-time constants. The `resolveBranch` fallback shells out to
+`git symbolic-ref` (`version.go:106-113`) but swallows errors and
+returns empty string on failure, which is the correct degradation
+(output simply omits the branch field).
 
 ## Notes / open questions
 

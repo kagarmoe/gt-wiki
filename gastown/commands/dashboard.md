@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/dashboard.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [precondition, silent-suppression]
 ---
 
 # gt dashboard
@@ -112,6 +114,25 @@ None (terminal command).
   convoy status and event streams but from different UI surfaces.
 - [../binaries/gt.md](../binaries/gt.md) — parent binary.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+- **Port availability:** `ListenAndServe` at `dashboard.go:153`
+  assumes port 8080 (or `--port`) is available. If another process
+  holds the port, the error message is Go's raw `bind: address already
+  in use` with no retry or suggestion. **Absent** — no pre-check or
+  helpful error message.
+
+### Silent suppression (what errors are swallowed?)
+- **Browser open failure:** `openBrowser` at `dashboard.go:192`
+  discards the error from `cmd.Start()` with `_ = cmd.Start()`. If
+  `xdg-open`/`open` is missing or fails, no error reaches the user.
+  **Absent** — fire-and-forget.
+- **Town settings load failure:** `config.LoadOrCreateTownSettings`
+  error at `dashboard.go:86-89` is printed as a warning to stderr but
+  execution continues with nil config (defaults applied by
+  `NewDashboardMux`). **Present** — warned but non-fatal.
 
 ## Notes / open questions
 

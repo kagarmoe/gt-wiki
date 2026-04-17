@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/feed.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [precondition, silent-suppression]
 ---
 
 # gt feed
@@ -156,6 +158,26 @@ Defined in `init()` (`feed.go:30-43`):
 - [../binaries/gt.md](../binaries/gt.md) — parent binary; documents
   the beads-exempt list.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+- **`--window` requires tmux:** `runFeedInWindow` at `feed.go:293-295`
+  checks `tmux.IsInsideTmux()` and returns a clear error. **Present.**
+- **`--rig` requires `.beads` directory:** `feed.go:138-154` checks
+  candidate paths and returns an explicit error. **Present.**
+
+### Silent suppression (what errors are swallowed?)
+- **Event source creation failures are silent:** each of the three
+  sources (`NewBdActivitySource`, `NewMQEventSourceFromWorkDir`,
+  `NewGtEventsSource` at `feed.go:243-258`) discards errors — if
+  creation fails, the source is simply omitted. Only if all three
+  fail does the user see an error (`feed.go:260-262`). A user with
+  a broken `bd` and no `.events.jsonl` gets a feed with only MQ
+  events and no indication that other sources failed. **Absent** —
+  no warning for partially degraded sources.
+- **MultiSource close error:** `_ = multiSource.Close()` at
+  `feed.go:267`. **Absent** — error discarded.
 
 ## Notes / open questions
 

@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/prime.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [precondition]
 ---
 
 # gt prime
@@ -267,6 +269,21 @@ the normal-mode prompt. Explain lines are added via
   also runs inside `persistentPreRun` as the universal session
   bootstrap.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+- **Database error during hook query triggers safety banner:**
+  `findAgentWork` at `prime.go:182-190` detects database connectivity
+  errors and emits a loud "DO NOT RUN gt done" banner to stderr. This
+  is **present** — the code explicitly handles the DB-error case to
+  prevent the destructive cycle documented in GH#2638 (DB error -> "no
+  work" -> gt done -> bead lost).
+- **Identity lock assumes writable filesystem:** `setupPrimeSession`
+  (called at `prime.go:172`) performs identity lock, beads redirect,
+  and event emission. Filesystem permission errors in the town root
+  would cause hard failures. **Absent** — no pre-check for write
+  access.
 
 ## Notes / open questions
 

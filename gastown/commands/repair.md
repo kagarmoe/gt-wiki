@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/repair.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -14,6 +14,8 @@ phase3_findings: [cobra-drift]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion]
 ---
 
 # gt repair
@@ -148,6 +150,17 @@ See forward-link: [../drift/README.md](../drift/README.md).
   `StaleDoltPortCheck` is repair's second check.
 - [../binaries/gt.md](../binaries/gt.md) — parent binary.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Partial completion (what doesn't it clean up?)
+- **Fix failure does not abort the loop:** `repair.go:76-79` prints
+  the fix error to stderr but continues to the next check. The
+  `hasIssues` flag remains true, so the closing message says "Repair
+  complete" even when fixes failed. The exit code is always zero
+  (`runRepair` returns `nil`). **Absent** — fix failure is not
+  reflected in the exit code, and there is no re-verification pass
+  after fixing.
 
 ## Notes / open questions
 

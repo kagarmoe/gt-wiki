@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/doctor.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [precondition]
 ---
 
 # gt doctor
@@ -203,6 +205,23 @@ See forward-link: [../drift/README.md](../drift/README.md).
 - [../binaries/gt.md](../binaries/gt.md) — parent binary; documents
   doctor's double exemption (beads + branch check).
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+- **No short-circuit on prerequisite failure:** infrastructure
+  prerequisite checks (`NewDoltServerReachableCheck`,
+  `NewBeadsBinaryCheck`, etc.) are registered at `doctor.go:163-167`
+  with a comment about ordering, but there is no mechanism to skip
+  downstream checks when a prerequisite fails. If the Dolt server is
+  unreachable, every check that queries Dolt still runs and fails
+  individually, producing a noisy report. **Absent** — no dependency
+  graph or early abort between checks.
+
+This is a known friction point (noted in existing wiki content at
+the bottom of this page) but confirmed as absent from the code:
+`d.RunStreaming` and `d.FixStreaming` run all registered checks
+sequentially regardless of earlier results.
 
 ## Notes / open questions
 

@@ -1240,3 +1240,25 @@ All planned phases complete:
 
 - Stale frontmatter dates: fixed in this session (82 pages)
 - corrections-audit.md ambiguity findings: awaiting Kimberly's review for potential additions to corrections.md
+
+## [2026-04-17 12:00] stage | 8.1.1a — Failure modes: commands/ Diagnostics
+
+**Actor:** subagent (wiki-curator)
+**Unit:** 22 GroupDiag command pages audited for failure modes. 22 source files read. 22 wiki pages updated with `## Failure modes` sections and `phase8_audited`/`phase8_findings` frontmatter.
+**Duration:** one dispatch
+
+**What went well:**
+- The three-question framework (assumes/cleanup/swallows) was productive. Silent suppression was the dominant finding category, which matches the codebase style: diagnostics commands degrade gracefully but often too silently.
+- Leaf command triage was fast. version/thanks/whoami/stale/checkpoint/activity needed minimal source reading to confirm [none].
+- seance.go was the richest source of findings (3 categories) due to its cross-account symlink machinery.
+
+**What didn't:**
+- The log.md entry had an inline correction because info was initially categorized as [none] then reclassified to [silent-suppression]. Should have finalized counts before writing the entry.
+- Reading 22 source files sequentially was the bottleneck. Parallel reads would have been faster but tool constraints required batching.
+
+**What to change next time:**
+- Finalize the findings tally in a scratch summary BEFORE writing the log.md entry to avoid inline corrections.
+- For the next sub-batch (GroupAdmin or GroupWork), consider reading all source files in the first pass and building a complete findings map before any wiki edits.
+
+**Follow-ups filed:**
+- none — lessons are purely informational

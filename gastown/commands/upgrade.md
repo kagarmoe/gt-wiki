@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/upgrade.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion]
 ---
 
 # gt upgrade
@@ -215,6 +217,21 @@ usage text.
 - [../binaries/gt.md](../binaries/gt.md) — parent binary; documents
   upgrade's double exemption.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Partial completion (what doesn't it clean up?)
+- **Step N failure does not stop step N+1:** `runUpgrade` at
+  `upgrade.go:66-104` runs all 5 steps sequentially but each step
+  returns an `upgradeResult` — not an error. Failures within a step
+  are captured in `result.details` but the function always returns
+  `nil`. If step 1 (doctor --fix) fails to start the daemon, step 4
+  (hooks sync) may target stale settings files. **Absent** — no
+  dependency tracking between steps.
+- **Error reporting is summary-only:** errors from individual steps
+  are collected and printed in the summary at `upgrade.go:466-498`,
+  but the exit code is always zero. Automation that relies on exit
+  code to detect upgrade failures will miss them. **Absent.**
 
 ## Notes / open questions
 

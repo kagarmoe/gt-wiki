@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/costs.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt costs
@@ -150,6 +152,22 @@ type CostsOutput struct { Sessions []SessionCost; Total float64; ByRole, ByRig m
 - [../binaries/gt.md](../binaries/gt.md) — parent binary; documents the
   full `beadsExemptCommands` list including `costs`.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+- **Session cost extraction failures silently zero out:**
+  `extractCostFromWorkDir` errors at `costs.go:258-264` are printed
+  only when `--verbose` is set. Without `-v`, sessions with failed
+  transcript parsing appear with `$0.00` cost and no indication of
+  failure. **Absent** — errors are hidden by default.
+- **Session workdir lookup failures silently skip:** `getTmuxSessionWorkDir`
+  errors at `costs.go:249-253` cause the session to be omitted from
+  the report entirely (only visible with `-v`). **Absent.**
+- **Week query swallows today's errors:** `querySessionCostEntries`
+  error in the `--week` path at `costs.go:316` is discarded with
+  `todayEntries, _ := ...`. Today's costs are silently missing from the
+  weekly total. **Absent.**
 
 ## Notes / open questions
 

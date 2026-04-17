@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/stale.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt stale
@@ -150,6 +152,14 @@ allowed to run `make build && make install` without human review.
 - [../files/makefile.md](../files/makefile.md) — the `make build` /
   `make install` recipe that makes a binary fresh.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+No significant failure modes. All error paths are handled explicitly
+with three-way branching (quiet/json/text) at `stale.go:57-80`. The
+`version.GetRepoRoot` and `version.CheckStaleBinary` errors are
+properly propagated with appropriate exit codes (2 for errors). The
+`NewSilentExit` pattern is clean and documented.
 
 ## Notes / open questions
 

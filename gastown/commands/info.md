@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/info.go
   - /home/kimberly/repos/gastown/internal/cmd/version.go
@@ -15,6 +15,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt info
@@ -126,6 +128,19 @@ Defined in `init()` (`info.go:479-483`):
 - [../binaries/gt.md](../binaries/gt.md) — parent binary; documents
   the five ldflag variables that info reads.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+- **JSON encoding error in `--json` mode:** `_ = enc.Encode(info)` at
+  `info.go:53` discards the error from JSON encoding. If encoding
+  fails (unlikely for a simple map), the user sees no output and no
+  error. **Absent** — error is silently discarded.
+- **JSON encoding error in `--whats-new --json`:** `_ = enc.Encode(...)` at
+  `info.go:448` discards the error similarly. **Absent.**
+
+Both suppressions are low-risk (encoding static data), but violate the
+principle of never discarding an error without at least logging it.
 
 ## Notes / open questions
 

@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/audit.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt audit
@@ -131,6 +133,24 @@ type AuditEntry struct {
   `collectFeedEvents` scans.
 - [../binaries/gt.md](../binaries/gt.md) — parent binary.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+- **Per-source failures are non-fatal:** each of the four collectors
+  (`collectGitCommits`, `collectBeadsActivity`, `collectTownlogEvents`,
+  `collectFeedEvents`) prints a warning to stderr on failure and
+  continues (`audit.go:92-119`). **Present** — errors are logged to
+  stderr, but the user gets a partial result with no indication that
+  sources are missing from the combined output. A git error + beads
+  error could produce an empty timeline that looks like "no activity"
+  rather than "data unavailable."
+- **Malformed JSONL lines in events feed:** `collectFeedEvents` at
+  `audit.go:421-423` skips unparseable lines with `continue`. No
+  warning or count of skipped lines. **Absent.**
+- **Unparseable timestamps:** `parseBeadsTimestamp` (`audit.go:320-334`)
+  silently returns `time.Time{}` (zero) on failure, causing entries to
+  sort to the epoch boundary. **Absent.**
 
 ## Notes / open questions
 

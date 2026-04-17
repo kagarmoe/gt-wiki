@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/thanks.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt thanks
@@ -125,6 +127,12 @@ None — `init` at `thanks.go:237-239` only registers the command on
 - [../binaries/gt.md](../binaries/gt.md) — parent binary; documents
   the Diag group registration.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+No significant failure modes. Pure in-memory data (hard-coded
+contributor map at `thanks.go:46-74`) formatted to stdout. No I/O,
+no workspace interaction, no error returns.
 
 ## Notes / open questions
 

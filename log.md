@@ -4710,3 +4710,37 @@ Plus two optional sub-sections:
 **Not retroactive.** Existing pages don't need this section added; it populates as failure modes are discovered through issues, investigation, validation testing, or release sync.
 
 → [.claude/skills/writing-entity-pages/SKILL.md](.claude/skills/writing-entity-pages/SKILL.md)
+
+## [2026-04-17] drift-found | Phase 8 Batch 1a (Failure modes: commands/ Diagnostics — 22 pages)
+
+**Scope:** Failure mode analysis across 22 GroupDiag command pages.
+
+**Pages audited:**
+- [activity](gastown/commands/activity.md) — `phase8_findings: [none]`
+- [audit](gastown/commands/audit.md) — `phase8_findings: [silent-suppression]`
+- [checkpoint](gastown/commands/checkpoint.md) — `phase8_findings: [none]`
+- [costs](gastown/commands/costs.md) — `phase8_findings: [silent-suppression]`
+- [dashboard](gastown/commands/dashboard.md) — `phase8_findings: [precondition, silent-suppression]`
+- [doctor](gastown/commands/doctor.md) — `phase8_findings: [precondition]`
+- [feed](gastown/commands/feed.md) — `phase8_findings: [precondition, silent-suppression]`
+- [heartbeat](gastown/commands/heartbeat.md) — `phase8_findings: [silent-suppression]`
+- [info](gastown/commands/info.md) — `phase8_findings: [silent-suppression]`
+- [log](gastown/commands/log.md) — `phase8_findings: [precondition]`
+- [metrics](gastown/commands/metrics.md) — `phase8_findings: [silent-suppression]`
+- [patrol](gastown/commands/patrol.md) — `phase8_findings: [partial-completion, silent-suppression]`
+- [prime](gastown/commands/prime.md) — `phase8_findings: [precondition]`
+- [repair](gastown/commands/repair.md) — `phase8_findings: [partial-completion]`
+- [seance](gastown/commands/seance.md) — `phase8_findings: [partial-completion, precondition, silent-suppression]`
+- [stale](gastown/commands/stale.md) — `phase8_findings: [none]`
+- [status](gastown/commands/status.md) — `phase8_findings: [silent-suppression]`
+- [thanks](gastown/commands/thanks.md) — `phase8_findings: [none]`
+- [upgrade](gastown/commands/upgrade.md) — `phase8_findings: [partial-completion]`
+- [version](gastown/commands/version.md) — `phase8_findings: [none]`
+- [vitals](gastown/commands/vitals.md) — `phase8_findings: [silent-suppression]`
+- [whoami](gastown/commands/whoami.md) — `phase8_findings: [none]`
+
+**Findings summary:**
+- 16 pages with failure modes documented (6 precondition, 4 partial-completion, 11 silent-suppression)
+- 6 pages with [none] (version, thanks, whoami, activity, checkpoint, stale)
+
+→ gastown/commands/{activity,audit,checkpoint,costs,dashboard,doctor,feed,heartbeat,info,log,metrics,patrol,prime,repair,seance,stale,status,thanks,upgrade,version,vitals,whoami}.md

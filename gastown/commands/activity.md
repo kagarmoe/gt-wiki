@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/activity.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -17,6 +17,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt activity
@@ -160,6 +162,14 @@ See forward-link: [../drift/README.md](../drift/README.md).
 - [../binaries/gt.md](../binaries/gt.md) — parent binary and
   `persistentPreRun` context.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+No significant failure modes. All error paths return proper errors to
+cobra. The `events.LogFeed` call at `activity.go:185` propagates its
+error. The only suppression is `json.Marshal(payload)` at
+`activity.go:190` which discards the error for the confirmation
+message, but the event was already written by that point.
 
 ## Notes / open questions
 

@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/checkpoint_cmd.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt checkpoint
@@ -128,6 +130,14 @@ Only `checkpoint write` has flags (`checkpoint_cmd.go:73-78`):
 - [../binaries/gt.md](../binaries/gt.md) — parent binary and role
   detection context.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+No significant failure modes. All error paths return proper errors via
+`RunE`. The `detectMoleculeContext` and `detectHookedBead` helpers
+(`checkpoint_cmd.go:222-290`) return empty strings on failure rather
+than erroring out, which is correct degradation (checkpoint is written
+without molecule/bead context rather than failing entirely).
 
 ## Notes / open questions
 

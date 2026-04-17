@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/heartbeat.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt heartbeat
@@ -120,6 +122,21 @@ to `TouchSessionHeartbeatWithState` as the context field.
   how `persistentPreRun` already touches the heartbeat for every
   polecat/crew/dog session on every `gt` invocation.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+- **Heartbeat file write errors:** `TouchSessionHeartbeatWithState`
+  (`polecat/heartbeat.go:78`) has a `void` return type. Errors from
+  `os.MkdirAll` (line 80), `json.Marshal` (line 91), and the
+  underlying file write are all silently swallowed. The caller at
+  `heartbeat.go:66` prints "Heartbeat updated" unconditionally, even
+  if the file was never written. **Absent** — no error propagation.
+
+This is a deliberate design choice (heartbeat must be fast and
+dependency-free per the beads-exempt comment at `root.go:76`), but it
+means the witness may see a stale heartbeat and misclassify the agent
+as stuck when the real problem is a filesystem error.
 
 ## Notes / open questions
 

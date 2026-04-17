@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/metrics.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt metrics
@@ -153,6 +155,18 @@ Defined in `init()` (`metrics.go:21-27`):
 - [../binaries/gt.md](../binaries/gt.md) — parent binary; `metrics`
   log is fed by the `logCommandUsage` step of `persistentPreRun`.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+- **Malformed JSONL lines silently skipped:** `readUsageLog` at
+  `metrics.go:86-88` skips lines that fail `json.Unmarshal` with a
+  bare `continue`. No warning, no count. Corrupted entries are
+  invisible. **Absent.**
+- **Timestamp parse errors silently ignored:** `showFrequency` at
+  `metrics.go:118-119` uses `time.Parse` and on error keeps the
+  raw string as the "last used" value. Not harmful but produces
+  inconsistent output format. **Absent** — no warning.
 
 ## Notes / open questions
 

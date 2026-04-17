@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/status.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -14,6 +14,8 @@ phase3_findings: [cobra-drift]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt status
@@ -264,6 +266,26 @@ See forward-link: [../drift/README.md](../drift/README.md).
 - [../binaries/gt.md](../binaries/gt.md) — parent binary; documents
   status's polecat-safe annotation and beads exemption.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+- **Config load failures silently degrade:** `gatherStatus` at
+  `status.go:617-628` catches `config.LoadTownConfig` and
+  `config.LoadRigsConfig` errors by falling back to empty/default
+  configs. No warning is emitted — the user sees a status report
+  with missing data and no indication that config loading failed.
+  **Absent.**
+- **Town settings load failure discarded:** `status.go:631` uses
+  `townSettings, _ := config.LoadOrCreateTownSettings(...)` —
+  the error is entirely discarded. **Absent.**
+- **Watch mode retries once then uses stale cache:**
+  `runStatusWatch` at `status.go:504-510` retries `gatherStatus`
+  once on error, then falls back to a cached result up to
+  5x the interval old. During a sustained tmux failure, the
+  user sees stale data with no staleness indicator (beyond the
+  `[cached]` debug string). **Present** — cached but with a
+  staleness bound.
 
 ## Notes / open questions
 

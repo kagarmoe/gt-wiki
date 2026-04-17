@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/vitals.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt vitals
@@ -155,6 +157,23 @@ None — `init` at `vitals.go:26` only registers the command.
   the same quantity costs amortizes over time.
 - [../binaries/gt.md](../binaries/gt.md) — parent binary.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+- **Database listing errors discarded:** `printVitalsDatabases` at
+  `vitals.go:117-118` uses `databases, _ := doltserver.ListDatabases(townRoot)`
+  and `orphans, _ := doltserver.FindOrphanedDatabases(townRoot)`. If
+  the Dolt server is unreachable, both return nil and the user sees
+  "Databases (0 registered)" with no error. **Absent.**
+- **Per-database stat query failure silently shows dashes:**
+  `queryVitalsStats` at `vitals.go:157-186` returns `nil` on any
+  error (exec failure, parse failure). The caller at `vitals.go:142-144`
+  prints `-` for all columns. **Absent** — no indication whether
+  "no data" means empty database or query failure.
+- **Dolt process running check error discarded:**
+  `doltserver.IsRunning` at `vitals.go:44` has a third return value
+  (error) that is discarded with `_, _`. **Absent.**
 
 ## Notes / open questions
 

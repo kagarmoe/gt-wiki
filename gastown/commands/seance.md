@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/seance.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion, precondition, silent-suppression]
 ---
 
 # gt seance
@@ -172,6 +174,34 @@ Defined in `init()` (`seance.go:66-75`):
   seance discovers (see prime's `emitSessionEvent`).
 - [../binaries/gt.md](../binaries/gt.md) — parent binary.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+- **Agent must support `--fork-session`:** `resolveSeanceCommand` at
+  `seance.go:196-206` iterates agent presets looking for
+  `SupportsForkSession == true`. If no preset supports it (e.g.,
+  pi/opencode), the command fails with a clear error. **Present.**
+
+### Partial completion (what doesn't it clean up?)
+- **SIGKILL leaves orphan symlinks + index entries:** the cleanup
+  function returned by `symlinkSessionToCurrentAccount`
+  (`seance.go:545-560`) is `defer`red, but a SIGKILL bypasses defer.
+  The orphaned symlink and sessions-index.json entry persist until
+  the next `cleanupOrphanedSessionSymlinks` call at
+  `seance.go:216`. **Present** — code explicitly handles this
+  with the startup cleanup sweep at `seance.go:758-872`.
+
+### Silent suppression (what errors are swallowed?)
+- **Symlink cleanup errors discarded:** throughout
+  `symlinkSessionToConfigDir` (`seance.go:565-753`), multiple
+  `_ = os.Remove()` calls discard cleanup errors (e.g., lines 598,
+  669, 730). **Absent** — these are cleanup paths where failure is
+  non-critical but invisible.
+- **Cross-account symlink failure is non-fatal:**
+  `symlinkSessionToCurrentAccount` error at `seance.go:237-240`
+  prints a note but continues. The seance may still work if the
+  session is in the current account. **Present** — warned.
 
 ## Notes / open questions
 

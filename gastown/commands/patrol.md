@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/patrol.go
   - /home/kimberly/repos/gastown/internal/cmd/patrol_new.go
@@ -17,6 +17,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion, silent-suppression]
 ---
 
 # gt patrol
@@ -278,6 +280,29 @@ type PatrolCycleEntry struct {
   wisps write to `logs/town.log`.
 - [../binaries/gt.md](../binaries/gt.md) — parent binary.
 - [README.md](README.md) — command tree index.
+
+## Failure modes
+
+### Partial completion (what doesn't it clean up?)
+- **`patrol report` closes old patrol before spawning new one:** at
+  `patrol_report.go:119-121` the current patrol is closed, then
+  `autoSpawnPatrol` is called at line 127. If the spawn fails, there
+  is no active patrol for the role until the next cycle. The code at
+  lines 128-134 handles this by printing a warning and the new ID if
+  available, but does not reopen the old patrol. **Absent** — no
+  rollback if spawn fails after close.
+
+### Silent suppression (what errors are swallowed?)
+- **Digest auto-close is best-effort:** `createPatrolDigestBead` at
+  `patrol.go:320-321` runs `bd close <id>` with `_ = closeCmd.Run()`.
+  If closing fails, the digest bead stays open. **Absent.**
+- **Source deletion failure in `patrol digest`:**
+  `deletePatrolDigests` error at `patrol.go:169` is printed as a
+  stderr warning but does not fail the command. **Present** — warned.
+  Next run is idempotent via `findExistingPatrolDigest`.
+- **`patrol scan` notification failure:** `sendZombieNotification`
+  at `patrol_scan.go:208-215` uses `_ = router.Send(msg)` — mail
+  delivery failure is silent. **Absent.**
 
 ## Notes / open questions
 

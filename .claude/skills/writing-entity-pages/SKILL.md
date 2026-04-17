@@ -207,24 +207,31 @@ file and line range.>
 <populated when failure modes are discovered — via issues, investigation,
  release sync, or wiki validation testing. Not mandatory on every page;
  added when a failure mode is known. The absence of this section means
- "not yet investigated," not "no failure modes exist.">
+ "not yet investigated," not "no failure modes exist."
+
+ **IMPORTANT: Absent failure modes are more valuable than present ones.**
+ A "present" finding means the code handles the error — that's documentation.
+ An "absent" finding means the code DOESN'T handle it — that's a prediction
+ of where the next bug lives before a user finds it. Spend more time
+ documenting absent findings; they are the wiki's highest-value output.>
 
 ### Precondition violations (what does it assume?)
 - **<assumption>:** <what breaks when it's violated; `file:line` of the
   unchecked assumption>
-- **Present / Absent:** does the code check this precondition, or silently
-  assume it?
+- **Present** (code checks) / **Absent** (code silently assumes — predicted
+  bug surface)
 
 ### Partial completion (what doesn't it clean up?)
 - **<step N fails>:** <what's left dirty — zombie sessions, orphan files,
   dangling beads, stale locks; `file:line` of the incomplete cleanup>
-- **Present / Absent:** does the code have cleanup/rollback logic, or does
-  it exit leaving partial state?
+- **Present** (rollback/cleanup logic exists) / **Absent** (code exits
+  leaving partial state — predicted bug surface)
 
 ### Silent suppression (what errors are swallowed?)
 - **<error path>:** <errors caught and discarded without logging or
   propagation; `file:line` of the suppression>
-- **Present / Absent:** does the code log/propagate, or `_ = err`?
+- **Present** (code logs/propagates) / **Absent** (code discards with
+  `_ = err` — predicted bug surface)
 
 ### Cross-platform concerns                [optional]
 - **<platform>:** <behavior difference — e.g., "Windows: tmux unavailable,

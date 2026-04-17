@@ -4640,3 +4640,11 @@ Drafted corrections for all 61 drift findings from the drift index Section 1, gr
 **Total: 61 corrections** across 52 entity pages and 10 standalone docs file findings.
 
 → gastown/drift/corrections.md
+
+## [2026-04-16] drift-found | Phase 6 close (Implementation complete)
+
+**Wiki-side:** 6 new package pages, 5 expanded, 4 subcommand gaps filled.
+**Upstream:** 61 correction drafts in gastown/drift/corrections.md.
+**Remaining:** 4 large packages still partial; 2 gap beads deferred to release sync.
+
+→ gastown/drift/README.md, gastown/drift/corrections.md

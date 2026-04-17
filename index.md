@@ -142,10 +142,11 @@ Multi-step flows:
 - [Plugin inventory](gastown/plugins/README.md) — 14 plugin directories; 13 declarative (shell + TOML), 1 with Go source
 - [dolt-snapshots](gastown/plugins/dolt-snapshots.md) — Dolt snapshot plugin (the only Go-based plugin); tags production databases at convoy lifecycle boundaries
 
-### Drift (Phase 3)
+### Drift (Phases 3-6)
 
-- [Phase 3 drift index](gastown/drift/README.md) — consolidated index of ~83 findings: drift (wrong), gaps (missing), coverage decisions
+- [Drift index](gastown/drift/README.md) — consolidated index of ~83 findings: drift (wrong), gaps (missing), coverage decisions; Phase 6 implementation summary
 - [Gap findings](gastown/drift/gaps.md) — systematic code-to-wiki gap enumeration (Batch 14): 6 missing packages, 4 subcommand gaps, 9 deliberate exclusions
+- [Upstream correction drafts](gastown/drift/corrections.md) — 61 correction drafts grouped by meta-pattern for PR batching (Phase 6 Batch 3)
 
 ### Inventory
 

@@ -5,12 +5,12 @@ status: complete
 topic: gastown
 created: 2026-04-15
 updated: 2026-04-16
-phase: 3-5
+phase: 3-6
 ---
 
 # Drift Index
 
-Consolidated index of findings from Phase 3 (Drift audit, Batches 1-14), Phase 4 (Coverage/Completeness audit, Batches 1-3), and Phase 5 (Audience classification of 111 commands). Phase 3 audited 271 units (211 entity pages in Sweep 1 + 60 docs files in Sweep 2) and surfaced ~83 findings. Phase 4 audited 94 `status:partial` pages: 89 upgraded to `status:verified`, 5 confirmed incomplete. Phase 5 classified all 111 command pages by primary audience (user/agent/dev/internal) for Phase 6 prioritization.
+Consolidated index of findings from Phase 3 (Drift audit, Batches 1-14), Phase 4 (Coverage/Completeness audit, Batches 1-3), Phase 5 (Audience classification of 111 commands), and Phase 6 (Implementation). Phase 3 audited 271 units (211 entity pages in Sweep 1 + 60 docs files in Sweep 2) and surfaced ~83 findings. Phase 4 audited 94 `status:partial` pages: 89 upgraded to `status:verified`, 5 confirmed incomplete. Phase 5 classified all 111 command pages by primary audience (user/agent/dev/internal) for Phase 6 prioritization. Phase 6 executed: 6 new package pages, 5 expanded, 4 subcommand gaps filled, 61 upstream correction drafts.
 
 **How to read this index:**
 - **Section 1** is the Phase 6 work-list: upstream corrections to the gastown source repo (code edits, docs PRs). Phase 5 (Audience classification) refines it; Phase 6 (Implementation) executes it.
@@ -20,6 +20,7 @@ Consolidated index of findings from Phase 3 (Drift audit, Batches 1-14), Phase 4
 - **Section 5** records subcommand coverage decisions (384 subcommands systematically classified).
 - **Section 6** lists coverage gaps from Phase 4: pages whose wiki content is incomplete relative to their source code surface.
 - **Section 7** summarizes the Phase 5 audience classification across all 111 command pages.
+- **Section 8** summarizes Phase 6 implementation results: wiki-side fixes, upstream correction drafts, and remaining work.
 
 **Plan:** [../../.claude/plans/2026-04-14-phase3-drift.md](../../.claude/plans/2026-04-14-phase3-drift.md) (gitignored).
 
@@ -359,3 +360,21 @@ Drift findings by audience (for Phase 6 prioritization):
 | dashboard | dev (GroupDiag) | dev | Convoy tracking TUI for maintainers |
 | scheduler | agent (GroupAgents) | agent | Daemon-facing capacity control |
 | tap | agent (PolecatSafe) + hook handlers | agent | Hook handlers agents invoke |
+
+---
+
+## Section 8: Phase 6 Implementation summary
+
+### Wiki-side fixes (completed)
+- 6 new package pages written (agent, agent/provider, boot, checkpoint, connection, proxy)
+- 5 incomplete pages expanded (formula, beads, daemon, doltserver, polecat)
+- 4 subcommand gaps filled (formula overlay tree, patrol scan)
+
+### Upstream correction drafts (pending Kimberly's PR submission)
+- 61 corrections drafted in [corrections.md](corrections.md)
+- Grouped by: enumerations (11), stale claims (19), docs (19), status callouts (12)
+
+### Remaining wiki work
+- beads.md, daemon.md, doltserver.md, polecat.md still status:partial (large packages)
+- bitbucket package page (bead wiki-7u4) — deferred to release sync
+- 6 new docs file coverage (bead wiki-w71) — deferred to release sync

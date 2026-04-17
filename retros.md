@@ -1145,3 +1145,37 @@ Flagging is cheap; Kimberly decides when to actually schedule.
 
 - **Batch 4 should cross-reference corrections.md rows back to drift index PR reference column.** As Kimberly files PRs, the drift index should track which corrections have been submitted.
 - **Consider generating the Group 1 corrections programmatically in a future pass.** The hand-maintained enumeration pattern is so uniform that a script could detect Long-text subcommand lists and compare them against registered subcommands.
+
+## [2026-04-16] phase | Phase 6 — Implementation
+
+**Scope:** Execute drift findings from Phases 3-5. Write missing pages, expand incomplete pages, fill subcommand gaps, draft upstream corrections.
+
+**Batches:**
+- Batch 1: 6 new package pages (agent, agent/provider, boot, checkpoint, connection, proxy)
+- Batch 2: 5 incomplete pages expanded + 4 subcommand gaps filled
+- Batch 3: 61 upstream correction drafts in corrections.md
+- Batch 4: Drift index update, index.md update, phase close
+
+### What went well
+
+- **Phase 3 annotations were investment that paid off.** Every Drift section contained exact file:line citations and verbatim quotes. Batch 3 drafted 61 corrections without re-reading any gastown source files — all data came from Phase 3 wiki annotations.
+- **Meta-pattern grouping reduced correction sprawl.** The 4-group structure (enumerations, stale claims, docs, status callouts) makes PR batching practical. Group 1 alone batches 11 corrections into one PR pattern.
+- **Gap-fill pages were clean.** The 6 missing packages were well-scoped (62-1363 lines each), and each read produced a complete page in one pass.
+- **Phase 5 audience classification was useful for prioritization** but Phase 6 ultimately addressed all findings regardless of audience, so the prioritization was less impactful than expected.
+
+### What didn't go well
+
+- **4 large packages remain partial.** beads (28 files/10K lines), daemon (33 files/23K lines), doltserver (WL Commons), and polecat (session manager) are too large for complete coverage in single batches. Each needs a dedicated expansion pass.
+- **Counting consistency is fragile.** The drift index says 52 rows but 60 findings (multi-finding pages). The corrections file counts 61. Keeping these numbers aligned across drift index summary stats, corrections, and retros required repeated recounting.
+
+### What to change next time
+
+- **Large package pages should get dedicated batches.** beads.md, daemon.md, doltserver.md, and polecat.md each warrant their own focused pass rather than being bundled with other expansion work.
+- **Consider automating enumeration drift detection.** The hand-maintained Long-text enumeration pattern (Group 1, 11 corrections) is so uniform that a script could detect and flag new instances after future releases.
+- **Track PR submission status in drift index.** As Kimberly files upstream PRs, the Section 1 "PR reference" column should be populated to close the loop from finding to fix.
+
+### Follow-ups filed
+
+- beads.md, daemon.md, doltserver.md, polecat.md expansion — tracked as remaining partial status (no new bead; existing pages note their gaps)
+- wiki-7u4 (bitbucket package) — deferred to release sync
+- wiki-w71 (6 new docs files) — deferred to release sync

@@ -246,11 +246,11 @@ The three questions that drive failure-mode discovery:
 2. **What doesn't it clean up on failure?** (partial completion — session killed but worktree left)
 3. **What does it silently swallow?** (error suppression — `_ = os.Remove()`, bare `continue`)
 
-These three map to the bug categories the wiki validation surfaced: assumption violations (#3538 Windows/tmux), partial-completion zombies (#3658 polecat remove, #3604 refinery stall), and silent swallowing (#3554 wisp config spam, #3653 dead handlers).
+These three map to common bug categories: assumption violations (e.g., hard dependency on a platform service that may not be running), partial-completion zombies (e.g., step 2 of a 3-step cleanup fails and steps 1's side effects persist), and silent swallowing (e.g., an error return discarded with `_ = err`).
 
 **Cross-platform concerns** are a special case of precondition violations where the precondition is "running on the expected OS." Gastown has explicit platform shims (`*_unix.go` / `*_windows.go` pairs) that are worth documenting — especially when they're stubs or untested.
 
-**Release notes cross-references** catch drift between what a release ANNOUNCES and what the code DOES. Issue #3651 (incorrect install instructions on 1.0 release) is this category — the release notes used a wrong npm scope that the code doesn't match.
+**Release notes cross-references** catch drift between what a release ANNOUNCES and what the code DOES. Examples: release notes use a different package name than the code, document a flag that doesn't exist, or omit a breaking change.
 
 ## Notes / open questions
 

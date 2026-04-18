@@ -229,6 +229,11 @@ if len(nudges) > 0 {
   if the orphan sweep also fails (e.g., directory permissions
   changed), the nudge is silently lost.
 
+## Troubleshooting
+
+For diagnostic workflows involving this entity, see
+[Investigating: message delivery](../workflows/investigations/message-delivery.md).
+
 ## Notes / open questions
 
 - **The rename-then-process claim protocol is the subtle heart of the

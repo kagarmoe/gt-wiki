@@ -324,6 +324,12 @@ See also: [gastown/drift/README.md](../drift/README.md) for the consolidated cor
 - **Partial fan-out:** `mail_send.go:170-210` sends to multiple recipients and collects errors. If some sends succeed and some fail, the command reports partial success to stderr and returns the message as sent. **Present** — partial delivery is surfaced to the user.
 - **`rand.Read` error discarded:** `mail_send.go:236` uses `_, _ = rand.Read(b)` for thread ID generation. `crypto/rand.Read` only fails if the system entropy source is broken. **Present** — documented inline as acceptable.
 
+## Troubleshooting
+
+For diagnostic workflows involving this command, see
+[Investigating: message delivery](../workflows/investigations/message-delivery.md)
+and [Investigating: data-plane failures](../workflows/investigations/data-plane.md).
+
 ## Notes / open questions
 
 - **`mail` is in the beads-exempt preflight** so it can start

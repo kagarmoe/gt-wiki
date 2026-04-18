@@ -151,6 +151,11 @@ None.
 
 No failure modes discovered. Background process that drains the nudge queue. Runs in a loop with error handling per-drain cycle. Session-death detection exits cleanly.
 
+## Troubleshooting
+
+For diagnostic workflows involving this command, see
+[Investigating: message delivery](../workflows/investigations/message-delivery.md).
+
 ## Notes / open questions
 
 - **Who starts it?** The `Long` help says `gt crew start`, but polecats

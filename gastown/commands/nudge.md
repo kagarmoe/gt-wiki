@@ -209,6 +209,11 @@ Mode and priority are validated eagerly at `nudge.go:356-361`.
 - **`watchAndDeliver` delivery failure:** `nudge.go:325-327` prints stderr warning if `NudgeSessionWithOpts` fails during idle-watcher delivery, but the nudge has already been atomically drained from the queue (line 320). If delivery fails, the nudge is lost. **Absent** — nudge consumed from queue but not delivered; no re-enqueue.
 - **Event feed discard in `--if-fresh` skip:** When `--if-fresh` causes a silent skip (`nudge.go:375-377`, returns nil), no event is logged. **Present** — intentional; skip means "don't send", so no event needed.
 
+## Troubleshooting
+
+For diagnostic workflows involving this command, see
+[Investigating: message delivery](../workflows/investigations/message-delivery.md).
+
 ## Notes / open questions
 
 - **The 1.5K-line file.** `runNudge` is the tip of a long tail

@@ -520,6 +520,11 @@ _ = t.NudgeSessionWithOpts(name, prompt, tmux.NudgeOpts{TownRoot: townRoot})
   tested end-to-end (tmux itself is Unix-only; Windows uses WSL or
   similar).
 
+## Troubleshooting
+
+For diagnostic workflows involving this entity, see
+[Investigating: message delivery](../workflows/investigations/message-delivery.md).
+
 ## Notes / open questions
 
 - `sessionNudgeLocks sync.Map` grows monotonically — no eviction when

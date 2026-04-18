@@ -5447,3 +5447,26 @@ Lives at `gastown/workflows/investigations/`. Frontmatter uses `type: investigat
 Added to the writing-entity-pages skill page-type list under "Meta."
 
 → [.claude/skills/writing-entity-pages/SKILL.md](.claude/skills/writing-entity-pages/SKILL.md)
+
+## [2026-04-18] ingest | Cross-page inference Batch 1a: Investigation workflows for message-delivery + data-plane
+
+Two diagnostic decision trees created at `gastown/workflows/investigations/`:
+
+- **message-delivery.md** — 9-step decision tree covering nudge delivery (queue, wait-idle, immediate modes), tmux send-keys protocol failure points, mail notification path, two-phase delivery acknowledgment. Entities linked: nudge (pkg), mail (pkg+cmd), tmux (pkg), session (pkg), nudge-poller (cmd).
+- **data-plane.md** — 9-step decision tree covering Dolt reachability, imposter detection, database health, beads routing, bd subprocess timeouts, daemon Dolt supervision. Entities linked: doltserver (pkg), beads (pkg), daemon (pkg), mail (pkg). Contains the shared "is Dolt reachable?" prefix that message-delivery links to.
+
+**Entity pages modified (10):**
+- `gastown/packages/mail.md` — added `## Failure modes` section (precondition violations for Dolt reachability + stale PID; silent suppression for async notification + reply reminder)
+- `gastown/packages/nudge.md` — added `## Troubleshooting` cross-reference
+- `gastown/packages/tmux.md` — added `## Troubleshooting` cross-reference
+- `gastown/packages/session.md` — added `## Troubleshooting` cross-reference
+- `gastown/packages/doltserver.md` — added `## Troubleshooting` cross-reference
+- `gastown/packages/beads.md` — added `## Troubleshooting` cross-reference
+- `gastown/packages/daemon.md` — added `## Troubleshooting` cross-reference
+- `gastown/commands/nudge.md` — added `## Troubleshooting` cross-reference
+- `gastown/commands/nudge-poller.md` — added `## Troubleshooting` cross-reference
+- `gastown/commands/mail.md` — added `## Troubleshooting` cross-reference
+
+**Missing failure modes added (1):** `mail.md` (package) had no `## Failure modes` section; added with 4 findings derived from source at `bd.go:15-22,58-118,62-64` and `router.go:1597-1675`.
+
+**Sources traced:** `nudge.go` (deliverNudge call chain), `nudge_poller.go` (poll loop), `mail_send.go` (Router.Send), `mail_check.go` (hook drain path), `router.go` (notifyRecipient), `queue.go` (Enqueue/Drain), `poller.go` (StartPoller), `tmux.go` (NudgeSession 8-step protocol), `doltserver.go` (CheckServerReachable, Start, KillImposters, health metrics), `stale_pid.go` (CleanStaleDoltServerPID), `dolt.go` (DoltServerManager), `daemon.go` (ensureDoltServerRunning, heartbeat).

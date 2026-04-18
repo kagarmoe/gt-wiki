@@ -771,6 +771,11 @@ spike detection).
 - **Lifecycle lock release:** `lifecycle.go` has 5 suppressed unlock
   calls. **Present** — POSIX flock semantics provide a safety net.
 
+## Troubleshooting
+
+For diagnostic workflows involving this entity, see
+[Investigating: data-plane failures](../workflows/investigations/data-plane.md).
+
 ## Notes / open questions
 
 - **`dolt.go` (47KB), `compactor_dog.go` (31KB),

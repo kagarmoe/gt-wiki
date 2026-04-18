@@ -122,6 +122,11 @@ Multi-step flows:
 - [convoy-launch](gastown/workflows/convoy-launch.md) — staging → launch → dispatch → merge landing
 - [polecat-lifecycle](gastown/workflows/polecat-lifecycle.md) — name allocation → work → nuke
 
+Investigation workflows (Cross-page inference Batch 1a):
+
+- [Investigating: message delivery](gastown/workflows/investigations/message-delivery.md) — nudge/mail delivery diagnostic decision tree
+- [Investigating: data-plane failures](gastown/workflows/investigations/data-plane.md) — Dolt/beads connection, query, and state diagnostic decision tree
+
 ### Files
 
 - [Makefile](gastown/files/makefile.md) — canonical build recipe; produces `gt`, `gt-proxy-server`, `gt-proxy-client` with the `BuiltProperly` ldflag

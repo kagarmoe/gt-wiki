@@ -426,6 +426,46 @@ mb.AcknowledgeDeliveries("gastown/Toast", msgs)
   `github.com/steveyegge/beads` (in-process SDK).
 - [go-packages inventory](../inventory/go-packages.md)
 
+## Failure modes
+
+### Precondition violations (what does it assume?)
+- **Dolt server reachable:** Every `runBdCommand` at `bd.go:58-118`
+  shells out to `bd`, which requires a working Dolt connection on port
+  3307. If Dolt is unreachable, the subprocess hangs until
+  `bdReadTimeout = 60s` or `bdWriteTimeout = 60s` at `bd.go:15-22`,
+  then dies with "signal: killed". The comment at `bd.go:18-20`
+  records a real incident: the original 30s timeout caused kills under
+  concurrent agent load. **Present** -- timeouts are explicit and the
+  error propagates, but the 60-second wait before failure is a long
+  user-facing delay.
+- **Stale dolt-server.pid in `.beads/`:** `runBdCommand` calls
+  `beads.CleanStaleDoltServerPID` at `bd.go:62-64` before every
+  subprocess invocation. A stale PID file causes `bd` to connect with
+  the wrong config, potentially talking to the wrong Dolt server.
+  **Present** -- cleaned proactively on every call.
+
+### Silent suppression (what errors are swallowed?)
+- **Notification delivery is async and best-effort:**
+  `Router.notifyRecipient` at `router.go:1597-1675` runs in a
+  goroutine tracked only by `WaitPendingNotifications` (used by
+  tests). Failed notifications are logged to stderr but do not undo
+  the send or surface to the caller. **Absent** -- if the nudge
+  notification fails, the message is in beads but the recipient is
+  never notified. The recipient will only see the message on their
+  next `gt mail check` call, which may be minutes later. There is no
+  retry mechanism for failed notifications.
+- **Reply reminder queue failure:** `enqueueReplyReminder` at
+  `router.go:1642,1666` queues a deferred nudge so the sender's agent
+  gets poked if no reply arrives. If `nudge.Enqueue` fails for the
+  reminder, the error is logged but the send still succeeds. **Absent**
+  -- no retry; the reminder is silently dropped.
+
+## Troubleshooting
+
+For diagnostic workflows involving this entity, see
+[Investigating: message delivery](../workflows/investigations/message-delivery.md)
+and [Investigating: data-plane failures](../workflows/investigations/data-plane.md).
+
 ## Notes / open questions
 
 - `router.go` at ~1880 lines is the single-file hotspot for

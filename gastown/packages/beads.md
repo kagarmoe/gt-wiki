@@ -656,6 +656,11 @@ issue, err := b.Show("hq-cv-abc123")   // routes into hq rig automatically
   version` probe. **Present** — this is intentional capability
   detection; failure means "not supported."
 
+## Troubleshooting
+
+For diagnostic workflows involving this entity, see
+[Investigating: data-plane failures](../workflows/investigations/data-plane.md).
+
 ## Notes / open questions
 
 - This page is `status: partial` — coverage was expanded in Phase 6

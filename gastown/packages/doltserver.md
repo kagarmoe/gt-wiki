@@ -592,6 +592,11 @@ _ = doltserver.Stop(townRoot)
   **Untested** — no indication in the codebase that the Windows
   Dolt server lifecycle has been tested.
 
+## Troubleshooting
+
+For diagnostic workflows involving this entity, see
+[Investigating: data-plane failures](../workflows/investigations/data-plane.md).
+
 ## Notes / open questions
 
 - **doltserver.go is ~3990 lines** — by far the largest single file

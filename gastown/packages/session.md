@@ -423,6 +423,11 @@ result, err := session.StartSession(t, session.SessionConfig{
   `GT_LOG_AGENT_OUTPUT=true`. **Untested** — the stub exists but the
   feature is architecturally absent on Windows.
 
+## Troubleshooting
+
+For diagnostic workflows involving this entity, see
+[Investigating: message delivery](../workflows/investigations/message-delivery.md).
+
 ## Notes / open questions
 
 - The package doc comment says "polecat session lifecycle management"

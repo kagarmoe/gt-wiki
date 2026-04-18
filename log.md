@@ -5041,3 +5041,48 @@ As expected for leaf commands: read-only viewers (agent-log, health, memories, s
   - tmux: 6 platform shim pairs with untested Windows implementations
 
 → gastown/packages/{daemon,tmux,runtime}.md
+
+## [2026-04-17] drift-found | Phase 8 Batch 2f (Failure modes: packages/ Supporting + gap-fill — 30 pages)
+
+**Scope:** Failure mode analysis across 30 supporting and gap-fill package pages.
+
+**Pages audited:**
+- [acp](gastown/packages/acp.md) — `phase8_findings: [silent-suppression]`
+- [protocol](gastown/packages/protocol.md) — `phase8_findings: [silent-suppression]`
+- [web](gastown/packages/web.md) — `phase8_findings: [silent-suppression]`
+- [git](gastown/packages/git.md) — `phase8_findings: [silent-suppression]`
+- [testutil](gastown/packages/testutil.md) — `phase8_findings: [cross-platform]`
+- [hooks](gastown/packages/hooks.md) — `phase8_findings: [none]`
+- [krc](gastown/packages/krc.md) — `phase8_findings: [none]`
+- [quota](gastown/packages/quota.md) — `phase8_findings: [none]`
+- [wasteland](gastown/packages/wasteland.md) — `phase8_findings: [none]`
+- [agentlog](gastown/packages/agentlog.md) — `phase8_findings: [none]`
+- [constants](gastown/packages/constants.md) — `phase8_findings: [none]`
+- [feed](gastown/packages/feed.md) — `phase8_findings: [none]`
+- [github](gastown/packages/github.md) — `phase8_findings: [none]`
+- [shell](gastown/packages/shell.md) — `phase8_findings: [none]`
+- [suggest](gastown/packages/suggest.md) — `phase8_findings: [none]`
+- [townlog](gastown/packages/townlog.md) — `phase8_findings: [none]`
+- [activity](gastown/packages/activity.md) — `phase8_findings: [none]`
+- [estop](gastown/packages/estop.md) — `phase8_findings: [none]`
+- [hookutil](gastown/packages/hookutil.md) — `phase8_findings: [none]`
+- [scheduler](gastown/packages/scheduler.md) — `phase8_findings: [none]`
+- [state](gastown/packages/state.md) — `phase8_findings: [none]`
+- [templates](gastown/packages/templates.md) — `phase8_findings: [none]`
+- [tui](gastown/packages/tui.md) — `phase8_findings: [none]`
+- [wrappers](gastown/packages/wrappers.md) — `phase8_findings: [none]`
+- [agent](gastown/packages/agent.md) — `phase8_findings: [none]`
+- [agent-provider](gastown/packages/agent-provider.md) — `phase8_findings: [none]`
+- [boot](gastown/packages/boot.md) — `phase8_findings: [none]`
+- [checkpoint](gastown/packages/checkpoint.md) — `phase8_findings: [none]`
+- [connection](gastown/packages/connection.md) — `phase8_findings: [none]`
+- [proxy](gastown/packages/proxy.md) — `phase8_findings: [none]`
+
+**Findings summary:**
+- 5 pages with failure modes (acp, protocol, web, git, testutil)
+- 25 pages with [none]
+- Highest-value absent finding:
+  - acp: proxy cleanup failures leave orphan processes without diagnostic trail
+  - git: copy_windows.go explicitly documented as untested
+
+→ gastown/packages/{acp,hooks,krc,protocol,quota,testutil,wasteland,web,agentlog,constants,feed,git,github,shell,suggest,townlog,activity,estop,hookutil,scheduler,state,templates,tui,wrappers,agent,agent-provider,boot,checkpoint,connection,proxy}.md

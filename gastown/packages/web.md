@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-15
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/web/handler.go
   - /home/kimberly/repos/gastown/internal/web/templates.go
@@ -18,6 +18,8 @@ phase3_audited: 2026-04-14
 phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # internal/web
@@ -243,6 +245,16 @@ before they're passed to subprocess invocations. No exported types.
   `BuildPrefixRegistryFromTown` and `PrefixRegistry` used for
   parsing tmux session names into rig/role components.
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+- **HTTP handler error responses:** The web package (dashboard +
+  setup mux) has 42 silent suppressions across its handlers.
+  Many are `http.Error` write failures — when the client has
+  disconnected, the error response itself fails to send.
+  **Present** — intentional for HTTP handlers where the client
+  is already gone.
 
 ## Notes / open questions
 

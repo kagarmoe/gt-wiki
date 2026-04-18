@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-15
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/git/git.go
   - /home/kimberly/repos/gastown/internal/git/copy_unix.go
@@ -14,6 +14,8 @@ phase3_audited: 2026-04-14
 phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # internal/git
@@ -199,6 +201,20 @@ groupings:
 - [gt stale](../commands/stale.md), [gt doctor](../commands/doctor.md).
 - [gt](../binaries/gt.md).
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+- **Git subprocess cleanup:** A handful of `_ =` calls in git
+  operation wrappers for process cleanup. **Present** — errors in
+  the git wrapper are propagated from the main operations; only
+  cleanup is suppressed.
+
+### Cross-platform concerns
+- **copy_unix.go / copy_windows.go:** File-copy platform shims.
+  The Windows implementation comment at `copy_windows.go:14` notes
+  "This Windows implementation has not been tested on Windows."
+  **Untested** — explicitly documented as untested.
 
 ## Notes / open questions
 

@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-15
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/testutil/cmd.go
   - /home/kimberly/repos/gastown/internal/testutil/doltserver.go
@@ -15,6 +15,8 @@ phase3_audited: 2026-04-14
 phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
+phase8_audited: 2026-04-17
+phase8_findings: [cross-platform]
 ---
 
 # internal/testutil
@@ -114,6 +116,13 @@ with the unix file so grep hits both.
   that `gt dolt start` manages. `testutil` never touches the
   production Dolt setup — it uses fresh testcontainers instead.
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Failure modes
+
+### Cross-platform concerns
+- **Test utility platform shim:** The package has a platform-specific
+  helper for test process management. **Untested** — test utilities
+  are development-only and the shim may not run on all platforms.
 
 ## Notes / open questions
 

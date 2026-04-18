@@ -1500,3 +1500,22 @@ All planned phases complete:
 
 **Follow-ups filed:**
 - none — lessons are purely informational
+
+## [2026-04-17 14:30] stage | 8.2.f — packages/ Supporting + gap-fill
+
+**Actor:** wiki-curator subagent
+**Unit:** 30 pages audited
+**Duration:** one dispatch
+
+**What went well:**
+- `_ =` count triage method correctly identified 25/30 pages as [none] without needing to read source code in detail
+- The 5 pages with findings were identified quickly by suppression count > 2
+
+**What didn't:**
+- Some pages got doubled phase8 entries due to mixed sed patterns — verified and corrected
+
+**What to change next time:**
+- Use a single consistent sed pattern that handles both phase3-only and phase4 pages
+
+**Follow-ups filed:**
+- none — lessons are purely informational

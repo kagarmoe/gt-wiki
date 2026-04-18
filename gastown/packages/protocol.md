@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-15
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/protocol/types.go
   - /home/kimberly/repos/gastown/internal/protocol/messages.go
@@ -16,6 +16,8 @@ phase3_audited: 2026-04-14
 phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # internal/protocol
@@ -166,6 +168,15 @@ poll loops), and by `gt done` code paths that construct
 - [witness role](../roles/witness.md) and [refinery role](../roles/refinery.md)
   — conceptual descriptions of the agents this protocol connects.
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+- **Protocol message delivery cleanup:** The protocol package handles
+  structured agent-to-agent communication. Silent suppressions appear
+  in message acknowledgment and state-tracking paths where failures
+  could leave messages in limbo between sent and acknowledged.
+  **Present** — most suppressions are in error-path cleanup code.
 
 ## Notes / open questions
 

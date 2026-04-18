@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-15
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/acp/proxy.go
   - /home/kimberly/repos/gastown/internal/acp/proxy_unix.go
@@ -15,6 +15,8 @@ phase3_audited: 2026-04-14
 phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # internal/acp
@@ -195,6 +197,20 @@ load-bearing for the Mayor-as-IDE-agent flow.
   `acp_stop`/`acp_error`/`acp_prompt`/`acp_shutdown`/`acp_degraded`
   lifecycle events (no wiki page yet).
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+- **ACP proxy session cleanup:** The ACP (Agent Client Protocol) proxy
+  manages opencode sessions and uses `_ =` for tmux session kills,
+  process signal delivery, and PID file removal. Failures in these
+  cleanup paths leave orphan processes or stale PID files without
+  logging. **Absent** — no diagnostic trail for cleanup failures.
+
+### Cross-platform concerns
+- **Unix/Windows process management shims:** Platform-specific
+  process lifecycle code exists but Windows behavior may diverge.
+  **Untested** — the ACP proxy is primarily designed for Unix tmux.
 
 ## Notes / open questions
 

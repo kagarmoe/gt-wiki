@@ -17,6 +17,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt dolt
@@ -287,6 +289,10 @@ read only `dolt.go` in `sources:` and missed sibling-file cobra
 registrations. Both sibling files existed at Phase 2 time.
 
 See also: [gastown/drift/README.md](../drift/README.md)
+
+## Failure modes
+
+No failure modes discovered. `dolt.go` wraps `doltserver` package operations (start/stop/cleanup/status/migrate). All error paths propagated. The `flatten` and `rebase` subcommands operate on Dolt databases with error checking throughout.
 
 ## Notes / open questions
 

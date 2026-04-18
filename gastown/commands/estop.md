@@ -15,6 +15,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt estop
@@ -164,6 +166,10 @@ scans for per-rig `ESTOP.<rig>` sentinel files in the town root via
   during E-stop
 - [../packages/estop.md](../packages/estop.md) — the sentinel-file
   primitives (town-wide and per-rig) backing this command.
+
+## Failure modes
+
+No failure modes discovered. `estop.go` writes a sentinel file and sends SIGTSTP to tmux sessions. Sentinel-first design ensures E-stop state is durable even if session freezing fails. All errors propagated. SIGTSTP delivery failures per-session are non-fatal (some sessions may be gone).
 
 ## Notes / open questions
 

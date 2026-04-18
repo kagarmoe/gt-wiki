@@ -17,6 +17,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt daemon
@@ -137,6 +139,10 @@ Subcommand-scoped (`daemon.go:152-165`):
 - [deacon](./deacon.md) — health orchestrator agent
 - [doctor](./doctor.md) — diagnostic command that inspects daemon state
 - [dashboard](./dashboard.md) — surfaces daemon heartbeat counter
+
+## Failure modes
+
+No failure modes discovered. All subcommands are thin wrappers: `start` spawns a detached process with proper race detection (`daemon.go:224-231`), `stop` delegates to `daemon.StopDaemon`, `status` is read-only. The `run` subcommand (foreground mode) clears identity env vars to prevent misattribution. Error paths are well-checked.
 
 ## Notes / open questions
 

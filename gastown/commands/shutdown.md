@@ -15,6 +15,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt shutdown
@@ -151,6 +153,10 @@ Defined at `start.go:144-161`:
 - `--nuclear` (bool, default false)
 - `--cleanup-orphans` (bool, default false)
 - `--cleanup-orphans-grace-secs` (int, default 60)
+
+## Failure modes
+
+No failure modes discovered. `shutdown` delegates to `gt down` with additional worktree cleanup. Wraps the `down` command with `--all` semantics. Error paths propagated from `down`.
 
 ## Notes / open questions
 

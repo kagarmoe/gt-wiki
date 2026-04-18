@@ -17,6 +17,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt start
@@ -145,6 +147,13 @@ Defined at `start.go:134-142`:
 - `gt start crew --account <handle>` — Claude account override
 - `gt start crew --agent <alias>` — agent override for the crew
   worker
+
+## Failure modes
+
+### Silent suppression
+
+- **Agent shutdown notification best-effort:** `start.go:610`, `:619` send Escape and shutdown messages with `_ = t.SendKeysRaw(...)` and `_ = t.SendKeys(...)`. Agents may not receive clean-shutdown signals. **Absent** — no warning.
+- **Branch cleanup:** `start.go:901` uses `_ = mayorGit.DeleteBranch(branchName, true)`. Stale branches persist silently. **Absent** — no warning for failed cleanup.
 
 ## Notes / open questions
 

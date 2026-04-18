@@ -15,6 +15,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt quota
@@ -266,6 +268,10 @@ non-init order.)
 - **Severity:** `wrong`
 - **Fix tier:** `code`
 - **Release position:** `in-release`
+
+## Failure modes
+
+No failure modes discovered. Read-only query command. Fetches API usage data and displays it. All errors propagated. No state mutations.
 
 ## Notes / open questions
 

@@ -4875,3 +4875,19 @@ Plus two optional sub-sections:
 - `escalate`: all escalation lifecycle events (sent, acked, closed, re-escalated) silently lose feed writes
 
 → gastown/commands/{broadcast,dnd,escalate,mail,notify,nudge,peek}.md
+
+## [2026-04-17] drift-found | Phase 8 Batch 1f (Failure modes: commands/ Services — 11 pages)
+
+- Read error paths in `daemon.go`, `dolt.go`, `down.go`, `estop.go`, `maintain.go`, `quota.go`, `reaper.go`, `start.go`, `up.go`
+- Pages audited: [daemon](gastown/commands/daemon.md), [dolt](gastown/commands/dolt.md), [down](gastown/commands/down.md), [estop](gastown/commands/estop.md), [maintain](gastown/commands/maintain.md), [quota](gastown/commands/quota.md), [reaper](gastown/commands/reaper.md), [shutdown](gastown/commands/shutdown.md), [start](gastown/commands/start.md), [thaw](gastown/commands/thaw.md), [up](gastown/commands/up.md)
+- [up](gastown/commands/up.md) — `phase8_findings: [partial-completion, silent-suppression]`
+- [down](gastown/commands/down.md) — `phase8_findings: [partial-completion, silent-suppression]`
+- [start](gastown/commands/start.md) — `phase8_findings: [silent-suppression]`
+- 8 pages with [none]: daemon, dolt, estop, thaw, maintain, quota, reaper, shutdown
+
+**Notable absent findings:**
+- `up`: `EnsureAllMetadata` error silently discarded, causing rogue Dolt servers downstream
+- `down`: shutdown sentinel persists on abnormal termination, blocking subsequent `gt up`
+- `start`: agent shutdown notifications best-effort; agents may be killed without warning
+
+→ gastown/commands/{daemon,dolt,down,estop,maintain,quota,reaper,shutdown,start,thaw,up}.md

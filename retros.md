@@ -1345,3 +1345,22 @@ All planned phases complete:
 
 **Follow-ups filed:**
 - none — lessons are purely informational
+
+## [2026-04-17 20:30] stage | 8.1.f — Failure modes: commands/ Services
+
+**Actor:** wiki-curator subagent
+**Unit:** 11 pages audited (daemon, dolt, down, estop, maintain, quota, reaper, shutdown, start, thaw, up)
+**Duration:** one dispatch
+
+**What went well:**
+- Services commands split cleanly: `up`/`down` are the complex multi-phase orchestrators; everything else is thin wrappers
+- `down` shutdown sentinel persistence on panic is a real absent finding — blocks `gt up` on abnormal exit
+
+**What didn't:**
+- Using sed for bulk frontmatter updates requires re-reading files before Edit; batch python approach was cleaner for the [none] pages
+
+**What to change next time:**
+- Use python for bulk edits when the pattern is uniform
+
+**Follow-ups filed:**
+- none — lessons are purely informational

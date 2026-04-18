@@ -15,6 +15,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt thaw
@@ -107,6 +109,10 @@ thaw — a rig removed mid-freeze leaves its sessions stuck in the
 `estop.go:67-73`:
 - `--rig <name>` — thaw only the named rig (string, default empty =
   thaw the whole town)
+
+## Failure modes
+
+No failure modes discovered. `thaw` is the inverse of estop: sends SIGCONT, removes sentinel, nudges sessions. Sentinel removal failure is propagated as error. Session thaw count is informational.
 
 ## Notes / open questions
 

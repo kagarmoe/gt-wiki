@@ -15,6 +15,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion, silent-suppression]
 ---
 
 # gt down
@@ -208,6 +210,17 @@ Defined at `down.go:86-94`:
 - **Release position:** `in-release`
 
 See also: [gastown/drift/README.md](../drift/README.md)
+
+## Failure modes
+
+### Partial completion
+
+- **Shutdown sentinel may persist on panic:** `down.go:124` writes sentinel, defers `os.Remove`. On abnormal termination, sentinel persists and `ensureDaemon` refuses to start. **Absent** — no cleanup for abnormal exit.
+
+### Silent suppression
+
+- **`exit-empty` configuration:** `down.go:131` uses `_ = t.SetExitEmpty(false)`. If this fails, tmux server may exit when all sessions die. **Absent** — no warning.
+- **Halt event fire-and-forget:** `down.go:464` uses `_ = events.LogFeed(events.TypeHalt, ...)`. **Absent** — audit gap.
 
 ## Notes / open questions
 

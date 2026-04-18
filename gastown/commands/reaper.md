@@ -15,6 +15,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt reaper
@@ -206,6 +208,10 @@ Duration format is anything `time.ParseDuration` accepts.
 - **Release position:** `in-release`
 
 See also: [gastown/drift/README.md](../drift/README.md)
+
+## Failure modes
+
+No failure modes discovered. `reaper.go` finds and kills orphaned processes. Process-kill failures are logged individually but don't abort the sweep. Correct continue-on-error pattern for cleanup commands.
 
 ## Notes / open questions
 

@@ -15,6 +15,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion, silent-suppression]
 ---
 
 # gt up
@@ -161,6 +163,18 @@ Defined at `up.go:148-158`:
 - `--restore` — also start crew (from rig settings) and polecats with
   pinned beads.
 - `--json` — structured output; exit 1 on any failure.
+
+## Failure modes
+
+### Partial completion
+
+- **Parallel startup with no rollback:** `runUp` at `up.go:208-284` starts Dolt, daemon, deacon, mayor, and rig prefetch in 5 parallel goroutines. If daemon succeeds but deacon fails, there's no rollback. **Present** — by design; `gt up` is idempotent so a re-run starts missing services.
+- **`EnsureAllMetadata` error discarded:** `up.go:288` uses `_, _ = doltserver.EnsureAllMetadata(townRoot)`. If metadata propagation fails, `bd` may auto-spawn rogue Dolt servers. **Absent** — silently continues.
+
+### Silent suppression
+
+- **Boot event fire-and-forget:** `up.go:426` uses `_ = events.LogFeed(...)`. **Absent** — audit gap.
+- **Env var propagation:** `up.go:330-336` sets Dolt port/host into process env for child agent inheritance. **Present** — intentional.
 
 ## Notes / open questions
 

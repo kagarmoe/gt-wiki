@@ -151,6 +151,18 @@ flags in its sibling file's `init()`.
 - **`resolveDirectiveContext` silently ignores cwd error:** `directive_show.go:97-99` calls `os.Getwd()` and only uses the result if `err == nil`. If `Getwd` fails (deleted cwd, broken mount), `rigName` stays empty and the command silently operates at town-level scope with no indication that rig detection failed. **Absent** — no warning emitted; the user sees town-level output and may not realize rig scope was intended.
 - **`directive list` silently skips unreadable rig directories:** `directive_list.go:59-88` scans `os.ReadDir(townRoot)` and silently continues past any rig whose `directives/` subdirectory cannot be read. A permissions error on a rig directory produces no output for that rig, no error, no warning. **Absent** — the user sees a complete-looking list that may be missing entries from inaccessible rigs.
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `$EDITOR` (or `vi`) | `<path>` | — | `EDITOR` env var, fallback `vi` | `directive_edit.go:84` |
+
+### Config file writes
+| Target | Operation | Value | Purpose | `file:line` |
+|---|---|---|---|---|
+| `<townRoot>/<rig>/directives/<role>.md` | `os.WriteFile` | header template | create new directive file if absent | `directive_edit.go:72` |
+
 ## Related
 
 - [gt](../binaries/gt.md) — parent binary.

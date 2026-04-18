@@ -208,6 +208,20 @@ No failure modes identified in `hooks.go` itself. The parent command is a pure `
   town settings. Hooks config is explicitly a separate system
   (`~/.gt/hooks-*.json`) from town settings (`settings/config.json`).
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `$EDITOR` (or `vi`) | `<basePath>` | — | `EDITOR` env var, fallback `vi` | `hooks_base.go:66` |
+| `$EDITOR` (or `vi`) | `<overridePath>` | — | `EDITOR` env var, fallback `vi` | `hooks_override.go:78` |
+
+### Config file writes
+| Target | Operation | Value | Purpose | `file:line` |
+|---|---|---|---|---|
+| `settings.json` (sync target) | `os.WriteFile` | marshaled hooks settings | sync hooks into Claude Code settings | `hooks_sync.go:305` |
+| `settings.json` (install target) | `os.WriteFile` | marshaled hooks settings | install hooks into Claude Code settings | `hooks_install.go:299` |
+
 ## Notes / open questions
 
 - **Phase 3 Batch 1b wiki-stale correction (2026-04-15):** → promoted to `## Drift` — see the `wiki-stale` finding above. The Phase 2 claim that subcommands were unwired has been replaced with the actual sibling-file registrations.

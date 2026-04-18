@@ -5587,3 +5587,13 @@ Additive optional section — no schema version bump.
 Grep patterns: `exec.Command`, `exec.CommandContext`, `os.Setenv`, `os.Unsetenv`, `SET @@`, `INSERT INTO`, `UPDATE.*SET`, `DELETE FROM`, `WriteFile`, `atomicWrite`, `json.Marshal.*Write`, `json.NewEncoder`.
 
 Tables added: 10 Subprocess invocations tables, 3 Environment variables set tables, 3 Config file writes tables.
+
+## [2026-04-14] sweep | Outgoing calls 1b: Configuration (11 pages)
+
+**verb:** sweep
+**scope:** `gastown/commands/` — Configuration group (11 pages)
+**sources read:** 23 source files across account, config, directive, disable, enable, hooks, issue, plugin, shell, theme, uninstall
+**pages touched:** directive, hooks (2 pages with outgoing calls)
+**pages with no outgoing calls (section omitted):** account, config, disable, enable, issue, plugin, shell, theme, uninstall (9 pages)
+
+Tables added: 2 Subprocess invocations tables, 2 Config file writes tables.

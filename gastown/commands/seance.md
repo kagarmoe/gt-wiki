@@ -204,6 +204,21 @@ Defined in `init()` (`seance.go:66-75`):
   prints a note but continues. The seance may still work if the
   session is in the current account. **Present** — warned.
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `<agentCmd>` | `--fork-session --resume <sessionID> -p <prompt>` | runtime (resolved via `resolveSeanceCommand()`) | `seance.go:257` |
+| `<agentCmd>` | `--fork-session --resume <sessionID>` | runtime (interactive mode) | `seance.go:269` |
+
+### Config file writes
+| Target | Operation | Value | Purpose | `file:line` |
+|---|---|---|---|---|
+| target `sessions-index.json` | `os.WriteFile` | updated index JSON | register symlinked session in target account | `seance.go:713` |
+| target `sessions-index.json` | `os.WriteFile` | pruned index JSON | remove session entry on cleanup | `seance.go:745` |
+| source `sessions-index.json` | `os.WriteFile` | pruned index JSON | remove session entry on cleanup | `seance.go:865` |
+
 ## Notes / open questions
 
 - The cross-account symlink dance exists because Claude Code accounts

@@ -128,6 +128,13 @@ build-time constants. The `resolveBranch` fallback shells out to
 returns empty string on failure, which is the correct degradation
 (output simply omits the branch field).
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `git` | `symbolic-ref` | `--short HEAD` | hardcoded | `version.go:106` |
+
 ## Notes / open questions
 
 - **The polecatSafe annotation** — `version.go:34` sets

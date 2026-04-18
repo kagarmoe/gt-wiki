@@ -306,6 +306,18 @@ type PatrolCycleEntry struct {
   at `patrol_scan.go:208-215` uses `_ = router.Send(msg)` — mail
   delivery failure is silent. **Absent.**
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `bd` | `list` | `--status=closed --label=digest --json --limit=0` | hardcoded | `patrol.go:189` |
+| `bd` | `create` | `--type=event --title=<title> --event-category=patrol.digest --event-payload=<json> --description=<desc> --silent` | runtime (digest data) | `patrol.go:311` |
+| `bd` | `close` | `<digestID> --reason=daily patrol digest` | runtime (from create output) | `patrol.go:320` |
+| `bd` | `list` | `--type=event --json --limit=50` | hardcoded | `patrol.go:332` |
+| `bd` | `delete` | `--force <id>...` | runtime (collected IDs) | `patrol.go:380` |
+| `gt` | `formula list` | — | hardcoded | `patrol_helpers.go:215` |
+
 ## Notes / open questions
 
 - `GetRole`, `PatrolConfig`, `autoSpawnPatrol`, `findActivePatrol`,

@@ -170,6 +170,23 @@ type CostsOutput struct { Sessions []SessionCost; Total float64; ByRole, ByRig m
   `todayEntries, _ := ...`. Today's costs are silently missing from the
   weekly total. **Absent.**
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `bd` | `list` | `--type=event --all --limit=0 --json` | hardcoded | `costs.go:468` |
+| `bd` | `show` | `--json <id>...` | runtime (from list output) | `costs.go:492` |
+| `bd` | `list` | `--type=event --all --limit=0 --json` | hardcoded (second call path) | `costs.go:552` |
+| `bd` | `show` | `--json <id>...` | runtime (from list output) | `costs.go:573` |
+| `bd` | `create` | `--type=event --title=<title> --event-category=costs.digest --event-payload=<json> --description=<desc> --silent` | runtime (digest data) | `costs.go:1329` |
+| `bd` | `close` | `<digestID> --reason=daily cost digest` | runtime (from create output) | `costs.go:1338` |
+
+### Config file writes
+| Target | Operation | Value | Purpose | `file:line` |
+|---|---|---|---|---|
+| costs log (`costs.jsonl`) | `os.WriteFile` | filtered JSONL lines | rewrite log without deleted date entries | `costs.go:1396` |
+
 ## Notes / open questions
 
 - `parseSessionName`, `getTmuxSessionWorkDir`, `extractCostFromWorkDir`,

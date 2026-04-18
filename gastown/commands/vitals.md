@@ -176,6 +176,19 @@ None — `init` at `vitals.go:26` only registers the command.
   `doltserver.IsRunning` at `vitals.go:44` has a third return value
   (error) that is discarded with `_, _`. **Absent.**
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `dolt` | `sql` | `--host 127.0.0.1 --port <port> --user <user> --no-tls -r csv -q <query>` | runtime (dolt config) | `vitals.go:165` |
+| `git` | `log` | `-C <archiveDir> -1 --format=%ci` | runtime (archive path) | `vitals.go:217` |
+
+### Environment variables set
+| Variable | Value source | Consumed by | `file:line` |
+|---|---|---|---|
+| `DOLT_CLI_PASSWORD` | `config.Password` | `dolt` CLI subprocess | `vitals.go:169` (via `cmd.Env`) |
+
 ## Notes / open questions
 
 - `doltserver.FindAllDoltListeners`, `GetDoltDataDirFromProcess`,

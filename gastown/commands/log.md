@@ -179,6 +179,13 @@ Defined in `init()` (`log.go:74-79`):
   the external `tail` binary. On minimal containers without coreutils,
   this fails. **Absent** — no fallback or check for `tail`.
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `tail` | `-f` | `<logPath>` | runtime (resolved log file path) | `log.go:181` |
+
 ## Notes / open questions
 
 - `--since` uses Go's `time.ParseDuration` only — no `d` suffix like

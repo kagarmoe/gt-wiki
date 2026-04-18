@@ -5575,3 +5575,15 @@ Pages with no outgoing calls omit the section (absence = "no outgoing calls").
 Additive optional section — no schema version bump.
 
 → [.claude/skills/writing-entity-pages/SKILL.md](.claude/skills/writing-entity-pages/SKILL.md)
+
+## [2026-04-14] sweep | Outgoing calls 1a: Diagnostics (22 pages)
+
+**verb:** sweep
+**scope:** `gastown/commands/` — Diagnostics group (22 pages)
+**sources read:** 30 source files across activity, audit, checkpoint, costs, dashboard, doctor, feed, heartbeat, info, log, metrics, patrol, prime, repair, seance, stale, status, thanks, upgrade, version, vitals, whoami
+**pages touched:** audit, costs, dashboard, log, patrol, prime, seance, upgrade, version, vitals (10 pages with outgoing calls)
+**pages with no outgoing calls (section omitted):** activity, checkpoint, doctor, feed, heartbeat, info, metrics, repair, stale, status, thanks, whoami (12 pages)
+
+Grep patterns: `exec.Command`, `exec.CommandContext`, `os.Setenv`, `os.Unsetenv`, `SET @@`, `INSERT INTO`, `UPDATE.*SET`, `DELETE FROM`, `WriteFile`, `atomicWrite`, `json.Marshal.*Write`, `json.NewEncoder`.
+
+Tables added: 10 Subprocess invocations tables, 3 Environment variables set tables, 3 Config file writes tables.

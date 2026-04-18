@@ -289,6 +289,36 @@ the normal-mode prompt. Explain lines are added via
   would cause hard failures. **Absent** — no pre-check for write
   access.
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `bd` | `prime` | — | hardcoded | `prime.go:507` |
+| `gt` | `mail check` | `--inject` | hardcoded | `prime.go:596` |
+| `bd` | `show` | `<beadID>` | runtime (hooked bead ID) | `prime.go:950` |
+| `git` | `rev-parse` | `--show-toplevel` | hardcoded | `prime.go:999` |
+| `tmux` | `display-message` | `-p #{session_name}` | hardcoded | `prime.go:1185` |
+| `tmux` | `set-environment` | `-t <session> <key> <value>` | runtime (work context vars) | `prime.go:1195` |
+| `tmux` | `set-environment` | `-u -t <session> <key>` | runtime (unset empty vars) | `prime.go:1197` |
+| `bd` | `list` | `--status=open --tag=escalation --json` | hardcoded | `prime.go:1209` |
+| `bd` | `mol current` | `<moleculeID> --json` | runtime (molecule ID) | `prime_molecule.go:39` |
+
+### Environment variables set
+| Variable | Value source | Consumed by | `file:line` |
+|---|---|---|---|
+| `GT_SESSION_ID` | generated session ID | all gt subcommands | `prime.go:301` |
+| `CLAUDE_SESSION_ID` | same as `GT_SESSION_ID` (legacy) | legacy consumers | `prime.go:302` |
+| identity vars (dynamic) | session env repair | agent identity | `prime.go:465` |
+| `GT_WORK_RIG` | hooked bead rig context | bd, mail, gt subcommands | `prime.go:1170` |
+| `GT_WORK_BEAD` | hooked bead ID | bd, mail, gt subcommands | `prime.go:1171` |
+| `GT_WORK_MOL` | attached molecule ID | bd, mail, gt subcommands | `prime.go:1172` |
+
+### Config file writes
+| Target | Operation | Value | Purpose | `file:line` |
+|---|---|---|---|---|
+| `<runtimeDir>/session_id` | `os.WriteFile` | `<sessionID>\n<timestamp>` | persist session ID for resume | `prime_session.go:155` |
+
 ## Notes / open questions
 
 - The file is 1291 lines; only the top ~400 cover control flow.

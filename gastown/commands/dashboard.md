@@ -139,6 +139,22 @@ None (terminal command).
 
 - [Investigating: monitoring](../workflows/investigations/monitoring.md) — Steps 6-7 cover dashboard startup failures and data issues.
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `open` | (URL) | — | runtime (darwin) | `dashboard.go:184` |
+| `xdg-open` | (URL) | — | runtime (linux) | `dashboard.go:186` |
+| `cmd` | `/c start` | (URL) | runtime (windows) | `dashboard.go:188` |
+
+### Environment variables set
+| Variable | Value source | Consumed by | `file:line` |
+|---|---|---|---|
+| `GT_DOLT_PORT` | `doltserver.LoadState()` or `doltserver.DefaultPort` | bd, gt subprocesses | `dashboard.go:169` |
+| `BEADS_DOLT_PORT` | same as `GT_DOLT_PORT` | bd subprocess | `dashboard.go:170` |
+| `BEADS_DOLT_SERVER_HOST` | `doltserver.DefaultConfig().Host` | bd subprocess | `dashboard.go:175` |
+
 ## Notes / open questions
 
 - The dashboard depends on a reachable Dolt server — the env-var

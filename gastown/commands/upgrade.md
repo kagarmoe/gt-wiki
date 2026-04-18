@@ -234,6 +234,13 @@ usage text.
   but the exit code is always zero. Automation that relies on exit
   code to detect upgrade failures will miss them. **Absent.**
 
+## Outgoing calls
+
+### Config file writes
+| Target | Operation | Value | Purpose | `file:line` |
+|---|---|---|---|---|
+| `CLAUDE.md` | `os.WriteFile` | generated CLAUDE.md content | update agent instructions on upgrade | `upgrade.go:211` |
+
 ## Notes / open questions
 
 - `doctor` registers ~80 checks (`doctor.go:154-275`); upgrade

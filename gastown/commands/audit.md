@@ -153,6 +153,13 @@ type AuditEntry struct {
   silently returns `time.Time{}` (zero) on failure, causing entries to
   sort to the epoch boundary. **Absent.**
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `git` | `log` | `--format=%H %ai %s`, `--all`, `-n 100` | hardcoded | `audit.go:182` |
+
 ## Notes / open questions
 
 - The beads location is hard-coded to `<townRoot>/gastown/mayor/rig`

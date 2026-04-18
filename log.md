@@ -4905,3 +4905,17 @@ Plus two optional sub-sections:
 - `install`: multi-step workspace creation has no rollback on mid-sequence failure; `--force` re-run is the only recovery path
 
 → gastown/commands/{crew,git-init,init,install,namepool,rig,worktree}.md
+
+## [2026-04-17] drift-found | Phase 8 Batch 1h (Failure modes: commands/ Ungrouped — 15 pages)
+
+- Read error paths in `agent_log.go`, `commit.go`, `cycle.go`, `forget.go`, `health.go`, `krc.go`, `memories.go`, `nudge_poller.go`, `proxy_subcmds.go`, `remember.go`, `show.go`, `status_line.go`, `tap*.go`, `town_cycle.go`, `warrant.go`
+- Pages audited: [agent-log](gastown/commands/agent-log.md), [commit](gastown/commands/commit.md), [cycle](gastown/commands/cycle.md), [forget](gastown/commands/forget.md), [health](gastown/commands/health.md), [krc](gastown/commands/krc.md), [memories](gastown/commands/memories.md), [nudge-poller](gastown/commands/nudge-poller.md), [proxy-subcmds](gastown/commands/proxy-subcmds.md), [remember](gastown/commands/remember.md), [show](gastown/commands/show.md), [status-line](gastown/commands/status-line.md), [tap](gastown/commands/tap.md), [town](gastown/commands/town.md), [warrant](gastown/commands/warrant.md)
+- All 15 pages: `phase8_findings: [none]`
+
+**Findings summary:**
+- 0 pages with failure modes
+- 15 pages with [none]
+
+As expected for leaf commands: read-only viewers (agent-log, health, memories, show, status-line), single-operation mutators (commit, forget, remember), pure policy evaluators (tap), and session utilities (cycle, town, nudge-poller). No multi-step sequences with partial-completion risk.
+
+→ gastown/commands/{agent-log,commit,cycle,forget,health,krc,memories,nudge-poller,proxy-subcmds,remember,show,status-line,tap,town,warrant}.md

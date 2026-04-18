@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt memories
@@ -104,6 +106,10 @@ Within the printed output, types appear in the priority order used by
 - [bead](bead.md) — the underlying `bd kv *` plumbing this command
   shells out to.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+No failure modes discovered. Lists stored memories from beads. Read-only query with error propagation.
 
 ## Notes / open questions
 

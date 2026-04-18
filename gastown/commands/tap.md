@@ -16,6 +16,8 @@ phase3_findings: [cobra-drift, wiki-stale]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt tap
@@ -177,6 +179,10 @@ Registered from sibling files via `init()`:
 - [prime](prime.md) — session-start hook; sibling Claude-integration
   command.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+No failure modes discovered. Guard system for controlling which commands agents can run. Read-only policy evaluation that returns allow/deny. Guard checks are pure functions; no state mutations.
 
 ## Notes / open questions
 

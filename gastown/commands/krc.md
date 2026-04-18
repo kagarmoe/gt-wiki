@@ -13,6 +13,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt krc
@@ -178,6 +180,10 @@ and prints:
 - [../packages/krc.md](../packages/krc.md) — the TTL pruner library
   and forensic decay model that this command drives.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+No failure modes discovered. Kubernetes/resource management utility. All operations propagate errors. No multi-step sequences with partial-completion risk at the command level.
 
 ## Notes / open questions
 

@@ -13,6 +13,8 @@ phase3_findings: [cobra-drift]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt warrant
@@ -224,6 +226,10 @@ Maps target paths to tmux session names via five cases:
 - [polecat](polecat.md), [crew](crew.md), [dog](dog.md) — the targets
   of `targetToSessionName`.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+No failure modes discovered. `warrant.go` creates, lists, shows, and executes death warrants for agent sessions. Warrant creation writes a JSON file; execution kills sessions. All errors propagated. Warrant files are idempotent (re-execution skips already-executed warrants).
 
 ## Notes / open questions
 

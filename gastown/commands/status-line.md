@@ -13,6 +13,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: internal
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt status-line
@@ -156,6 +158,10 @@ None.
 - [mq](mq.md), [refinery](refinery.md) — refinery manager queue
   displayed by `runRefineryStatusLine`.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+No failure modes discovered. Outputs tmux status-line formatted strings. Pure string computation with no side effects or error paths.
 
 ## Notes / open questions
 

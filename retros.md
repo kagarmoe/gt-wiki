@@ -1383,3 +1383,23 @@ All planned phases complete:
 
 **Follow-ups filed:**
 - none — lessons are purely informational
+
+## [2026-04-17 21:00] stage | 8.1.h — Failure modes: commands/ Ungrouped
+
+**Actor:** wiki-curator subagent
+**Unit:** 15 pages audited (agent-log, commit, cycle, forget, health, krc, memories, nudge-poller, proxy-subcmds, remember, show, status-line, tap, town, warrant)
+**Duration:** one dispatch
+
+**What went well:**
+- All 15 pages correctly identified as [none] — leaf commands with no complex error paths
+- Python batch approach handled 15 pages in one pass efficiently
+- Source files confirmed: zero `_ =` silent suppression patterns across the entire batch
+
+**What didn't:**
+- Nothing — this was the expected quick-stamp batch
+
+**What to change next time:**
+- Leaf command batches can be handled as a single bulk operation from the start
+
+**Follow-ups filed:**
+- none — lessons are purely informational

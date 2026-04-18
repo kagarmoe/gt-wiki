@@ -13,6 +13,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt remember
@@ -153,6 +155,10 @@ Four helpers at `remember.go:194-231`:
 - [bead](bead.md) — the underlying `bd kv *` primitives this command
   delegates to.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+No failure modes discovered. Stores a memory entry in beads. Single bead write with error propagation.
 
 ## Notes / open questions
 

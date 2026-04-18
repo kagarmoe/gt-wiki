@@ -13,6 +13,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt show
@@ -103,6 +105,10 @@ None declared directly — everything is forwarded to `bd show`.
   scopes.
 - [issue](issue.md) — legacy/alias surface area for bead operations.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+No failure modes discovered. Opens a file or URL in the default viewer. Single `exec.Command` invocation with platform-specific opener. Errors propagated.
 
 ## Notes / open questions
 

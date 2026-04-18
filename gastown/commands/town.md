@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt town
@@ -141,6 +143,10 @@ town-level.
 - [status-line](status-line.md) — renders the tmux status right of the
   same mayor/deacon panes.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+No failure modes discovered. Town-level session cycling. Same pattern as `cycle.go` but across town-level sessions (mayor, deacon). All errors propagated.
 
 ## Notes / open questions
 

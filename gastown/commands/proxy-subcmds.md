@@ -13,6 +13,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: internal
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt proxy-subcmds
@@ -142,6 +144,10 @@ to a compiled-in default.
   the current polecat-safe set (per the batch brief). Each sets
   `Annotations: map[string]string{AnnotationPolecatSafe: "true"}` in
   its own init.
+
+## Failure modes
+
+No failure modes discovered. Registers proxy subcommands for `bd` passthrough. Pure command registration — no runtime error paths.
 
 ## Notes / open questions
 

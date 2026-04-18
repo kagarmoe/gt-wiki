@@ -13,6 +13,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt commit
@@ -117,6 +119,10 @@ Agent: gastown/crew/jack  →  Name: gastown/crew/jack
   commit identity.
 - [handoff](handoff.md) — session handoff can touch the working tree.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+No failure modes discovered. Thin wrapper over `git commit` with branch-check enforcement. All errors propagated. Single `exec.Command` invocation.
 
 ## Notes / open questions
 

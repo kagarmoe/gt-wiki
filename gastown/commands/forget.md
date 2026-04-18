@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt forget
@@ -108,6 +110,10 @@ primitives `remember` and `memories` call.
   start; the injection order is `memoryTypeOrder`.
 - [bead](bead.md) — the underlying issue/kv plumbing (`bd kv *`).
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+No failure modes discovered. Removes a memory entry from the beads store. Single bead delete operation with error propagation.
 
 ## Notes / open questions
 

@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt cycle
@@ -138,6 +140,10 @@ Runs `tmux list-sessions -F #{session_name}` and splits output by lines.
   lifecycle commands that create the sessions this one navigates between.
 - [internal/tmux package](../packages/tmux.md) — `SocketFromEnv` / `SetDefaultSocket` / `NewTmux` + the underlying `switch-client` wrappers all live here; the socket override rationale at `cycle.go:95-97` pairs with the package-level `defaultSocket` design
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+No failure modes discovered. Session cycling via tmux operations. Resolves current session, finds cycle group, switches. All errors propagated. No state mutations beyond tmux session switching.
 
 ## Notes / open questions
 

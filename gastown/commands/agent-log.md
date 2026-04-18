@@ -13,6 +13,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: internal
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt agent-log
@@ -108,6 +110,10 @@ down when the session dies. Users shouldn't run it directly; it's
 - [costs](costs.md) — aggregates the token-usage events this command
   emits.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+No failure modes discovered. Read-only log viewer. Wraps `agent_log.go` file reads with formatting. No state mutations.
 
 ## Notes / open questions
 

@@ -13,6 +13,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt health
@@ -148,6 +150,10 @@ on `report.Server.Running`).
   health snapshot.
 - [status](status.md) — user-facing workspace status (different scope).
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+No failure modes discovered. Read-only health check aggregator. Queries system state (daemon, dolt, tmux, agents) and reports. No state mutations. Errors per-check are surfaced in the output.
 
 ## Notes / open questions
 

@@ -13,6 +13,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: internal
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt nudge-poller
@@ -143,6 +145,10 @@ None.
 - [agent-log](agent-log.md) — another hidden session-lifecycle daemon
   launched alongside non-Claude agents.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+No failure modes discovered. Background process that drains the nudge queue. Runs in a loop with error handling per-drain cycle. Session-death detection exits cleanly.
 
 ## Notes / open questions
 

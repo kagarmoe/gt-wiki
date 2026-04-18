@@ -5358,3 +5358,20 @@ Scored 22 command pages in GroupDiag against source. All pages scored against th
 **Pages modified:** 13 (detail_depth added to all).
 
 **Outcome:** Plan predicted "High" depth-gap rate for Runtime packages. Refuted again: all 13 pages scored 5-7/8. These agent-runtime packages have consistent interface-level documentation with heavy file:line citation density. The errors axis is the universal weak spot (1/8 on 12 of 13 pages), but Phase 8 already covered failure modes. The runtime packages cluster at 6/8 — a characteristic "good but not exhaustive" pattern where params and data_flow are fully documented but error returns and side effects could be deeper.
+
+## [2026-04-18] depth-pass | Detail Gap Batch 2d — Diagnostics packages (4 pages)
+
+**Verb:** depth-pass
+**Scope:** `gastown/packages/` — doctor, health, keepalive, deps
+
+**Score distribution (total/8):**
+- 7/8: 1 page (keepalive)
+- 6/8: 3 pages (doctor, health, deps)
+
+**Complexity:** 4/4 complex. All above threshold (lowest: 6/8).
+
+**Fixes:** 0 inline fixes needed. Note: doctor sources: frontmatter lists 11 of 70 actual source files, but the page body correctly documents "70 non-test .go files" and describes the Check interface pattern. Source-list completeness is a coverage concern, not a depth gap.
+
+**Pages modified:** 4 (detail_depth added to all).
+
+**Outcome:** Plan predicted "Medium" depth-gap rate for Diagnostics. Confirmed at the low end: all 4 pages scored 6-7/8. Doctor is the standout — largest package by file count (70 files, ~19k lines) but the wiki correctly documents the Check interface pattern and registry architecture rather than attempting per-check coverage.

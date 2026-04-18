@@ -25,6 +25,7 @@ phase3_severities: []
 phase3_findings_post_release: false
 phase8_audited: 2026-04-17
 phase8_findings: [silent-suppression]
+detail_depth: {params: 2, data_flow: 2, errors: 1, side_effects: 1}
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 ---

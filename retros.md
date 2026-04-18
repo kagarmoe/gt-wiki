@@ -1803,3 +1803,17 @@ All planned phases complete:
 
 **Pattern emerging:**
 - Three sub-batches (30 pages), zero fixes. The depth-gap pass is confirming that Phase 2 + Phase 3 + Phase 8 produced interface-level documentation that is above the fix threshold everywhere. The remaining axis weakness (errors at 1/8) is structural — Phase 8 documented failure modes but not every individual error return. This is acceptable per the plan.
+
+## [2026-04-18] stage | Detail Gap Batch 2d — Diagnostics packages
+
+**Sub-batch:** 2d (4 pages: doctor, health, keepalive, deps)
+**Duration:** ~8 min
+**Pages assessed:** 4
+**Fixes applied:** 0
+
+**What went well:**
+- Doctor page already correctly stated "70 non-test .go files" in the body despite sources: frontmatter only listing 11
+- All pages follow the same scoring pattern as previous sub-batches
+
+**Observation:**
+- Four sub-batches (34 pages), still zero fixes. Pattern is now well-established.

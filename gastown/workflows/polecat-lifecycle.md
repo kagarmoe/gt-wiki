@@ -4,7 +4,7 @@ type: workflow
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/sling.go
   - /home/kimberly/repos/gastown/internal/polecat/manager.go
@@ -557,6 +557,85 @@ workflows compose many polecat lifecycles:
   spawn-time env vars.
 - [rig concept](../concepts/rig.md) — polecats live
   inside a rig.
+
+## Lifecycle comparison: Start() across agents
+
+Cross-entity comparison of the four agent Start() functions.
+Each cell verified against source code; asymmetries annotated.
+
+### Start() behavior comparison
+
+| Behavior | Polecat | Witness | Refinery | Crew |
+|---|---|---|---|---|
+| **Creates agent bead** | Yes (`createAgentBeadWithRetry` at `manager.go:308-326`) | No | No | No |
+| **Creates tmux session** | Yes (`NewSessionWithCommand` at `session_manager.go:376`) | Yes (`NewSessionWithCommand` at `manager.go:193`) | Yes (`NewSessionWithCommand` at `manager.go:204`) | Yes (`NewSessionWithCommandAndEnv` at `manager.go:841`) |
+| **Uses `-e` env flags on session creation** | No (sets env after via `SetEnvironment`) | No (sets env after) | No (sets env after) | Yes (`NewSessionWithCommandAndEnv` — prevents parent env leak, GH#1289) |
+| **Starts nudge poller** | No (poller started by `sling.go` caller) | Yes (`nudge.StartPoller` at `manager.go:252`) | Yes (`nudge.StartPoller` at `manager.go:247`) | Yes (`nudge.StartPoller` at `manager.go:888`, non-interactive only) |
+| **Tracks PID** | No (delegated to `session.StartSession` via sling) | Yes (`session.TrackSessionPID` at `manager.go:245`) | Yes (`session.TrackSessionPID` at `manager.go:255`) | Yes (`session.TrackSessionPID` at `manager.go:858`) |
+| **Activates agent logging** | No (handled by `session.StartSession`) | Yes (opt-in via `GT_LOG_AGENT_OUTPUT`, `manager.go:265-268`) | Yes (opt-in, `manager.go:260-263`) | No |
+| **Records telemetry instantiation** | No (handled by `session.StartSession`) | Yes (`RecordAgentInstantiateFromDir` at `manager.go:272`) | Yes (`RecordAgentInstantiateFromDir` at `manager.go:267`) | No |
+| **Zombie detection before start** | Stale check + kill (`session_manager.go:237-243`) | TOCTOU-safe: record creation time, wait `ZombieKillGracePeriod`, re-verify (`manager.go:119-148`) | Simple: `IsAgentAlive` check + immediate kill (`manager.go:125-133`) | Lock-protected: `KillSessionWithProcesses` (`manager.go:811-828`) |
+| **Issues validated before session** | Yes (`validateIssue` at `session_manager.go:254-258`) | n/a (no work bead) | n/a (no work bead) | n/a (no work bead) |
+| **Accepts startup dialogs** | No (delegated to sling caller) | Yes (`AcceptStartupDialogs` at `manager.go:240`) | Yes (suppressed: `_ = t.AcceptStartupDialogs` at `manager.go:234`) | Yes (conditional on `EmitsPermissionWarning`, `manager.go:873-878`) |
+| **Waits for agent ready** | No (delegated to sling caller) | Yes, fatal (`WaitForCommand` at `manager.go:233-237`, kills on failure) | Yes, fatal (`WaitForRuntimeReady` at `manager.go:238-242`, kills on failure) | Conditional (only for `EmitsPermissionWarning` agents, `manager.go:874`) |
+| **Sets auto-respawn hook** | No | No | No | No |
+| **Has foreground mode** | n/a (always background) | Deprecated (returns error at `manager.go:114-117`) | Deprecated (returns error at `manager.go:117-119`) | n/a (always background) |
+| **Acquires file lock** | No | No | No | Yes (flock via `lockCrew` at `manager.go:687-691`) |
+| **Auto-creates workspace if missing** | No (must exist) | No (must exist) | Yes (auto-repairs worktree from bare repo, `manager.go:151-165`) | Yes (auto-creates via `addLocked`, `manager.go:695-701`) |
+
+**Asymmetry: agent bead creation.** Only polecat Start() creates an
+agent bead. Witnesses, refineries, and crew do not have agent beads
+tracking their lifecycle in the beads database. **By design:** polecats
+have persistent identity and a CV chain (work history); infrastructure
+agents (witness, refinery) are replaceable and restarted by the daemon's
+heartbeat loop; crew workers are human-managed. Verified at
+`polecat/manager.go:308-326` (bead creation) and absence of any
+`CreateOrReopenAgentBead` call in `witness/manager.go`,
+`refinery/manager.go`, `crew/manager.go`.
+
+**Asymmetry: TOCTOU-safe zombie detection.** Only witness Start() uses
+the TOCTOU-safe two-step zombie detection (record creation time, wait
+`ZombieKillGracePeriod`, re-verify). Refinery and crew use simpler
+single-check approaches. **Undocumented:** no code comment explains why
+witness needs the stronger guarantee but refinery does not. Both are
+per-rig singletons restarted by the daemon; the witness's TOCTOU guard
+may have been added in response to a production incident (the
+`constants.ZombieKillGracePeriod` reference suggests this) without
+backporting to refinery.
+
+**Asymmetry: `-e` env flags on session creation.** Only crew Start()
+uses `NewSessionWithCommandAndEnv` which passes env vars as tmux `-e`
+flags at session creation time. The other three set env after creation
+via `SetEnvironment`. **By design:** GH#1289 documented that parent env
+(e.g., `GT_ROLE=mayor`) leaked into crew sessions via tmux inheritance;
+the `-e` fix ensures the initial shell starts with correct env. The
+other agents are less affected because they are managed by the daemon
+(which scrubs identity env), not launched from interactive sessions.
+
+**Asymmetry: startup dialog handling.** Polecat Start() does not call
+`AcceptStartupDialogs` — this is delegated to the sling caller chain.
+Refinery suppresses dialog errors with `_ =`. Crew only checks when
+the agent preset has `EmitsPermissionWarning`. **By design:** each agent
+type has different startup timing; the dialog acceptance is placed where
+it fits each agent's specific readiness flow.
+
+### Stop() behavior comparison
+
+| Behavior | Polecat | Witness | Refinery | Crew |
+|---|---|---|---|---|
+| **Stops nudge poller** | No | No | No | Yes (`nudge.StopPoller` at `manager.go:917`) |
+| **Graceful shutdown** | No (immediate kill via nuke path) | No (`KillSession` only, `manager.go:380`) | No (`KillSession` only, `manager.go:322`) | No (`KillSession` only) |
+| **Validates crew name** | n/a | n/a | n/a | Yes (`validateCrewName` at `manager.go:899`) |
+| **Error on not running** | `ErrSessionRunning` check during start | `ErrNotRunning` | `ErrNotRunning` | `ErrSessionNotFound` |
+
+**Asymmetry: nudge poller cleanup.** Only crew Stop() explicitly stops
+the nudge poller. Witness and refinery start pollers in Start() but do
+not stop them in Stop(). **By design:** the comment in crew Stop() says
+"Non-fatal -- the poller will exit on its own when the session dies."
+The poller's `pollerAlive` check at `poller.go:143-163` cleans up stale
+PID files, so the missing explicit stop is not a resource leak. But it
+means witness/refinery leave poller PID files behind until the next
+start detects them as stale.
 
 ## Notes / open questions
 

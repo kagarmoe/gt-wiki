@@ -4,7 +4,7 @@ type: investigation
 status: verified
 topic: gastown
 created: 2026-04-17
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - gastown/commands/daemon.md
   - gastown/commands/boot.md
@@ -359,6 +359,71 @@ succeeded/failed. Re-run `gt up` to start any that failed.
   'gt start' to bring everything back up" — but `gt start` does NOT
   start the daemon. This is a known cobra drift finding. See
   [gt down](../../commands/down.md) ## Drift.
+
+## Lifecycle comparison: daemon/boot/deacon startup and shutdown
+
+Cross-entity comparison of the three infrastructure components'
+lifecycle behavior. Each cell verified against source code.
+
+### Startup behavior
+
+| Behavior | Daemon | Boot | Deacon |
+|---|---|---|---|
+| **Process type** | Go process (not a Claude agent) | Short-lived Claude agent (per daemon tick) | Persistent Claude agent in tmux |
+| **Startup trigger** | `gt daemon start` / `gt up` | Daemon heartbeat tick | `gt deacon start` / `gt up` / Boot triage |
+| **Singleton mechanism** | Exclusive flock on `daemon.lock` (`daemon.go:341-352`) | Lock file at `.boot-running` (`boot.go:89-108`) | Tmux session existence check (`deacon/manager.go:80-93`) |
+| **Creates tmux session** | No (Go process, not tmux-hosted) | Yes (spawned fresh per tick) | Yes (`NewSessionWithCommand` at `deacon/manager.go:126`) |
+| **Depends on tmux** | No (survives tmux server crashes) | Yes (is a tmux session) | Yes (is a tmux session) |
+| **Sets auto-respawn hook** | n/a | No | Yes (PATCH-010: `SetAutoRespawnHook` at `deacon/manager.go:173`) |
+| **Pre-flight checks** | `checkAllRigsDolt` at `daemon.go:354-357` | Lock acquisition only | Zombie check + `KillSessionWithProcesses` |
+| **PID tracking** | PID file with nonce at `daemon.go:368-370` | Status file at `.boot-status.json` | Yes (`session.TrackSessionPID` at `deacon/manager.go:165-167`) |
+| **Metadata repair** | Yes (`doltserver.EnsureAllMetadata` at `daemon.go:361-365`) | No | No |
+| **Identity scrub** | Yes (clears `agentconfig.IdentityEnvVars`, runs as `BD_ACTOR=daemon`) | No (inherits daemon env) | No (receives env via `SetEnvironment`) |
+| **Accepts startup dialogs** | n/a | n/a (handled by Claude runtime) | Yes (`AcceptStartupDialogs` at `deacon/manager.go:180`) |
+| **Starts Dolt server** | Indirectly (via `DoltServerManager` goroutine) | No | No |
+| **Starts nudge poller** | No | No | No |
+
+**Asymmetry: auto-respawn hook.** Only the Deacon has
+`SetAutoRespawnHook` (PATCH-010, `deacon/manager.go:169-177`). When
+Claude exits for any reason, tmux automatically respawns it. This
+prevents the crash loop where the daemon repeatedly restarts the
+Deacon. **By design:** the Deacon is the most critical Claude agent
+(it supervises all others). Boot is intentionally ephemeral (runs and
+exits per tick). The daemon is a Go process that manages its own
+lifecycle.
+
+**Asymmetry: identity scrub.** Only the daemon scrubs identity env
+vars before running. The Deacon and Boot inherit whatever env the
+daemon exports. **By design:** the daemon is the identity root; it
+runs as `BD_ACTOR=daemon` and must not impersonate whoever launched
+`gt daemon start`. The Deacon receives its own identity via
+`SetEnvironment` after session creation.
+
+**Asymmetry: tmux independence.** The daemon is the only infrastructure
+component that survives a tmux server crash (it's a Go process with
+file-based locking, not a tmux session). **By design:** the daemon
+must be able to restart the tmux server and all agents after a crash.
+If the daemon depended on tmux, a tmux crash would be unrecoverable
+without manual intervention.
+
+### Shutdown behavior
+
+| Behavior | Daemon | Boot | Deacon |
+|---|---|---|---|
+| **Shutdown trigger** | `gt down` / `gt daemon stop` / SIGTERM | Natural exit (short-lived) | `gt deacon stop` / daemon heartbeat / `gt down` |
+| **Shutdown lock** | Monitored: `isShutdownInProgress` checks `shutdown.lock` | n/a | n/a |
+| **Graceful shutdown** | Yes: stop feed curator, convoy manager, KRC pruner, push Dolt remotes, stop Dolt, flush OTel | n/a (exits naturally) | Partial: sends `C-c` before kill (`deacon/manager.go:202`) |
+| **State cleanup** | Saves `state.json` with `Running=false`, removes PID file | Releases lock file, saves status | Kills tmux session |
+| **Crash recovery** | Flock auto-releases; PID file may persist (cleaned by next start) | Lock file may persist (removed manually or by next triage) | Auto-respawn hook restarts Claude; daemon detects and restarts if hook fails |
+
+**Asymmetry: graceful shutdown.** The daemon has a comprehensive
+8-step shutdown sequence (`daemon.go:1911-1961`) including a Dolt
+remote push to avoid stranding local commits. The Deacon gets a
+best-effort `C-c` before kill. Boot has no shutdown at all — it's
+designed to exit naturally after triage completes. **By design:** the
+daemon owns long-lived resources (Dolt server, beads stores, OTel
+exporters) that require ordered teardown. The Deacon and Boot are
+Claude sessions with no persistent resources beyond their tmux pane.
 
 ## Related investigation workflows
 

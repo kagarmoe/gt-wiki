@@ -4,7 +4,7 @@ type: investigation
 status: verified
 topic: gastown
 created: 2026-04-17
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - gastown/packages/doltserver.md
   - gastown/packages/beads.md
@@ -230,6 +230,72 @@ cat ~/gt/daemon/restart_state.json  # Per-agent backoff counters
 - **Daemon not running:** Dolt gets no automatic supervision.
   `gt up` starts both the daemon and Dolt. See
   [daemon](../../packages/daemon.md) ## Lifecycle.
+
+## Connection management comparison: beads, doltserver, mail
+
+Cross-entity comparison of how the three data-plane packages acquire
+connections, handle errors, and manage timeouts. Each cell verified
+against source code.
+
+### Connection acquisition
+
+| Behavior | beads (internal/beads) | doltserver (internal/doltserver) | mail (internal/mail) |
+|---|---|---|---|
+| **Connection mode** | Hybrid: subprocess (`bd` via `exec.Command`) or in-process SDK (`beadsdk.Storage`) | Direct MySQL driver (`github.com/go-sql-driver/mysql`) for SQL helpers; subprocess (`dolt sql-server`) for lifecycle | Delegates to beads: subprocess (`bd` via `runBdCommand`) or in-process SDK |
+| **Connection target** | Dolt SQL server on port 3307 (resolved from `.beads/metadata.json`) | Same Dolt SQL server (it IS the server) | Same Dolt SQL server (via beads layer) |
+| **Per-call vs pooled** | Subprocess: one `bd` process per call (~600ms overhead). SDK: connection pooled inside `beadsdk.Storage` | Direct SQL: `database/sql` connection pool. Subprocess: one `dolt` process per call | Subprocess: one `bd` process per call. SDK: reuses `beadsdk.Storage` pool |
+| **Stale PID cleanup** | Yes: `CleanStaleDoltServerPID` at `stale_pid.go:20-46` before resolve | n/a (owns the server process) | Yes: `beads.CleanStaleDoltServerPID` called at `bd.go:62-64` before every subprocess |
+| **BEADS_DIR explicitly set** | Yes: prevents inherited env from causing prefix mismatches (`beads.go:426-430`, GH#803) | n/a | Yes: inherited from beads layer |
+
+**Asymmetry: connection overhead.** The beads package spawns a new
+`bd` subprocess per call (~600ms) unless a `beadsdk.Storage` is
+attached. The doltserver package uses `database/sql` connection
+pooling for its direct SQL helpers. Mail delegates to beads and
+inherits whichever path is available. **By design:** the subprocess
+path provides CLI compatibility and isolation; the SDK path is opt-in
+for callers that can hold a long-lived store (daemon, long-running
+services). The comment at `store.go:1-6` in the mail package records
+the ~600ms motivation for the in-process path.
+
+### Error handling
+
+| Behavior | beads | doltserver | mail |
+|---|---|---|---|
+| **Timeout mechanism** | Context deadline from caller; no package-level default | 2s TCP timeout for `CheckServerReachable`; read/write timeouts of 5 min in `config.yaml` | `bdReadTimeout = 60s`, `bdWriteTimeout = 60s` (context deadlines at `bd.go:15-22`) |
+| **Retry on transient error** | `--allow-stale` flag; `isSubprocessCrash` detection for SIGSEGV retries (`beads.go:555-565`) | `doltSQLWithRetry` retries on `isDoltRetryableError` patterns | `InjectFlatForListJSON` auto-retries without `--flat` if bd rejects the flag (`beads.go:451-468`) |
+| **Error wrapping** | Maps stderr substrings to `ErrNotFound`, `ErrNotInstalled` (`beads.go:531-550`) | Returns raw MySQL/exec errors | Wraps in `bdError` struct with inner error + stderr capture (`bd.go:26-50`) |
+| **Connection refused handling** | Propagates as `bd` subprocess exit code + stderr | `CheckServerReachable` returns error; `WaitForReady` retries | Propagates as `signal: killed` after 60s timeout |
+
+**Asymmetry: timeout values.** Beads has no package-level timeout
+default (relies on caller context). Doltserver uses 2s for reachability
+checks but 5 minutes for read/write (to prevent CLOSE_WAIT
+accumulation). Mail uses 60s for both read and write. **By design:**
+the comment at `bd.go:18-20` records a real incident where 30s caused
+`signal: killed` under concurrent load. The 60s is a deliberate
+overcorrection. Doltserver's 5-minute timeouts are for the MySQL
+`wait_timeout` equivalent, not for individual queries.
+
+### Timeout and capacity thresholds
+
+| Threshold | Value | Package | Source |
+|---|---|---|---|
+| TCP connection timeout | 2s | doltserver | `doltserver.go:587-600` |
+| Read/write timeout (MySQL session) | 5 min each | doltserver | `doltserver.go:137-156` |
+| Max connections | 1000 | doltserver | `doltserver.go:141` |
+| `bd` subprocess read timeout | 60s | mail | `bd.go:15-22` |
+| `bd` subprocess write timeout | 60s | mail | `bd.go:15-22` |
+| In-process store context timeout | 30s | beads | `store.go` (`storeCtx()`) |
+| Dolt health check interval (daemon) | 30s | daemon | `dolt.go:27` |
+| DB list cache TTL | 30s | doltserver | `doltserver.go:1864-1871` |
+
+**Asymmetry: in-process store timeout.** The beads SDK store uses a
+30s context timeout (`storeCtx()`) while the subprocess path uses
+whatever the caller provides (or no timeout). Mail's subprocess path
+uses 60s. **Undocumented:** the 30s vs 60s discrepancy between the
+SDK path and the subprocess path means the same logical operation can
+time out at different thresholds depending on which code path executes.
+The SDK path is faster (no subprocess overhead) so 30s is likely
+sufficient, but no comment explains the choice.
 
 ## Related investigation workflows
 

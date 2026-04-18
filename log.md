@@ -5521,3 +5521,28 @@ Added `## Detail tables` sections with structured reference tables to 6 entity p
 - `gastown/packages/session.md` — StartSession env vars, session name patterns, PID tracking
 
 **Detail tables added:** 22 structured tables across 6 pages. All values verified against source code.
+
+## [2026-04-18] ingest | Cross-page inference Batch 3: Lifecycle comparison tables + asymmetry annotations
+
+Added comparison tables with asymmetry annotations to 3 hub pages, covering 3 lifecycle clusters derived from investigation workflow entity linkages.
+
+**Cluster 1: Agent Start()/Stop() comparison** — placed on `gastown/workflows/polecat-lifecycle.md`.
+Compared polecat, witness, refinery, and crew Start()/Stop() across 15 behavioral dimensions. Found 5 asymmetries:
+- Agent bead creation (polecat only): **by design** — polecats have persistent identity; infrastructure agents are replaceable.
+- TOCTOU-safe zombie detection (witness only): **undocumented** — no code comment explains why witness needs stronger guarantee than refinery.
+- `-e` env flags on session creation (crew only): **by design** — GH#1289 fix for parent env leaking.
+- Startup dialog handling (varies per agent): **by design** — each agent type has different timing.
+- Nudge poller cleanup in Stop() (crew only): **by design** — poller self-terminates when session dies.
+
+**Cluster 2: Daemon startup/shutdown comparison** — placed on `gastown/workflows/investigations/daemon-infrastructure.md`.
+Compared daemon, boot, and deacon across 13 startup + 5 shutdown dimensions. Found 3 asymmetries:
+- Auto-respawn hook (deacon only): **by design** — deacon is the most critical Claude agent.
+- Identity scrub (daemon only): **by design** — daemon is the identity root.
+- Tmux independence (daemon only): **by design** — daemon must survive tmux crashes to restart everything.
+
+**Cluster 3: Data-plane connection management** — placed on `gastown/workflows/investigations/data-plane.md`.
+Compared beads, doltserver, and mail across connection acquisition, error handling, and timeout behavior. Found 2 asymmetries:
+- Connection overhead (subprocess vs pooled): **by design** — subprocess provides CLI compatibility; SDK is opt-in for performance.
+- In-process store timeout (30s vs 60s): **undocumented** — SDK path and subprocess path use different timeout thresholds without explanation.
+
+**Total:** 3 comparison tables with 10 asymmetries annotated (8 "by design", 2 "undocumented").

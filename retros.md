@@ -1539,3 +1539,27 @@ All planned phases complete:
 
 **Follow-ups filed:**
 - None — lessons are purely informational
+
+## [2026-04-17] phase | Phase 8 — Failure Mode Analysis
+
+**Scope:** Audit all 212 entity pages for failure modes. Improve validation score from 35% full toward 60% target.
+
+**Result:** 83 pages with failure mode findings (39%), 129 with [none]. Validation improved from 35% to 45% full (+10pp). Target 60% NOT met.
+
+**What went well:**
+- Absent findings are genuinely valuable. Documenting "this code swallows errors here" or "no rollback on partial completion" creates predicted bug surfaces that will compound over time. These are not padding — they're the wiki doing forward-looking work.
+- The three-question methodology (what errors are swallowed, what partial states are left, what preconditions are unchecked) was consistent and scalable across all page types. Subagents applied it uniformly without drift.
+- Synthesis-only pages (concepts, workflows, roles) got a lighter-weight cross-reference-only treatment that avoided fabrication. Clean separation prevented hallucinated failure modes on pages with no backing source code.
+- Coverage was complete: every entity page was touched and stamped. No pages were missed or skipped.
+
+**What didn't:**
+- The 60% validation target was not met. The gap analysis shows why: 4 of 10 remaining partials are "detail-gap" (the wiki covers the right area but misses specific parameter names, flag values, or config keys) and 2 are "cross-page-inference" (information exists but isn't synthesized across pages). These gap types are not failure-mode shaped — failure-mode analysis cannot fix them.
+- The methodology was designed around error paths, but the validation's partial scores are driven by BOTH error-path gaps AND happy-path implementation-detail gaps. Phase 8 only addressed the former.
+
+**What to change next time:**
+- Future depth passes should target specific detail gaps identified by gap-type tags (failure-mode-gap, detail-gap, cross-page-inference) rather than applying a uniform methodology across all pages. The gap-type taxonomy from the validation retest is the roadmap.
+- The "shortest path to 60%" analysis identified 3 specific fixes that would flip 3 partials to full. A targeted micro-phase hitting those 3 pages would be more efficient than another sweep.
+- When setting validation targets, account for gap-type distribution. If most remaining gaps aren't addressable by the planned methodology, the target should reflect that or the methodology should be scoped differently.
+
+**Follow-ups filed:**
+- bead wiki-24m closed with Phase 8 results

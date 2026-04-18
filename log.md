@@ -5129,3 +5129,20 @@ against the current wiki with Phase 8 failure mode sections.
 **Shortest path to 60% target (3 more fulls):** annotate HandlePolecatDone as dead code (#3653), note witness/refinery Start() lacks agent bead creation (#3652), document GT_PANE_ID staleness across restarts (#3563).
 
 → gastown/drift/validation-retest.md, index.md
+
+## [2026-04-17] drift-found | Phase 8 close (Failure Mode Analysis complete)
+
+**Scope:** Full sweep of all entity pages for failure modes.
+
+**Coverage:** 212 pages audited, 83 with findings (39%), 129 with [none].
+
+**Validation retest:** 35% → 45% full (+10pp). Target 60% not met.
+Remaining gaps: 4 failure-mode-gap, 4 detail-gap, 2 cross-page-inference.
+
+**Key insight:** Failure-mode analysis surfaces error-path bugs (absent
+findings are predicted bug surfaces). But the validation's partial scores
+are driven by BOTH error-path gaps AND happy-path detail gaps. Phase 8
+addressed the former; the latter requires a different methodology
+(implementation-detail deepening, not failure-mode analysis).
+
+→ gastown/drift/README.md, gastown/drift/validation-retest.md

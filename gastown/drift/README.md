@@ -402,3 +402,32 @@ Drift findings by audience (for Phase 6 prioritization):
 - **Stale frontmatter dates:** 82 pages had `updated:` dates older than their last git commit; all fixed
 - **Phase 6 page quality:** all 6 new package pages have proper frontmatter, file:line citations, cross-links, and `## What it actually does` sections
 - **Command page index coverage:** 73 command pages not individually listed in index.md, but all are linked from gastown/commands/README.md (by design — index.md delegates to the commands sub-index)
+
+---
+
+## Section 10: Phase 8 Failure Mode Analysis
+
+### Coverage
+- 212 entity pages audited for failure modes
+- 83 pages with failure mode findings (39%)
+- 129 pages with [none] (61%)
+- All pages stamped with phase8_audited frontmatter
+
+### Finding categories
+- Silent suppression: most common (code swallows errors)
+- Partial completion: second most common (no rollback on failure)
+- Precondition violations: third (unchecked assumptions)
+- Cross-platform: rare (platform shims are mostly stubs)
+
+### Validation retest
+- Original (pre-Phase 8): 7 full (35%), 12 partial (60%), 1 miss (5%)
+- After Phase 8: 9 full (45%), 10 partial (50%), 1 miss (5%)
+- Target of 60% full NOT met
+- Gap analysis: 4 failure-mode-gap, 4 detail-gap, 2 cross-page-inference
+
+### Why the target was missed
+Phase 8 added failure-mode sections to the RIGHT pages, but the validation
+issues often involve SPECIFIC parameter details (flag names, config keys,
+connection timeouts) that failure-mode analysis doesn't naturally surface.
+Failure modes are about error paths; many remaining partials are about
+implementation-detail depth on the happy path.

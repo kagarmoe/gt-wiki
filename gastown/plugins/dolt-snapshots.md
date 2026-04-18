@@ -18,6 +18,7 @@ phase3_severities: []
 phase3_findings_post_release: false
 phase8_audited: 2026-04-17
 phase8_findings: [cross-ref-only]
+detail_depth: {synthesis: 2, relationships: 2}
 ---
 
 # dolt-snapshots plugin

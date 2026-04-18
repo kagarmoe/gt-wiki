@@ -5303,3 +5303,21 @@ Scored 22 command pages in GroupDiag against source. All pages scored against th
 **Pages modified:** 15 (detail_depth added to all). 2 pages got updated sources.
 
 **Outcome:** Plan predicted "Low" depth-gap rate for Ungrouped. Confirmed: 14/15 scored perfect 8/8. These are mostly leaf commands that Phase 2 documented thoroughly.
+
+## [2026-04-18] depth-pass | Detail Gap Batch 2a — Platform packages (9 pages)
+
+**Verb:** depth-pass
+**Scope:** `gastown/packages/` — cli, config, session, style, telemetry, ui, util, version, workspace
+
+**Score distribution (total/8):**
+- 8/8: 1 page (style)
+- 7/8: 4 pages (cli, session, version, workspace)
+- 6/8: 4 pages (config, telemetry, ui, util)
+
+**Complexity:** 8 complex, 1 simple (cli). All above threshold (lowest: 6/8).
+
+**Fixes:** 0 inline fixes needed. All source files match wiki `sources:` frontmatter.
+
+**Pages modified:** 9 (detail_depth added to all).
+
+**Outcome:** Plan predicted "Low" depth-gap rate for Platform. Confirmed: all 9 pages scored 6-8/8. Phase 2 was thorough on these foundational packages — they were the first batch written and received the most attention. The errors axis (mostly 1/8) is the weakest across the board, but Phase 8 already addressed failure modes on most of these pages.

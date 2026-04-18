@@ -1748,3 +1748,22 @@ All planned phases complete:
 - 8 source updates across 4 sub-batches
 - Average score: ~7.4/8
 - Phase 2 + Phase 3 + Phase 8 were thorough on commands/
+
+## [2026-04-18] stage | Detail Gap Batch 2a — Platform packages
+
+**Sub-batch:** 2a (9 pages: cli, config, session, style, telemetry, ui, util, version, workspace)
+**Duration:** ~15 min
+**Pages assessed:** 9
+**Fixes applied:** 0
+
+**What went well:**
+- Sibling-file audit confirmed all sources: frontmatter was already complete on every page
+- Platform packages were Phase 2's first batch and it shows — thorough API documentation throughout
+- Scoring was fast because pages already document exported functions with signatures
+
+**What surprised:**
+- Zero fixes needed, matching Batch 1 (commands/). Plan predicted "Low" gap rate and was correct.
+- The errors axis was consistently the weakest (1/8 on 7 of 9 pages), but Phase 8 already addressed failure modes, so the remaining gap is just that not every error return is individually documented — reasonable for these large packages.
+
+**Recommendation for next sub-batches:**
+- 2b (Data layer) and 2c (Runtime) are predicted "High" gap rate — expect more fixes there since Phase 2 acknowledged `status: partial` on several data-layer packages.

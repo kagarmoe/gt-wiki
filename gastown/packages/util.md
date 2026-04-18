@@ -24,6 +24,7 @@ phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase8_audited: 2026-04-17
 phase8_findings: [precondition, cross-platform]
+detail_depth: {params: 2, data_flow: 1, errors: 1, side_effects: 2}
 ---
 
 # internal/util

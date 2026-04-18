@@ -26,6 +26,7 @@ phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase8_audited: 2026-04-17
 phase8_findings: [silent-suppression, partial-completion]
+detail_depth: {params: 2, data_flow: 2, errors: 1, side_effects: 2}
 ---
 
 # internal/session

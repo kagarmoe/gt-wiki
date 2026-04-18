@@ -296,6 +296,10 @@ keybinding.
 
 - **Cycle binding failure:** `rig.go:1107` uses `_ = t.SetCycleBindings(sessions[0])` during rig add. If tmux binding setup fails, cycle keybindings are unavailable but the rig add succeeds. **Absent** — no warning that cycle bindings are missing.
 
+## Troubleshooting
+
+- [Investigating: workspace setup](../workflows/investigations/workspace-setup.md) — Steps 3-4 cover `gt rig add` failures including clone failures and post-clone setup issues.
+
 ## Notes / open questions
 
 - **`rig` is both a domain noun and a CLI command.** This page

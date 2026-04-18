@@ -180,6 +180,10 @@ Defined in `init()` (`feed.go:30-43`):
 - **MultiSource close error:** `_ = multiSource.Close()` at
   `feed.go:267`. **Absent** — error discarded.
 
+## Troubleshooting
+
+- [Investigating: monitoring](../workflows/investigations/monitoring.md) — Step 8 covers feed event stream issues including missing sources and TUI crashes.
+
 ## Notes / open questions
 
 - `internal/tui/feed` package (imported at `feed.go:12`) is where the

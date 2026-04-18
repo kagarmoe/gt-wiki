@@ -286,6 +286,10 @@ See [gastown/drift/README.md](../drift/README.md) for the consolidated correctio
 
 - **Multi-step workspace creation:** `runInstall` at `install.go:94+` creates directories, writes config files, initializes beads, sets up git, creates GitHub repos, installs shell integration, and provisions supervisors — all in sequence. If any middle step fails (e.g., `--github` repo creation fails after directories and config are written), the workspace is left in a partial state. **Absent** — no rollback of previously created directories/files. A re-run with `--force` is the recovery path.
 
+## Troubleshooting
+
+- [Investigating: workspace setup](../workflows/investigations/workspace-setup.md) — Step 2 covers `gt install` failures including dependency checks, port conflicts, and partial scaffolding.
+
 ## Notes / open questions
 
 - **Install does a lot of things a healthy fresh system already

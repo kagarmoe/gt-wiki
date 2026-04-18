@@ -201,6 +201,10 @@ close duplicate sessions or remove lock files manually.
 
 No failure modes discovered. `agents.go` is a read-only display command: it lists tmux sessions, categorizes them, and either prints to stdout or builds a tmux `display-menu`. The `check`/`fix` subcommands read lock files and clean stale ones — all error paths are checked and propagated. No state mutations that could leave partial artifacts.
 
+## Troubleshooting
+
+- [Investigating: monitoring](../workflows/investigations/monitoring.md) — Steps 4-5 cover agent listing issues and identity collisions.
+
 ## Notes / open questions
 
 - **Phase 3 wiki-stale fix (2026-04-15).** The Phase 2 page body said

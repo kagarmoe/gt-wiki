@@ -135,6 +135,10 @@ None (terminal command).
   execution continues with nil config (defaults applied by
   `NewDashboardMux`). **Present** — warned but non-fatal.
 
+## Troubleshooting
+
+- [Investigating: monitoring](../workflows/investigations/monitoring.md) — Steps 6-7 cover dashboard startup failures and data issues.
+
 ## Notes / open questions
 
 - The dashboard depends on a reachable Dolt server — the env-var

@@ -288,6 +288,10 @@ See forward-link: [../drift/README.md](../drift/README.md).
   `[cached]` debug string). **Present** — cached but with a
   staleness bound.
 
+## Troubleshooting
+
+- [Investigating: monitoring](../workflows/investigations/monitoring.md) — Steps 2-3 cover status data accuracy and `--fast` mode differences.
+
 ## Notes / open questions
 
 - `discoverGlobalAgents`, `discoverRigHooks`, `discoverRigAgents`,

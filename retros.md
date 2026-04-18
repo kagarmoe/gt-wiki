@@ -1817,3 +1817,16 @@ All planned phases complete:
 
 **Observation:**
 - Four sub-batches (34 pages), still zero fixes. Pattern is now well-established.
+
+## [2026-04-18] stage | Detail Gap Batch 2e — Long-running packages
+
+**Sub-batch:** 2e (3 pages: daemon, tmux, runtime)
+**Duration:** ~8 min
+**Pages assessed:** 3
+**Fixes applied:** 0
+
+**What went well:**
+- Daemon page (800 lines) thoroughly covers the architecture despite only listing 14 of 32 source files in frontmatter
+
+**Observation:**
+- Five sub-batches (37 pages), still zero fixes. Moving to the final and largest sub-batch (30 pages).

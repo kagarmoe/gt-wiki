@@ -5375,3 +5375,20 @@ Scored 22 command pages in GroupDiag against source. All pages scored against th
 **Pages modified:** 4 (detail_depth added to all).
 
 **Outcome:** Plan predicted "Medium" depth-gap rate for Diagnostics. Confirmed at the low end: all 4 pages scored 6-7/8. Doctor is the standout — largest package by file count (70 files, ~19k lines) but the wiki correctly documents the Check interface pattern and registry architecture rather than attempting per-check coverage.
+
+## [2026-04-18] depth-pass | Detail Gap Batch 2e — Long-running packages (3 pages)
+
+**Verb:** depth-pass
+**Scope:** `gastown/packages/` — daemon, tmux, runtime
+
+**Score distribution (total/8):**
+- 6/8: 2 pages (tmux, runtime)
+- 5/8: 1 page (daemon — params:1 due to 32-file surface area with status:partial; sources: lists 14 of 32)
+
+**Complexity:** 3/3 complex. All above threshold (lowest: 5/8).
+
+**Fixes:** 0 inline fixes needed. Note: daemon sources: frontmatter lists 14 of 32 actual files. The page body is 800 lines and covers the architecture and patrol-ticker pattern thoroughly. Source-list incompleteness is a coverage concern for a future pass, not a depth gap.
+
+**Pages modified:** 3 (detail_depth added to all).
+
+**Outcome:** Plan predicted "High" depth-gap rate for Long-running packages. Refuted: all 3 pages scored 5-6/8, above threshold. Daemon (status: partial) is the weakest but still covers the interface at a level that exceeds the fix threshold.

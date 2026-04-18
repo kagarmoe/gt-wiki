@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/unsling.go
   - /home/kimberly/repos/gastown/internal/beads/
@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt unsling
@@ -132,6 +134,14 @@ Assignee: "")`.
 Normalizes `rig/crew/name` and `rig/polecats/name` to `rig/name` —
 the canonical form used by mail bead assignees (via
 `mail.AddressToIdentity` in `sendHandoffMail`).
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+
+- **Bead status update failure non-fatal:** `unsling.go:227-235` — if `hookedB.Update` fails to set the bead status back to "open", a warning is printed to stderr but the unsling continues. The agent's hook is cleared but the bead remains in "hooked" status with the old assignee. **Present** — warning emitted but bead status is inconsistent.
+- **Unhook event log silently discarded:** `unsling.go:239` — `_ = events.LogFeed(...)` discards the error. **Absent** — activity feed gap.
+- **Mayor nudge silently discarded:** `unsling.go:247` — same `_ = nudge.Enqueue(...)` pattern as sling/hook. **Absent**.
 
 ## Notes / open questions
 

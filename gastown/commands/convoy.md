@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/convoy.go
   - /home/kimberly/repos/gastown/internal/cmd/convoy_stage.go
@@ -19,6 +19,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt convoy
@@ -163,6 +165,13 @@ attached to individual subcommands.
 - [compact](compact.md), [changelog](changelog.md) — related
   observability tools.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+
+- **Convoy status errors during watch suppressed:** `convoy.go:1526-1527` — when iterating convoys in `convoy watch`, errors reading individual convoy metadata are printed to stderr and skipped via `continue`. A broken convoy is invisible in the watch display. **Present** — warning emitted but convoy is omitted.
+- **Random ID generation failure undetectable:** `convoy.go:41` — `io.ReadFull(r, b)` error is discarded with `_, _ = ...`. If the entropy source fails, the ID will be derived from zero bytes, producing predictable/colliding IDs. **Absent** — convoy ID collision predicted bug surface.
 
 ## Notes / open questions
 

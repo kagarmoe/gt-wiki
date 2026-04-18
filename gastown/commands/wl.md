@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/wl.go
   - /home/kimberly/repos/gastown/internal/cmd/wl_browse.go
@@ -25,6 +25,8 @@ phase3_findings: [wiki-stale]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt wl

@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/sling.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion, silent-suppression]
 ---
 
 # gt sling
@@ -161,6 +163,21 @@ mode). See [formula](formula.md) for formula mechanics and
 Multiple bead args before a rig target each get their own polecat.
 `--max-concurrent` throttles spawn rate to prevent Dolt server
 overload (`sling.go:101-107` Long text).
+
+## Failure modes
+
+### Partial completion (what doesn't it clean up?)
+
+- **Formula instantiation failure after polecat spawn leaves orphaned polecat:** `sling.go:870-883` — if `InstantiateFormulaOnBead` fails after `resolveTarget` spawned a new polecat, `rollbackSlingArtifactsFn` runs to clean up. But rollback itself can partially fail (e.g., worktree removal succeeds but bead unhook fails), leaving a zombie polecat with a stale hook. **Present** — rollback logic exists but is best-effort.
+- **Session start failure after hook set:** `sling.go:993-998` — if `newPolecatInfo.StartSession()` fails, rollback runs. But the bead has already been hooked (line 918), event logged (line 940), and fields stored (line 963). Rollback at line 997 unhooks the bead but does not undo the event log entry or field writes. **Present** — partial rollback.
+- **Auto-convoy creation failure is non-fatal:** `sling.go:770-771` — if `createAutoConvoy` fails, a warning is printed but the sling proceeds. The work is dispatched but invisible on the convoy dashboard. **Present** — warning emitted, by design.
+
+### Silent suppression (what errors are swallowed?)
+
+- **Nudge enqueue for mayor silently discarded:** `sling.go:928` — `_ = nudge.Enqueue(...)` discards the error. If the nudge queue is broken, the mayor is never notified of the hook change. **Absent** — no warning, no fallback.
+- **Activity feed event logging discarded:** `sling.go:940` — `_ = events.LogFeed(...)` silently drops the error. The sling succeeds but the activity feed has a gap. **Absent** — no indication the event was lost.
+- **Field storage failure non-fatal:** `sling.go:963-965` — if `storeFieldsInBead` fails, a warning is printed but the sling continues. The polecat may lack args/formula metadata when it starts. **Present** — warning emitted.
+- **BD_DOLT_AUTO_COMMIT env manipulation not thread-safe:** `sling.go:239-247` — `os.Setenv` / `os.Unsetenv` is process-global. Concurrent sling calls in the same process could race on this env var. **Absent** — predicted bug surface under concurrent load.
 
 ## Notes / open questions
 

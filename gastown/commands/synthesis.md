@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/synthesis.go
   - /home/kimberly/repos/gastown/internal/formula/
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt synthesis
@@ -129,6 +131,13 @@ outputs, and prints:
 | `--dry-run` | `false` | Preview. |
 | `--force` | `false` | Start even if some legs incomplete. |
 | `--review-id <id>` | `""` | Override review ID for output paths. |
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+
+- **Tracking dep-add silently discarded:** `synthesis.go:605` — `_ = depCmd.Run()` discards the error from adding the convoy-tracks-synthesis dependency. If this fails, the synthesis bead exists but is disconnected from the convoy tracking graph. **Absent** — convoy status display won't show the synthesis step.
+- **Formula parse errors silently ignored:** `synthesis.go:255,258` — `f, _ = formula.ParseFile(...)` discards parse errors. If the formula file is malformed, the synthesis proceeds without formula guidance (leg naming, ordering, etc. fall back to defaults). **Absent** — synthesis runs without formula context, potentially producing unexpected structure.
 
 ## Notes / open questions
 

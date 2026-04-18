@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/changelog.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -14,6 +14,8 @@ phase3_findings: [cobra-drift]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt changelog
@@ -204,6 +206,13 @@ See forward-link: [../drift/README.md](../drift/README.md).
   and registered byte-identical at `v1.0.0:internal/cmd/changelog.go:22`
   and `:49`, and `changelogSinceTime` at `:99-121` never reads it at
   v1.0.0 either.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+
+- **Per-rig beads query failures silently skipped:** `changelog.go:157-159` — if `fetchClosedBeads` returns an error for a rig location, the `continue` drops it with no warning. A rig's entire closed-bead history is invisible if its beads database is corrupted or unreachable. **Absent** — no indication to the user that results are incomplete.
+- **ClosedAt parse errors silently skip beads:** `changelog.go:188-189` — if `time.Parse(time.RFC3339, b.ClosedAt)` fails, the bead is silently skipped with `continue`. **Absent** — beads with non-RFC3339 timestamps are invisible in the changelog.
 
 ## Notes / open questions
 

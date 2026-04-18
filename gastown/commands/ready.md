@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/ready.go
   - /home/kimberly/repos/gastown/internal/beads/
@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt ready
@@ -111,6 +113,14 @@ type ReadySummary struct {
 ### Subcommands
 
 None.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+
+- **Rig beads errors silently degraded:** `ready.go:158-160` — when `rigBeads.Ready()` fails for a rig, the error is stored in `ReadySource.Error` and surfaced as a warning at `ready.go:246-251`, but only if some sources succeeded. If ALL sources fail, a proper error is returned. **Present** — partial failure is visible but doesn't block the command.
+- **Wisp ID query failures swallowed:** `ready.go:389-390` — `getWispIDs` returns `nil` on any error (Dolt unavailable, wisp table missing), meaning wisps silently leak into ready output. **Absent** — user sees wisps in ready work with no indication the filter failed.
+- **Formula names read failure swallowed:** `ready.go:333-335` — `os.ReadDir` failure returns `nil` map, so formula scaffolds silently appear in ready work. **Absent** — same pattern as wisp filter.
 
 ## Notes / open questions
 

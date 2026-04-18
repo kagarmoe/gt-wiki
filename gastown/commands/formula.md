@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/formula.go
   - /home/kimberly/repos/gastown/internal/cmd/formula_overlay.go
@@ -20,6 +20,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt formula
@@ -206,6 +208,13 @@ Per-subcommand, defined in `init()` at `formula.go:161-185`:
 - [mq](mq.md) — merge-queue formulas are part of the refinery loop
   that consumes the work formulas dispatch.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+
+- **Formula file parse errors silently ignored in `formula run`:** `formula.go:633,640` — dependency-add commands via `BdCmd("dep", "add", ...)` at lines 633 and 640 discard errors with `_ = ...Run()`. If the dep-add fails, the tracking relation between convoy and synthesis or between synthesis and leg beads is missing. **Absent** — the workflow runs but convoy tracking is broken silently.
+- **Comment on synthesis failure silently ignored:** `formula.go:690` — `_ = commentCmd.Run()` discards the error from adding a comment to a step bead after a sling failure. **Absent** — audit trail gap.
 
 ## Notes / open questions
 

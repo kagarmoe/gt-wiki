@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/mq.go
   - /home/kimberly/repos/gastown/internal/cmd/mq_next.go
@@ -15,6 +15,8 @@ phase3_findings: [wiki-stale]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion, silent-suppression]
 ---
 
 # gt mq
@@ -274,6 +276,18 @@ See forward-link: [../drift/README.md](../drift/README.md).
   new row enumerates `mq next`'s behavior, flags, and sibling-file
   registration; the frontmatter `sources:` list now includes
   `mq_next.go`).
+
+## Failure modes
+
+### Partial completion (what doesn't it clean up?)
+
+- **`mq post-merge` branch delete failure is non-fatal:** `mq.go:570-573` — if `rigGit.DeleteRemoteBranch` fails, a warning is printed but the command returns nil. The MR bead and source issue are already closed. The orphaned remote branch persists indefinitely. **Present** — warning emitted, but no automated retry or cleanup bead.
+- **`mq post-merge` local branch delete error fully swallowed:** `mq.go:578-579` — `_ = err` explicitly discards the error from `DeleteBranch`. **Absent** — local tracking branches accumulate without warning.
+
+### Silent suppression (what errors are swallowed?)
+
+- **Rigs config load failure silently creates empty config:** `mq.go:399-401` — if `config.LoadRigsConfig` fails, a fresh empty config is used. The rig lookup at line 406 may then fail with a confusing "rig not found" error rather than surfacing the root cause (config unreadable). **Absent** — root cause masked by downstream error.
+- **Rig settings load error silently defaults to delete-enabled:** `mq.go:547-549` — if `config.LoadRigSettings` fails, `deleteEnabled` stays `true` (default). A rig that configured `delete_merged_branches: false` has its setting silently ignored. **Absent** — branches deleted despite config requesting preservation.
 
 ## Notes / open questions
 

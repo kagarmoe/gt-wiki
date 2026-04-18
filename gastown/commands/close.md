@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/close.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt close
@@ -145,6 +147,14 @@ flags. The `Long` text at `close.go:23-38` calls out `--force` and
 - [convoy](convoy.md) — the convoy subsystem that receives completion
   events via `checkConvoyCompletion`.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+
+- **Convoy completion check entirely swallowed:** `close.go:99-105` — `checkConvoyCompletion` is called after successful close, but the function at `close.go:249-275` silently returns on every error path (workspace not found, store open failure, executable lookup failure). No warning is emitted. **Absent** — if convoy completion detection fails, the convoy sits open indefinitely until the daemon's backup polling catches it.
+- **Cascade child query failure swallowed:** `close.go:155-159` — if `bd children --json` fails, a warning is printed to stderr but execution continues, potentially leaving children open when the parent closes. **Present** — warning emitted.
+- **Cascade child JSON parse failure swallowed:** `close.go:161-164` — if JSON parse of children output fails, warning printed and returned nil (no error). **Present** — warning emitted, cascade silently skipped.
 
 ## Notes / open questions
 

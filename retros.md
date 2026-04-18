@@ -1284,3 +1284,25 @@ All planned phases complete:
 
 **Follow-ups filed:**
 - none — lessons are informational only
+
+## [2026-04-17 14:00] stage | 8.1.1c — Failure modes: commands/ Work Management
+
+**Actor:** subagent (wiki-curator)
+**Unit:** 26 GroupWork command pages audited for failure modes. All primary source files read (sling.go, convoy.go, done.go, mq.go, hook.go, handoff.go, mountain.go, and 19 others). 26 wiki pages updated with `phase8_audited`/`phase8_findings` frontmatter; 17 pages received `## Failure modes` sections.
+**Duration:** one dispatch
+
+**What went well:**
+- The high-complexity targets (sling.go at 1192 lines, convoy.go at 2739 lines, done.go at 1896 lines) yielded the richest findings. sling had both partial-completion (rollback after formula failure) and silent-suppression (env var race condition, nudge/event discards). done had the most safety-critical absent findings: done-intent label and heartbeat writes are fire-and-forget, meaning Witness crash recovery is blind if they fail.
+- Pre-reading all source files before edits worked well. Used `Grep` for error-path-specific patterns (`_ = `, `continue$`, `fmt.Fprintf(os.Stderr`) to efficiently navigate large files.
+- 9 pages triaged as fast [none] (cat, cleanup, molecule, orphans, prune-branches, release, resume, scheduler, wl) — either too simple for failure modes or pure parent/dispatcher commands.
+
+**What didn't:**
+- convoy.go at 2739 lines required multiple chunked reads and pattern searches. The file is spread across 4 source files (convoy.go, convoy_stage.go, convoy_launch.go, convoy_watch.go) but only convoy.go was deep-read. Some findings in the sibling files may have been missed.
+- The `phase8_findings` vocabulary used `partial-completion` and `silent-suppression` per the Batch 1b standardization note. `precondition-violation` findings were not prominent in this group — the Work Management commands are generally well-guarded with precondition checks.
+
+**What to change next time:**
+- For commands with 4+ source files (convoy, formula), grep all sibling files for error patterns rather than only deep-reading the primary file.
+- The 26-page batch is at the upper limit of what fits in one dispatch. Future batches of this size should consider splitting into 2 sub-batches.
+
+**Follow-ups filed:**
+- none — lessons are informational only

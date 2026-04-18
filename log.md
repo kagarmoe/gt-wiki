@@ -4774,3 +4774,51 @@ Plus two optional sub-sections:
 - `shell status`: treats any state load error as "not configured"
 
 → gastown/commands/{account,config,directive,disable,enable,hooks,issue,plugin,shell,theme,uninstall}.md
+
+## [2026-04-17] drift-found | Phase 8 Batch 1c (Failure modes: commands/ Work Management — 26 pages)
+
+**Scope:** Failure mode analysis across 26 GroupWork command pages.
+
+**Pages audited:**
+- [assign](gastown/commands/assign.md) — `phase8_findings: [partial-completion, silent-suppression]`
+- [bead](gastown/commands/bead.md) — `phase8_findings: [partial-completion]`
+- [cat](gastown/commands/cat.md) — `phase8_findings: [none]`
+- [changelog](gastown/commands/changelog.md) — `phase8_findings: [silent-suppression]`
+- [cleanup](gastown/commands/cleanup.md) — `phase8_findings: [none]`
+- [close](gastown/commands/close.md) — `phase8_findings: [silent-suppression]`
+- [compact](gastown/commands/compact.md) — `phase8_findings: [silent-suppression]`
+- [convoy](gastown/commands/convoy.md) — `phase8_findings: [silent-suppression]`
+- [done](gastown/commands/done.md) — `phase8_findings: [partial-completion, silent-suppression]`
+- [formula](gastown/commands/formula.md) — `phase8_findings: [silent-suppression]`
+- [handoff](gastown/commands/handoff.md) — `phase8_findings: [partial-completion, silent-suppression]`
+- [hook](gastown/commands/hook.md) — `phase8_findings: [silent-suppression]`
+- [molecule](gastown/commands/molecule.md) — `phase8_findings: [none]`
+- [mountain](gastown/commands/mountain.md) — `phase8_findings: [partial-completion]`
+- [mq](gastown/commands/mq.md) — `phase8_findings: [partial-completion, silent-suppression]`
+- [orphans](gastown/commands/orphans.md) — `phase8_findings: [none]`
+- [prune-branches](gastown/commands/prune-branches.md) — `phase8_findings: [none]`
+- [ready](gastown/commands/ready.md) — `phase8_findings: [silent-suppression]`
+- [release](gastown/commands/release.md) — `phase8_findings: [none]`
+- [resume](gastown/commands/resume.md) — `phase8_findings: [none]`
+- [scheduler](gastown/commands/scheduler.md) — `phase8_findings: [none]`
+- [sling](gastown/commands/sling.md) — `phase8_findings: [partial-completion, silent-suppression]`
+- [synthesis](gastown/commands/synthesis.md) — `phase8_findings: [silent-suppression]`
+- [trail](gastown/commands/trail.md) — `phase8_findings: [silent-suppression]`
+- [unsling](gastown/commands/unsling.md) — `phase8_findings: [silent-suppression]`
+- [wl](gastown/commands/wl.md) — `phase8_findings: [none]`
+
+**Findings summary:**
+- 17 pages with failure modes documented (7 partial-completion, 15 silent-suppression)
+- 9 pages with [none] (cat, cleanup, molecule, orphans, prune-branches, release, resume, scheduler, wl)
+
+**Notable absent findings (predicted bug surfaces):**
+- `sling`: `BD_DOLT_AUTO_COMMIT` env manipulation is process-global, not thread-safe under concurrent sling; nudge enqueue and event logging silently discarded
+- `done`: done-intent label and heartbeat state writes are fire-and-forget; if they fail, Witness crash-recovery and liveness detection are blind
+- `assign`: bead created but never cleaned up if all 5 hook retries fail; `updateAgentHookBead` errors unchecked
+- `mountain`: mountain label added before launch; no rollback on launch failure leaves labeled-but-unlaunched convoy visible to Deacon/Witness
+- `mq post-merge`: rig settings load failure silently defaults to delete-enabled, deleting branches despite config requesting preservation
+- `convoy`: `io.ReadFull(rand.Reader, b)` error discarded; entropy failure produces predictable/colliding convoy IDs
+- `bead move`: new bead created via bare `exec.Command` without explicit Dir routing; may create bead in wrong database
+- `changelog`: per-rig beads query failures silently skipped; results can be incomplete with no user indication
+
+→ gastown/commands/{assign,bead,cat,changelog,cleanup,close,compact,convoy,done,formula,handoff,hook,molecule,mountain,mq,orphans,prune-branches,ready,release,resume,scheduler,sling,synthesis,trail,unsling,wl}.md

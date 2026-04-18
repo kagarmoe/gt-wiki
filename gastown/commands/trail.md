@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/trail.go
 tags: [command, work, trail, audit, activity, git-log, hook-events, beads]
@@ -13,6 +13,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt trail
@@ -130,6 +132,15 @@ type HookEntry struct { Type, Actor, Bead string
   display paths.
 - `findBeadsDir` (`:470-479`) — delegates to `findLocalBeadsDir`
   with a fallback to `findMailWorkDir`.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+
+- **JSON parse errors in events file:** `readHookTrailEntries` at `trail.go:430-431` — if `json.Unmarshal` fails on an event line, it silently `continue`s, skipping the entry with no warning. **Absent** — corrupted event lines are invisible to the user.
+- **Date parse errors on commits:** `trail.go:171` — `time.Parse(time.RFC3339, parts[4])` error is discarded with `date, _ := ...`. The commit still renders but with a zero `Date` value. **Absent** — could display incorrect time data.
+- **Date parse errors on beads:** `trail.go:287` — same pattern: `time.Parse(time.RFC3339, parts[4])` error discarded. **Absent**.
+- **Config load errors suppressed:** `trail.go:129-132` — `workspace.FindFromCwd()` and `config.LoadOrCreateTownSettings()` errors are silently caught; falls back to `DefaultAgentEmailDomain`. **Present** — graceful fallback, but no warning that custom domain config was ignored.
 
 ## Notes / open questions
 

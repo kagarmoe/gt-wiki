@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/assign.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion, silent-suppression]
 ---
 
 # gt assign
@@ -159,6 +161,18 @@ See forward-link: [../drift/README.md](../drift/README.md).
 - **Release position:** `in-release` — both the flag registration
   and the absence of any `assignForce` read exist byte-identical at
   `v1.0.0:internal/cmd/assign.go:51` and `:62`.
+
+## Failure modes
+
+### Partial completion (what doesn't it clean up?)
+
+- **Bead created but hook fails:** `assign.go:124-161` — Step 1 creates a bead via `bd create`. If Step 2's hook (bd update --status=hooked) fails after all 5 retries, the bead remains as an unassigned orphan with no cleanup. **Absent** — the created bead is never deleted on hook failure.
+
+### Silent suppression (what errors are swallowed?)
+
+- **Event log failure:** `assign.go:169-171` — `events.LogFeed` error is printed to stderr as a warning but does not cause the command to fail. **Present** — warning emitted.
+- **Nudge failure:** `assign.go:182-183` — if `--nudge` is set and the nudge subprocess fails, a warning is printed to stderr but the command exits 0. **Present** — warning emitted, but agent won't be notified.
+- **Agent hook_bead update silently ignored:** `assign.go:166-167` — `updateAgentHookBead` is called but its errors (if any) are not checked at this call site. **Absent** — predicted bug surface; stale agent bead data.
 
 ## Notes / open questions
 

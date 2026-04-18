@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/compact.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: dev
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt compact
@@ -154,6 +156,14 @@ type compactAction struct {
   processes. The `compact` / `cleanup` / `dolt cleanup` split is a
   known naming ambiguity.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+
+- **Promotion comment failure swallowed:** `compact.go:365` — after promoting a wisp via `bd update --persistent`, the follow-up `bd comment` at `compact.go:365` discards its error with `_, _ = bd.Run(...)`. The promotion succeeds but the audit trail comment is silently lost. **Absent** — no indication the comment failed.
+- **Orphaned wisp_deps cleanup error collected but not fatal:** `compact.go:289-290` — the SQL DELETE for orphaned wisp dependencies appends to `result.Errors` on failure but doesn't stop compaction. **Present** — error surfaces in JSON/summary output.
+- **Rig bead TTL override silently ignored on error:** `compact.go:137-139` — `bd.Show(rigBeadID)` failure returns early with no warning, falling back to defaults. **Absent** — custom TTL overrides silently don't apply if the rig bead is unreachable.
 
 ## Notes / open questions
 

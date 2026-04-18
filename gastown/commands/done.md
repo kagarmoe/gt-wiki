@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/done.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -17,6 +17,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion, silent-suppression]
 ---
 
 # gt done
@@ -217,6 +219,20 @@ fields, forward link to the drift index). The substance of the
 finding is unchanged; only the shape is. Per the plan, Sweep 2
 Batch 9 (`docs/CLEANUP.md` formal re-audit) will supersede the
 pre-plan informal entry and this section will be left as-is.
+
+## Failure modes
+
+### Partial completion (what doesn't it clean up?)
+
+- **Auto-commit can fail silently while continuing:** `done.go:292-316` — if `g.Add("-A")` fails, a warning is printed but gt done continues. The uncommitted work remains at risk. If `g.Commit(autoMsg)` fails, same pattern — warning printed, doneCleanupStatus NOT updated from "uncommitted", and the flow continues with stale status. **Present** — warnings emitted, but work may still be lost.
+- **Push failure leaves branch in limbo:** `done.go:673-712` — the code has three fallback push paths (worktree, bare repo, mayor/rig). If all three fail, the branch is "committed locally but failed to push" — the commits exist only in the worktree's git objects. Since the polecat's worktree may be nuked after gt done completes, the commits could be lost. The Witness is notified but can't recover the data. **Present** — witness notification exists but data recovery is not guaranteed.
+- **Overlay strip adds commit but fails silently if git operations fail:** `done.go:564` — `stripOverlayCLAUDEmd` internally runs git operations that could fail, leaving the overlay in the committed history. **Absent** — if the strip commit fails, CLAUDE.md overlay pollutes the PR diff.
+
+### Silent suppression (what errors are swallowed?)
+
+- **Issue close retry failures after no-MR path:** `done.go:533-536` — after 3 failed close attempts, a warning is printed but gt done continues. The issue remains in HOOKED status with the assignee pointing to a polecat that's about to be cleaned up. **Present** — warning emitted but issue is orphaned.
+- **Heartbeat state write failure ignored:** `done.go:387-388` — `polecat.TouchSessionHeartbeatWithState` errors are not checked. If heartbeat write fails, the Witness doesn't know the polecat is in the gt done flow. **Absent** — Witness falls back to timer-based inference which may be wrong.
+- **Done-intent label write failure ignored:** `done.go:376` — `setDoneIntentLabel` errors are not propagated. If this fails, the Witness crash-recovery mechanism doesn't know gt done was attempted. **Absent** — crash recovery gap.
 
 ## Notes / open questions
 

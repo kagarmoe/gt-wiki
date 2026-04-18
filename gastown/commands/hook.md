@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/hook.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt hook
@@ -179,6 +181,14 @@ same `moleculeJSON` global (`hook.go:168-170`).
   hook scripts — unrelated to this command's concept but easily
   confused by name.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+
+- **Mayor nudge enqueue silently discarded:** `hook.go:400` — `_ = nudge.Enqueue(...)` discards the error. If the nudge fails, the mayor is never notified of the hook change. Same pattern as sling. **Absent** — no warning, no fallback.
+- **Hook event log failure warned but non-fatal:** `hook.go:426-428` — `events.LogFeed` error prints to stderr but does not fail the command. **Present** — warning emitted.
+- **`updateAgentHookBead` errors not checked:** `hook.go:416` — the call to `updateAgentHookBead` does not check for errors at this call site. If the agent bead's hook_bead field update fails, the hook display (`gt hook show`) may show stale data. **Absent** — predicted bug surface for hook status consistency.
 
 ## Notes / open questions
 

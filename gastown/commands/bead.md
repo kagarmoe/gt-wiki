@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/bead.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion]
 ---
 
 # gt bead
@@ -108,6 +110,13 @@ Internal struct at `bead.go:97-107` used to deserialize `bd show
   wrapper. `runBeadMove` shells directly to `bd close` (not `gt close`)
   for its rollback path.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+### Partial completion (what doesn't it clean up?)
+
+- **`bead move` source close failure leaves duplicates:** `bead.go:196-207` — after creating the new bead, if closing the source bead fails, the code attempts to close the new bead as cleanup. But if *that* cleanup also fails, both old and new beads remain open with a manual cleanup message to stderr. **Present** — cleanup attempt exists but can fail, leaving both beads open. The error message at `bead.go:202-203` explicitly warns of the double-open state.
+- **`bead move` creates new bead via raw `exec.Command`:** `bead.go:183-189` — unlike the source show which uses `BdCmd` with routing, the create uses bare `exec.Command("bd", ...)` without explicit `Dir`. **Absent** — if cwd is not in the target prefix's rig, the new bead may be created in the wrong database.
 
 ## Notes / open questions
 

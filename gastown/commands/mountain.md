@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/mountain.go
   - /home/kimberly/repos/gastown/internal/cmd/convoy.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion]
 ---
 
 # gt mountain
@@ -109,6 +111,13 @@ via `hasBeadLabel(…, "mountain:skipped")` and DAG blocker analysis
   convoy-id; if epic, searches for a mountain convoy whose title
   contains the epic title.
 - `renderProgressBar` (`:626-640`): Unicode bar `███░░░` helper.
+
+## Failure modes
+
+### Partial completion (what doesn't it clean up?)
+
+- **Mountain label added but launch fails leaves labeled convoy in staged state:** `mountain.go:214-235` — Step 4 adds the `mountain` label. If Step 5 (`transitionConvoyToOpen`) or `dispatchWave1` fails, the convoy has the mountain label but isn't open/launched. The Deacon and Witness see a mountain that never actually started. **Absent** — no rollback of the mountain label on launch failure.
+- **Cancel removes mountain label but not paused label on failure:** `mountain.go:704` — `bdRemoveLabelTown(convoyID, "mountain:paused")` is best-effort with `_ = ...`. If the mountain label removal succeeds but paused label removal fails, a stale `mountain:paused` label persists. **Present** — best-effort cleanup, minor cosmetic issue.
 
 ## Notes / open questions
 

@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/handoff.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
@@ -16,6 +16,8 @@ phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 phase5_audience: agent
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion, silent-suppression]
 ---
 
 # gt handoff
@@ -168,6 +170,18 @@ commands.
 - [mail](../commands/) (not yet mapped) — used to compose the
   handoff mail.
 - [../binaries/gt.md](../binaries/gt.md) — root.
+
+## Failure modes
+
+### Partial completion (what doesn't it clean up?)
+
+- **Handoff marker and runtime dir writes best-effort:** `handoff.go:334-336` — `os.MkdirAll` and `os.WriteFile` for the handoff marker both discard errors with `_ = ...`. If these fail, the successor session may re-trigger handoff (handoff loop bug). **Absent** — the marker is the only protection against handoff loops.
+
+### Silent suppression (what errors are swallowed?)
+
+- **Event log writes silently discarded:** `handoff.go:315-316` — both `LogHandoff` and `events.LogFeed` errors are discarded with `_ = ...`. The handoff succeeds but the audit trail has a gap. **Absent** — no indication the event was lost.
+- **Auto-handoff mail failure prints to stderr but continues:** `handoff.go:407-408` — if `sendHandoffMail` fails in the auto-handoff path, a warning is printed to stderr but the cycle continues. The successor session starts with no handoff context. **Present** — warning emitted but context is lost.
+- **Session env update errors for handoff silently ignored:** `handoff.go:1005,1036` — `_ = t.SetEnvironment(...)` calls discard errors. If tmux env isn't updated, liveness detection may produce false results. **Absent** — predicted bug surface for liveness checks.
 
 ## Notes / open questions
 

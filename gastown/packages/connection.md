@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-16
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/connection/address.go
   - /home/kimberly/repos/gastown/internal/connection/connection.go
@@ -165,6 +165,21 @@ key), `TownPath` (remote town root).
 - [polecat role](../roles/polecat.md) -- the polecat worker that
   addresses identify.
 - [go-packages inventory](../inventory/go-packages.md)
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| (dynamic) | (dynamic) | `args...` (CombinedOutput) | caller | `local.go:138` |
+| (dynamic) | (dynamic) | `args...` (Start) | caller | `local.go:143` |
+| (dynamic) | (dynamic) | `args...` (Run) | caller | `local.go:150` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| arbitrary path | caller data | `LocalConnection.WriteFile` | `local.go:51` |
+| registry file | JSON data | Connection registry persistence | `registry.go:101` |
 
 ## Notes / open questions
 

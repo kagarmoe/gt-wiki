@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/estop/estop.go
 tags: [package, estop, safety, sentinel-file, town-wide]
@@ -124,6 +124,14 @@ caller is. Enforcement lives in the freeze code that consumes `IsActive`.
   Mayor from any other caller. Any code path that reads `IsActive` and
   acts on it (freeze/pause) is responsible for respecting the exemption
   — easy to get wrong in a new consumer.
+
+## Outgoing calls
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| estop file (town) | content string | Town-level emergency stop | `estop.go:60` |
+| estop file (rig) | content string | Rig-level emergency stop | `estop.go:108` |
 
 ## Notes / open questions
 

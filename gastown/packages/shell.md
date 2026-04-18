@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/shell/integration.go
 tags: [package, shell, integration, rc-file, hook, zsh, bash]
@@ -139,6 +139,17 @@ Lives as a string literal at `integration.go:154-304`. Structure:
   script is the same file written by this package.)
 - [gt](../binaries/gt.md).
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Outgoing calls
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| shell hook script | hook script content | Shell integration hook | `integration.go:84` |
+| shell config backup | original content | Pre-modification backup | `integration.go:102` |
+| shell config file | content + block | Install shell integration | `integration.go:107` |
+| shell config file | updated content | Remove shell integration | `integration.go:137` |
+| shell config file | updated content | Update shell integration | `integration.go:151` |
 
 ## Notes / open questions
 

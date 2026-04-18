@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/lock/lock.go
   - /home/kimberly/repos/gastown/internal/lock/flock_unix.go
@@ -215,6 +215,20 @@ cleaned, err := lock.CleanStaleLocks(townRoot)
 - [gt doctor](../commands/doctor.md) — uses `CleanStaleLocks` and
   `DetectCollisions` in fix mode.
 - [go-packages inventory](../inventory/go-packages.md)
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| (dynamic) | (dynamic) | `args...` | `execCommand` wrapper | `lock.go:369` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| lock file (Unix) | flock acquire | Advisory file lock | `flock_unix.go:23` |
+| lock file (Unix try) | flock acquire | Non-blocking lock attempt | `flock_unix.go:45` |
+| lock tmp file | JSON data | Atomic lock state update | `lock.go:211` |
 
 ## Notes / open questions
 

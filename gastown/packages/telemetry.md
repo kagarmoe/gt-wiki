@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/telemetry/telemetry.go
   - /home/kimberly/repos/gastown/internal/telemetry/recorder.go
@@ -374,6 +374,15 @@ controlling surface here.
   `serviceVersion`. **Present** — explicitly documented in the
   function's doc comment, and in practice each process calls `Init`
   once, so this is informational rather than a bug.
+
+## Outgoing calls
+
+### Environment variables set
+| Variable | Value source | Consumed by | `file:line` |
+|---|---|---|---|
+| `OTEL_RESOURCE_ATTRIBUTES` | compiled attributes string | bd subprocesses | `subprocess.go:65` |
+| `BD_OTEL_METRICS_URL` | `metricsURL` | bd subprocesses | `subprocess.go:69` |
+| `BD_OTEL_LOGS_URL` | `logsURL` | bd subprocesses | `subprocess.go:71` |
 
 ## Notes / open questions
 

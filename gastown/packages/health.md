@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/health/health.go
 tags: [package, diagnostics, health, dolt, network]
@@ -137,6 +137,13 @@ in a `Report` struct.
 - [internal/util](util.md) — for `SetDetachedProcessGroup` (the
   git subprocess in `JSONLGitFreshness`).
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `git` | `log` | `-C <gitRepo> -1 --format=%ci` | hardcoded | `health.go:149` |
 
 ## Notes / open questions
 

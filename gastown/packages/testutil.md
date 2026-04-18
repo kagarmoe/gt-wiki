@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/testutil/cmd.go
   - /home/kimberly/repos/gastown/internal/testutil/doltserver.go
@@ -124,6 +124,23 @@ with the unix file so grep hits both.
 - **Test utility platform shim:** The package has a platform-specific
   helper for test process management. **Untested** — test utilities
   are development-only and the shim may not run on all platforms.
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `bd` | (dynamic) | `args...` | test caller | `cmd.go:39` |
+| `gt` | (dynamic) | `args...` | test caller | `cmd.go:48` |
+| `bd` | (dynamic) | `args...` (isolated env) | test caller | `cmd.go:56` |
+| `gt` | (dynamic) | `args...` (isolated env) | test caller | `cmd.go:66` |
+| `docker` | `info` | (none) | hardcoded | `doltserver.go:38` |
+
+### Environment variables set
+| Variable | Value source | Consumed by | `file:line` |
+|---|---|---|---|
+| `GT_DOLT_PORT` | Dolt container port | test gt subprocesses | `doltserver.go:96` |
+| `BEADS_DOLT_PORT` | Dolt container port | test bd subprocesses | `doltserver.go:97` |
 
 ## Notes / open questions
 

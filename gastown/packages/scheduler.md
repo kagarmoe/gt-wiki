@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/scheduler/capacity/config.go
   - /home/kimberly/repos/gastown/internal/scheduler/capacity/dispatch.go
@@ -218,6 +218,13 @@ This matches the implementation exactly.
   (`config.go:82-84`). A typo in `spawn_delay` (e.g., `"500mss"`)
   falls back to zero without a warning. `gt scheduler status` or
   `gt doctor` would be the right place to surface that drift.
+
+## Outgoing calls
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| scheduler state tmp | JSON data (atomic) | Scheduler state persistence | `state.go:79` |
 
 ## Notes / open questions
 

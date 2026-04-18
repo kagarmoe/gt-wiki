@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/wrappers/wrappers.go
   - /home/kimberly/repos/gastown/internal/wrappers/scripts/gt-codex
@@ -119,6 +119,13 @@ development get written verbatim to `~/bin/`.
 - **Severity:** `wrong`
 - **Fix tier:** `code` (update ABOUTME header to list all three wrappers)
 - **Release position:** `in-release` (`gt-gemini` existed at v1.0.0; the ABOUTME header was already incomplete at that tag)
+
+## Outgoing calls
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| wrapper script dest | embedded script content | Agent wrapper installation | `wrappers.go:34` |
 
 ## Notes / open questions
 

@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-16
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/boot/boot.go
 tags: [package, boot, watchdog, daemon, deacon, triage]
@@ -119,6 +119,18 @@ existence would always succeed.
 - [internal/doctor](doctor.md) -- `boot_check.go` health check.
 - [internal/deacon](deacon.md) -- the agent role that Boot triages.
 - [go-packages inventory](../inventory/go-packages.md)
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `gt` | `boot triage` | `--degraded` | hardcoded | `boot.go:203` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| boot status file | JSON data | Boot status persistence | `boot.go:131` |
 
 ## Notes / open questions
 

@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/tui/convoy/
   - /home/kimberly/repos/gastown/internal/tui/feed/
@@ -232,6 +232,22 @@ make sense of the file layout. The one explicit doc comment in
   this page starts feeling like "convoy in three paragraphs and feed
   in twelve," split it into `tui/convoy` and `tui/feed` sibling
   pages rather than growing this one.
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `bd` | `list` | `listArgs...` (convoy listing) | runtime | `convoy/model.go:96` |
+| `bd` | `dep list` | `<convoyID> -t tracks --json` | runtime | `convoy/model.go:143` |
+| `bd` | (dynamic) | `args...` (convoy ops) | runtime | `convoy/model.go:215` |
+| `bd` | `dep list` | `<convoyID> -t tracks --json` | runtime | `feed/convoy_issues.go:30` |
+| `bd` | (dynamic) | `args...` (issue ops) | runtime | `feed/convoy_issues.go:84` |
+| `bd` | `activity` | `--follow` | hardcoded | `feed/events.go:38` |
+| `bd` | `list` | `listArgs...` (feed convoy) | runtime | `feed/convoy.go:111` |
+| `bd` | `list` | `--type=convoy --status=open --json --flat` | hardcoded | `feed/convoy.go:406` |
+| `gt` | `nudge` | `<target> continue` | runtime | `feed/model.go:656` |
+| `gt` | `nudge` | `<target> handoff` | runtime | `feed/model.go:672` |
 
 ## Notes / open questions
 

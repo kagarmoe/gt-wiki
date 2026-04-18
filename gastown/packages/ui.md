@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/ui/styles.go
   - /home/kimberly/repos/gastown/internal/ui/terminal.go
@@ -189,6 +189,13 @@ one bolded (`styles.go:169`).
 - [internal/style](style.md) — thin wrapper that bundles semantic
   `Success/Warning/Error` styles on top of `ui`'s palette and icon set.
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| (pager) | (pager args) | from `$PAGER` or `less` | env / hardcoded | `pager.go:92` |
 
 ## Notes / open questions
 

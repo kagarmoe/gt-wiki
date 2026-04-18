@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/templates/templates.go
   - /home/kimberly/repos/gastown/internal/templates/townroot.go
@@ -216,6 +216,28 @@ role in detecting whether an existing CLAUDE.md is already "overlay'd."
   file under `roles/` or `messages/` requires editing both the file
   list and these functions. The embedded FS knows the real list but
   isn't consulted.
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `launchctl` | `unload` | `<plistPath>` (macOS) | runtime | `templates.go:371` |
+| `launchctl` | `load` | `<plistPath>` (macOS) | runtime | `templates.go:374` |
+| `systemctl` | `--user daemon-reload` | (none) (Linux) | hardcoded | `templates.go:423` |
+| `systemctl` | `--user enable` | `gastown-daemon.service` (Linux) | hardcoded | `templates.go:428` |
+| `systemctl` | `--user start` | `gastown-daemon.service` (Linux) | hardcoded | `templates.go:433` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| CLAUDE.md | generated content | Town CLAUDE.md template | `templates.go:212` |
+| settings.local.json | merged JSON | Claude local settings | `templates.go:261` |
+| settings.local.json | JSON content | Claude local settings (new) | `templates.go:264` |
+| CLAUDE.md | content | CLAUDE.md template (fallback) | `templates.go:268` |
+| launchd plist | plist XML | macOS daemon supervisor | `templates.go:366` |
+| systemd service | unit content | Linux daemon supervisor | `templates.go:418` |
+| provision script | shell script | Provision commands | `commands/provision.go:124` |
 
 ## Notes / open questions
 

@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/util/atomic.go
   - /home/kimberly/repos/gastown/internal/util/exec.go
@@ -281,6 +281,27 @@ results. The ps-tree/syscall.Kill approach is Unix-only.
   not install a cancel hook, so context cancellation on Windows does
   not kill the process tree. **Untested** — the Windows shim exists
   but diverges in behavior.
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| (dynamic) | (dynamic) | `cmd, args...` (Run) | caller | `exec.go:26` |
+| (dynamic) | (dynamic) | `cmd, args...` (Output) | caller | `exec.go:48` |
+| `ps` | `-eo pid,ppid` | (none) | hardcoded | `orphan.go:29` |
+| `tmux` | `-S <socket> list-panes` | `-a -F #{pane_pid}` | runtime | `orphan.go:108` |
+| `lsof` | `-a -p <pid>` | `-d cwd -Fn` | runtime | `orphan.go:287` |
+| `ps` | `-p <pid>` | `-o args=` | runtime | `orphan.go:338` |
+| `ps` | `-eo pid,tty,comm,etime` | (none) | hardcoded | `orphan.go:443` |
+| `ps` | `-eo pid,tty,comm,etime` | (none) | hardcoded | `orphan.go:564` |
+| `ps` | `-o tty=` | `-p <pid>` | runtime | `orphan.go:876` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| (atomic temp) | caller data | `AtomicWriteFile` helper | `atomic.go:58` |
+| orphan report | report data | Orphan cleanup report | `orphan.go:230` |
 
 ## Notes / open questions
 

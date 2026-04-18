@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/feed/curator.go
 tags: [package, feed, curator, events, dedup, aggregation, zfc, flock]
@@ -152,6 +152,15 @@ Per-event-type template strings — the layer that turns
   and the default path helpers for `TownSettings`.
 - [gt](../binaries/gt.md).
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Outgoing calls
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| events file | read-only open | Event source file (read) | `curator.go:102` |
+| feed JSONL file | append feed entry | Curated feed output | `curator.go:401` |
+| feed tmp file | rewritten feed | Atomic feed rewrite | `curator.go:443` |
 
 ## Notes / open questions
 

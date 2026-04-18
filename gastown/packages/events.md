@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/events/events.go
 tags: [package, data-layer, events, activity-feed, jsonl, flock]
@@ -174,6 +174,13 @@ should wait for goes through `channelevents`.
   activity feed is not being populated. **Absent** — callers like
   `events.LogFeed` return nil, so commands think the event was logged
   when it was not.
+
+## Outgoing calls
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| events JSONL file | append event JSON | Event logging | `events.go:134` |
 
 ## Notes / open questions
 

@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-16
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/proxy/ca.go
   - /home/kimberly/repos/gastown/internal/proxy/denylist.go
@@ -208,6 +208,21 @@ name, and validates it starts with the allowed prefix.
 - [rig concept](../concepts/rig.md) -- the rig name in addresses
   determines the bare repository path.
 - [go-packages inventory](../inventory/go-packages.md)
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| (dynamic) | (dynamic) | `argv[0] argv[1:]...` | API request | `exec.go:207` |
+| `git-upload-pack` / `git-receive-pack` | `--stateless-rpc --advertise-refs` | `<repoPath>` | runtime | `git.go:158` |
+| `git-upload-pack` / `git-receive-pack` | `--stateless-rpc` | `<repoPath>` | runtime | `git.go:190` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| CA cert temp file | PEM cert data | TLS certificate | `ca.go:70` |
+| CA key temp file | PEM key data | TLS private key | `ca.go:77` |
 
 ## Notes / open questions
 

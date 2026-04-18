@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-16
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/checkpoint/checkpoint.go
   - /home/kimberly/repos/gastown/internal/checkpoint/squash.go
@@ -152,6 +152,21 @@ polecat branches is not preserved."
 - [molecule concept](../concepts/molecule.md) -- `MoleculeID` and
   `CurrentStep` in the checkpoint track molecule progress.
 - [go-packages inventory](../inventory/go-packages.md)
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `git` | `status` | `--porcelain` | hardcoded | `checkpoint.go:125` |
+| `git` | `rev-parse` | `HEAD` | hardcoded | `checkpoint.go:143` |
+| `git` | `rev-parse` | `--abbrev-ref HEAD` | hardcoded | `checkpoint.go:152` |
+| `git` | (dynamic) | `args...` | caller | `squash.go:112` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| checkpoint file | JSON data | Checkpoint state persistence | `checkpoint.go:102` |
 
 ## Notes / open questions
 

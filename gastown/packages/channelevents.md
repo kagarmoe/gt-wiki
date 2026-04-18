@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/channelevents/channelevents.go
 tags: [package, data-layer, events, await-event, channels, refinery, rendezvous]
@@ -166,6 +166,13 @@ that subscriber.
   **Absent** — no warning that events are being written to a fallback
   location; subscribers watching the real town's `events/` directory
   will never see them.
+
+## Outgoing calls
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| channel event file | JSON event data | Channel event persistence | `channelevents.go:92` |
 
 ## Notes / open questions
 

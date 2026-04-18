@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/version/stale.go
 tags: [package, platform-service, version, git, build]
@@ -156,6 +156,20 @@ Source: `/home/kimberly/repos/gastown/internal/version/stale.go`.
   be parsed, `CommitsBehind` silently stays 0 with no error propagated.
   **Absent** — user sees "stale" but with zero commits behind, which
   is misleading.
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `git` | `rev-parse` | `HEAD` | hardcoded | `stale.go:86` |
+| `git` | `symbolic-ref` | `--short HEAD` | hardcoded | `stale.go:98` |
+| `git` | `cat-file` | `-t <commit>` | runtime | `stale.go:113` |
+| `git` | `merge-base` | `--is-ancestor <commit> HEAD` | runtime | `stale.go:133` |
+| `git` | `rev-list` | `--count <commit>..HEAD` | runtime | `stale.go:139` |
+| `git` | `rev-parse` | `--show-toplevel` | hardcoded | `stale.go:189` |
+| `git` | `rev-parse` | `--git-dir` | hardcoded | `stale.go:203` |
+| `git` | `diff` | `--name-only <commit>..HEAD -- . :!.beads` | runtime | `stale.go:223` |
 
 ## Notes / open questions
 

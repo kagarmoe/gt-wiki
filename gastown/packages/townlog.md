@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/townlog/logger.go
 tags: [package, townlog, logging, agent-lifecycle, witness, events]
@@ -139,6 +139,13 @@ helper used for the nudge context cap.
 - [gt](../binaries/gt.md) — session spawn, nudge, handoff, and done
   paths all call into `townlog.Logger`.
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Outgoing calls
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| town log file | append log line | Town-level operational logging | `logger.go:90` |
 
 ## Notes / open questions
 

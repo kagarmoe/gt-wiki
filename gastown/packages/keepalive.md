@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/keepalive/keepalive.go
 tags: [package, diagnostics, keepalive, daemon, sentinel-pattern]
@@ -128,6 +128,13 @@ imports `internal/keepalive`. The `Read`/`Age()` API has zero consumers.
 - [gt doctor](../commands/doctor.md), [gt health](../commands/health.md),
   [gt vitals](../commands/vitals.md) — sibling diagnostic CLI surfaces.
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Outgoing calls
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| keepalive status file | JSON data | Keepalive status for debugging | `keepalive.go:95` |
 
 ## Notes / open questions
 

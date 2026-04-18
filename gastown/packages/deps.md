@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/deps/beads.go
   - /home/kimberly/repos/gastown/internal/deps/dolt.go
@@ -173,6 +173,15 @@ constant is bumped — this is the intended pattern for downstream code:
 - [internal/util](util.md) — `SetDetachedProcessGroup` wrapper used on
   every subprocess in this package.
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `bd` | `version` | (none) | hardcoded | `beads.go:49` |
+| `go` | `install` | `BeadsInstallPath` | hardcoded | `beads.go:103` |
+| `dolt` | `version` | (none) | hardcoded | `dolt.go:43` |
 
 ## Notes / open questions
 

@@ -14,6 +14,8 @@ phase3_audited: 2026-04-14
 phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
+phase8_audited: 2026-04-17
+phase8_findings: [failure-modes]
 ---
 
 # Dockerfile.e2e
@@ -217,6 +219,18 @@ container is removed.
   the `go mod download` cache layer.
 - [../inventory/repo-root.md](../inventory/repo-root.md) — inventory
   row for this file.
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+
+- **Network access for dependency installs:** `Dockerfile.e2e:31-35,38-46,60-64` — three separate `for i in 1 2 3` retry loops for `bd`, `dolt`, and `go mod download`. Each retries 3 times with 2-second sleeps. If all three attempts fail (e.g., network outage, GitHub rate limit), the build exits. **Present** — retry logic with clear failure after 3 attempts.
+- **`BD_VERSION` / `DOLT_VERSION` version skew:** `Dockerfile.e2e:14-15` pins `BD_VERSION=v0.57.0` and `DOLT_VERSION=1.82.4`, but `go.mod` requires `beads v0.63.3`. The pinned `bd` binary is older than the Go library. **Absent** — no build-time check for version consistency between the binary and library.
+- **BuiltProperly ldflag set manually:** `Dockerfile.e2e:70` — `go build -ldflags "-X ...BuiltProperly=1"` bypasses the self-kill check, but does NOT set `Version`, `Commit`, or `BuildTime` (unlike `make build`). **Absent** — tests run with `Version="1.0.0"` and `Build="dev"` defaults, which may not match production behavior.
+
+### Silent suppression (what errors are swallowed?)
+
+- **Tests run as root:** No `USER` directive — all tests run as root. Any test that checks permission errors or non-root behavior will get different results than production. **Absent** — no documentation or guard for root-vs-user behavioral differences.
 
 ## Notes / open questions
 

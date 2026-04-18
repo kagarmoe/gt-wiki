@@ -1519,3 +1519,23 @@ All planned phases complete:
 
 **Follow-ups filed:**
 - none — lessons are purely informational
+
+## [2026-04-17 15:00] stage | 8.3 — binaries, files, roles, concepts, workflows, plugins
+
+**Actor:** wiki-curator subagent
+**Unit:** 34 pages audited (15 code-grounded, 19 synthesis)
+**Duration:** one dispatch
+
+**What went well:**
+- Clear separation between code-grounded (three questions) and synthesis (cross-ref-only) methodologies prevented fabrication on abstract pages
+- All 7 code-grounded pages with findings had genuinely interesting absent findings (proxy fallback path bug, rate limiter leak, ICU detection silent failure)
+- Pre-existing failure modes sections on convoy-launch.md and polecat-lifecycle.md were verified and stamped without duplication
+
+**What didn't:**
+- Nothing significant
+
+**What to change next time:**
+- None
+
+**Follow-ups filed:**
+- None — lessons are purely informational

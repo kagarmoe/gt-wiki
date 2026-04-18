@@ -5086,3 +5086,24 @@ As expected for leaf commands: read-only viewers (agent-log, health, memories, s
   - git: copy_windows.go explicitly documented as untested
 
 → gastown/packages/{acp,hooks,krc,protocol,quota,testutil,wasteland,web,agentlog,constants,feed,git,github,shell,suggest,townlog,activity,estop,hookutil,scheduler,state,templates,tui,wrappers,agent,agent-provider,boot,checkpoint,connection,proxy}.md
+
+## [2026-04-17] ingest | Phase 8 Batch 3 — failure modes: binaries, files, roles, concepts, workflows, plugins
+
+Phase 8 failure-mode analysis across 34 pages in 6 categories.
+
+**Code-grounded pages (15):**
+- 7 pages with failure modes: gt.md, gt-proxy-client.md, gt-proxy-server.md, docker-entrypoint.md, dockerfile.md, dockerfile-e2e.md, makefile.md
+- 8 pages with [none]: claude-dir.md, docker-compose.md, flake-nix.md, golangci-yml.md, go-mod.md, goreleaser-yml.md, opencode-dir.md, templates-agents.md
+
+**Synthesis pages (19):**
+- 19 cross-ref-only: 8 roles, 7 concepts, 2 workflows (pre-existing failure modes verified), 2 plugins
+
+**Highest-value absent findings:**
+- gt: heartbeat touch errors silently suppressed — Witness may incorrectly detect stale sessions
+- gt-proxy-client: `GT_REAL_BIN` fallback doesn't adjust for `argv[0]` — invoking as `bd` with unset proxy env falls back to `gt.real` not `bd.real`
+- gt-proxy-server: rate limiter map has no eviction — leaks ~200 bytes per unique client cert CN
+- docker-entrypoint: no `trap` for partial config rollback — git configured but dolt not if dolt config fails
+- dockerfile: unpinned `bd`/`dolt` installs with no retry logic
+- makefile: ICU detection failure produces no error — build proceeds to cryptic Go linker error
+
+→ gastown/binaries/{gt,gt-proxy-client,gt-proxy-server}.md, gastown/files/{claude-dir,docker-compose,docker-entrypoint,dockerfile-e2e,dockerfile,flake-nix,golangci-yml,go-mod,goreleaser-yml,makefile,opencode-dir,templates-agents}.md, gastown/roles/{crew,deacon,dog,mayor,polecat,reaper,refinery,witness}.md, gastown/concepts/{convoy,directive,formula,identity,molecule,rig,wisp}.md, gastown/workflows/{convoy-launch,polecat-lifecycle}.md, gastown/plugins/{dolt-snapshots,README}.md

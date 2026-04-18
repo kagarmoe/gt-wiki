@@ -14,6 +14,8 @@ phase3_audited: 2026-04-14
 phase3_findings: [wiki-stale]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
+phase8_audited: 2026-04-17
+phase8_findings: [failure-modes]
 ---
 
 # docker-entrypoint.sh
@@ -148,6 +150,18 @@ tini reaps the resulting process tree.
   self-kill check firing.
 - [../inventory/repo-root.md](../inventory/repo-root.md) — inventory
   row for this file.
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+
+- **`GIT_USER` and `GIT_EMAIL` both set or both unset:** `docker-entrypoint.sh:6` — the `if` guard requires both to be set. If only one is provided, the entire git/dolt config block is skipped. **Absent** — no partial-set warning; git/dolt identity silently left unconfigured.
+- **`/gt/mayor/town.json` as install marker:** `docker-entrypoint.sh:14` — presence of this file determines fresh install vs refresh. If the file is corrupt or from an incompatible version, the script takes the `--force` refresh path instead of a clean install. **Absent** — no version check on the marker file.
+- **`gt install` binary at `/app/gastown/gt`:** `docker-entrypoint.sh:16,19` — if the binary doesn't exist or is corrupt, the `set -e` at line 2 causes the container to exit immediately on first use. **Present** — `set -e` catches the error, but the error message is just the shell's default.
+
+### Partial completion (what doesn't it clean up?)
+
+- **`set -e` with no trap:** `docker-entrypoint.sh:2` — the script uses `set -e` for error handling but has no `trap` for cleanup. If `git config` succeeds but `dolt config` fails (line 10-11), git identity is configured but dolt identity is not. The container exits and the partial config persists on the volume. **Absent** — no rollback of partial config.
 
 ## Notes / open questions
 

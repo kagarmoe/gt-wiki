@@ -12,6 +12,8 @@ phase3_audited: 2026-04-14
 phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
+phase8_audited: 2026-04-17
+phase8_findings: [failure-modes]
 ---
 
 # Makefile
@@ -311,6 +313,24 @@ way to run" the e2e tests.
   but the `inventory/go-packages.md` enumeration of `cmd/` only lists
   `gt`, `gt-proxy-client`, `gt-proxy-server`. Does `cmd/gt-desktop` exist
   on disk? If not, these targets are dead.
+## Failure modes
+
+### Precondition violations (what does it assume?)
+
+- **Git repo with tracking branch:** `check-up-to-date` at `Makefile:47-68` requires a git repo with an upstream tracking branch. On detached HEAD (tag checkouts, CI), it silently exits 0. If the local branch has no upstream, it warns and exits 0. **Present** — guarded with explicit skip conditions.
+- **Forward-only install:** `check-forward-only` at `Makefile:73-92` prevents downgrade installs by verifying HEAD is a descendant of the installed binary's commit. If the installed binary can't report its commit, the check is skipped with a warning. **Present** — explicit guard prevents crash-loop regression (documented: "caused a crash loop where the replaced binary broke session startup hooks").
+- **ICU4C on macOS:** `Makefile:27-33` — `brew --prefix icu4c` auto-detects Homebrew's ICU path. If Homebrew isn't installed or `icu4c` isn't installed, the CGO flags are not set and the build may fail on macOS with missing ICU headers. **Absent** — no error message if ICU detection fails; the build just proceeds and the Go compiler emits a cryptic linker error.
+
+### Partial completion (what doesn't it clean up?)
+
+- **`install` target daemon restart failure:** `Makefile:108-115` — after copying the binary, the target tries to restart the daemon. If `daemon stop` succeeds but `daemon start` fails, the binary is installed but the daemon is down. The target prints a warning ("daemon restart failed") but exits 0. **Present** — warning printed, but the install is considered successful with a dead daemon.
+- **`safe-install` exit 1 on no-op:** `Makefile:124` — `check-forward-only` exits 1 when the binary is already at HEAD. Callers must treat this "nothing to do" exit 1 as success. **Present** — the message "Binary is already at HEAD" distinguishes this from a real error, but the exit code is misleading.
+
+### Silent suppression (what errors are swallowed?)
+
+- **Plugin sync failure:** `Makefile:118-119` — `gt plugin sync` errors are swallowed with `|| true`. If plugin sync fails, the install succeeds but runtime plugins may be stale. **Absent** — error completely suppressed.
+- **Stale binary removal failure:** `Makefile:99-104,130-135` — `rm -f` on stale binaries at `$HOME/go/bin/gt` and `$HOME/bin/gt` cannot fail (rm -f), but if the stale binary is running, it will be unlinked but still running in memory. **Present** — `rm -f` handles the common case.
+
 - The Makefile sets `BuildTime` via `-X internal/cmd.BuildTime=`, but the
   variable table in [../binaries/gt.md](../binaries/gt.md) does not list
   a `BuildTime` field on `internal/cmd`. Either the variable exists and

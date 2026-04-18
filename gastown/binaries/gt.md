@@ -18,6 +18,8 @@ phase3_severities: []
 phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
+phase8_audited: 2026-04-17
+phase8_findings: [failure-modes]
 ---
 
 # gt
@@ -224,6 +226,24 @@ overlap in Go dependencies with `gt`:
 Neither proxy binary imports `internal/cmd`, so the `BuiltProperly`
 self-kill gate described above does NOT apply to them — it's a
 `gt`-only mechanism.
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+
+- **Binary built via `make build` or package manager:** The self-kill check at `internal/cmd/root.go:100-107` calls `os.Exit(1)` when `BuiltProperly == "" && Build == "dev"`. Any `go build` or `go install` without ldflags produces a binary that refuses to run any command, including `gt --version`. **Present** — code checks explicitly and exits with a clear error message.
+- **Town root exists and is a git repo on main branch:** `warnIfTownRootOffMain` at `internal/cmd/root.go:217-248` assumes the town root is on `main`, `master`, or `gt_managed`. **Present** — warns on stderr but does not block execution.
+- **`bd` binary installed and version-compatible:** `CheckBeadsVersion` at `root.go:151-155` checks the installed `bd` version. **Present** — warns on stderr, does not block (exempt commands skip the check entirely).
+
+### Partial completion (what doesn't it clean up?)
+
+- **Telemetry provider shutdown on crash:** `Execute()` at `root.go:291-317` defers `provider.Shutdown` with a 2-second timeout. If the process crashes (e.g., SIGKILL), the deferred shutdown never runs and OTEL spans may be lost. **Absent** — no crash-resilient telemetry flush; deferred shutdown only runs on normal exit.
+
+### Silent suppression (what errors are swallowed?)
+
+- **Session registry init failure:** `root.go:121-123` — `session.InitRegistry` error is printed as a warning but execution continues. Commands that depend on the session registry may silently behave incorrectly (e.g., route to wrong town socket). **Present** — warning printed, but the downstream consequence is silent.
+- **Telemetry init failure:** `root.go:293-295` — `telemetry.Init` error is printed as a warning; execution continues without telemetry. **Present** — logged, non-blocking.
+- **Heartbeat touch errors:** `touchPolecatHeartbeat` at `root.go:194-213` is best-effort; all errors silently ignored. **Absent** — if heartbeat touch fails, the Witness may incorrectly detect the session as stale and trigger unnecessary recovery.
 
 ## Notes / open questions
 

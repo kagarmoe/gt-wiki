@@ -17,6 +17,8 @@ phase3_severities: []
 phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
+phase8_audited: 2026-04-17
+phase8_findings: [failure-modes]
 ---
 
 # gt-proxy-client
@@ -200,6 +202,24 @@ the host's filesystem. The client is purely a transport shim.
 
 The wire-protocol peer (`internal/proxy/exec.go`) is part of the
 `internal/proxy/` package, not yet mapped as a wiki entity.
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+
+- **Client cert and key valid PEM at paths:** `tls.LoadX509KeyPair(certFile, keyFile)` at `main.go:54-58`. If `GT_PROXY_CERT` or `GT_PROXY_KEY` point to missing/corrupt files, exits with "load client cert" error. **Present** — clear error message, exit 1.
+- **CA PEM valid and parseable:** `os.ReadFile(caFile)` + `pool.AppendCertsFromPEM(caPEM)` at `main.go:60-69`. If `GT_PROXY_CA` is corrupt or empty, exits with "invalid CA PEM". **Present** — explicit check.
+- **Real binary exists at fallback path:** `execReal()` at `main.go:127-136` calls `syscall.Exec` on `/usr/local/bin/gt.real` (or `GT_REAL_BIN`). If the file is missing, exits with "exec" error. **Present** — error printed.
+- **`GT_REAL_BIN` fallback is tool-agnostic:** When invoked as `bd`, the fallback still uses `/usr/local/bin/gt.real`, not `bd.real`. **Absent** — the binary does not adjust the fallback path based on `argv[0]`. If the container needs a real `bd` binary and proxy env vars are unset, it will exec `gt.real` instead of `bd.real`.
+
+### Silent suppression (what errors are swallowed?)
+
+- **Stdout/stderr write errors:** `main.go:113-117` — `_, _ = fmt.Fprint(os.Stdout, result.Stdout)` discards write errors. If stdout is a closed pipe, the output is silently lost. **Absent** — `_ =` suppression.
+- **Response body close error:** `main.go:98` — `defer resp.Body.Close()` with `//nolint:errcheck`. **Absent** — best-effort close, error discarded.
+
+### Cross-platform concerns
+
+- **Linux/container only:** The binary uses `syscall.Exec` which is Unix-only. No Windows build variant exists. **Untested** on non-Linux platforms (binary is designed exclusively for polecat containers).
 
 ## Notes / open questions
 

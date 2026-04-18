@@ -19,6 +19,8 @@ phase3_severities: []
 phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
+phase8_audited: 2026-04-17
+phase8_findings: [failure-modes]
 ---
 
 # gt-proxy-server
@@ -279,6 +281,26 @@ invocations over mTLS to this server.
 The backing implementation lives in `/home/kimberly/repos/gastown/internal/proxy/`
 (`ca.go`, `denylist.go`, `exec.go`, `git.go`, `server.go`); that package
 is not yet mapped as a wiki entity page.
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+
+- **Home directory resolvable:** `os.UserHomeDir()` at `main.go:42-44` — exits with "cannot determine home dir" if it fails. **Present** — clean fatal error.
+- **TownRoot non-empty and absolute:** `proxy.New` at `server.go:92-98` rejects empty or relative paths. **Present** — explicit validation.
+- **Allowed commands exist in PATH:** `exec.LookPath` at `server.go:117-125` checks each allowed command at startup. Missing commands are removed from the allowlist with an error log. **Present** — command silently dropped from allowlist (not fatal). If ALL commands are missing, the server starts but denies all exec requests (warn log at `server.go:127-129`).
+- **CA directory writable on first run:** `proxy.LoadOrGenerateCA` at `main.go:94-98` creates a CA if none exists. If `ca-dir` is not writable, exits with "CA setup failed". **Present** — fatal error.
+
+### Partial completion (what doesn't it clean up?)
+
+- **Rate limiter map never evicted:** `rateLimiters` at `server.go:197-198` is a `sync.Map` keyed on client cert CN with no eviction. Each unique CN leaks ~200 bytes permanently. **Absent** — documented as acceptable for dozens of polecats but will degrade with thousands of unique clients.
+- **Subprocess orphans on context cancellation:** `runCommand` uses `context.WithTimeout` at `exec.go:97-102`, but cancelling a context kills the Go side without guaranteed subprocess cleanup. **Absent** — if the subprocess ignores signals, it may outlive the proxy request.
+
+### Silent suppression (what errors are swallowed?)
+
+- **`gt proxy-subcmds` discovery failure:** `discoverAllowedSubcmds()` at `main.go:158-171` — if the `gt` binary is missing or `gt proxy-subcmds` fails, silently falls back to `defaultAllowedSubcmds`. **Present** — debug-level log, non-fatal.
+- **Invalid extra SAN IPs:** `main.go:108-119` — invalid IP strings are skipped with a warning but don't prevent startup. **Present** — warning logged, server continues.
+- **Missing config file:** `config.go:64-77` — `os.IsNotExist(err)` returns an empty config without error. **Present** — intentional silent default.
 
 ## Notes / open questions
 

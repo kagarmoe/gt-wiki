@@ -14,6 +14,8 @@ phase3_audited: 2026-04-14
 phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
+phase8_audited: 2026-04-17
+phase8_findings: [failure-modes]
 ---
 
 # Dockerfile
@@ -224,6 +226,18 @@ kept running while humans / agents `docker compose exec` into it.
   purpose.
 - [../inventory/repo-root.md](../inventory/repo-root.md) — inventory
   row for this file.
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+
+- **Go tarball URL matches architecture:** `Dockerfile:25-26` — `dpkg --print-architecture` determines the Go tarball fetched via `curl -fsSL`. If the base image's architecture detection is wrong or the Go download URL changes, the build fails at this step. **Present** — `curl -fsSL` fails loudly on HTTP errors.
+- **Unpinned `bd` and `dolt` installs:** `Dockerfile:30-31` — `curl | bash` from `main` (bd) and `latest` (dolt). If upstream breaks, the build fails with no way to pin a working version. **Absent** — no version pinning, no retry logic, no fallback.
+- **`GO_VERSION` vs go.mod mismatch:** `Dockerfile:5` pins Go 1.25.6 but `go.mod` declares 1.25.8. **Absent** — no build-time check that the container Go version matches `go.mod`; build currently works but is fragile.
+
+### Partial completion (what doesn't it clean up?)
+
+- **`make build` failure after apt/Go install:** If `make build` at `Dockerfile:48` fails (e.g., Go compile error), all prior RUN layers (apt packages, Go tarball, bd/dolt installs) are cached but the image is not produced. Docker layer caching makes retry cheap, but no cleanup of intermediate layers happens automatically. **Present** — standard Docker build behavior.
 
 ## Notes / open questions
 

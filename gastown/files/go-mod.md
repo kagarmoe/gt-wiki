@@ -12,6 +12,8 @@ phase3_audited: 2026-04-14
 phase3_findings: [wiki-stale, drift]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # go.mod

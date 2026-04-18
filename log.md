@@ -5166,3 +5166,22 @@ Each axis scored 0-2. Complex entities scoring ≤4 total are fixed inline durin
 Additive optional field — no schema version bump. Absence means "not yet assessed."
 
 → [.claude/skills/writing-entity-pages/SKILL.md](.claude/skills/writing-entity-pages/SKILL.md)
+
+## [2026-04-18] depth-pass | Detail Gap Batch 1a — Diagnostics (22 command pages)
+
+Scored 22 command pages in GroupDiag against source. All pages scored against the 4-axis rubric (params, data_flow, errors, side_effects). Source files read for every page.
+
+**Score distribution:**
+- Total 8 (max): 14 pages (activity=7 was the only sub-8 complex entity to note, but all are above threshold)
+- Total 7: 4 pages (activity, audit, checkpoint, feed)
+- Total 6: 3 pages (doctor, info, metrics)
+- Total 5: 1 page (dashboard)
+- **No pages scored ≤4.** Zero complex pages below threshold.
+
+**Sibling-file audit additions:**
+- `patrol.md`: added `patrol_helpers.go` to sources
+- `prime.md`: added `prime_molecule.go`, `prime_output.go`, `prime_session.go` to sources
+
+**Pages modified:** 22 (detail_depth added to all). 2 pages also got updated sources and `updated:` date bumps.
+
+**Outcome:** Phase 2 was thorough on Diagnostics commands (confirmed the plan's "Low" depth-gap rate prediction). Every page documents flags with types/defaults, names structs and functions, covers error conditions, and documents side effects with file:line. No inline fixes needed.

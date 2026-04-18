@@ -1563,3 +1563,37 @@ All planned phases complete:
 
 **Follow-ups filed:**
 - bead wiki-24m closed with Phase 8 results
+
+---
+
+## Detail Gap Batch 1a: Diagnostics (22 pages) — 2026-04-18
+
+**Scope:** 22 command pages in GroupDiag: activity, audit, checkpoint, costs, dashboard, doctor, feed, heartbeat, info, log, metrics, patrol, prime, repair, seance, stale, status, thanks, upgrade, version, vitals, whoami.
+
+**Result:** 22 pages scored. 0 pages below threshold. 0 pages fixed inline. 22 pages already adequate (all scored 5-8 out of 8).
+
+**Score distribution:**
+| Score | Pages | Examples |
+|-------|-------|---------|
+| 8/8 | 14 | costs, heartbeat, log, patrol, prime, repair, seance, stale, thanks, upgrade, version, vitals, whoami |
+| 7/8 | 4 | activity (errors:1), audit (side_effects:1), checkpoint (errors:1), feed (side_effects:1) |
+| 6/8 | 3 | doctor (errors:1, side_effects:1), info (errors:1, side_effects:1), metrics (side_effects:1) |
+| 5/8 | 1 | dashboard (errors:2, side_effects:1 — data_flow:2 but side effects are fire-and-forget browser open) |
+
+**Axis-level summary:**
+- Params: 22/22 scored 2 — every page documents all flags with types and defaults
+- Data flow: 22/22 scored 2 — every page names structs, functions, config loading paths
+- Errors: 18/22 scored 2 — 4 pages at 1 where Phase 8 already documented error paths but minor gaps remain (activity, checkpoint, doctor, info)
+- Side effects: 17/22 scored 2 — 5 pages at 1 where writes are documented but not with full path/format detail (audit, dashboard, doctor, feed, info, metrics, status)
+
+**What went well:**
+- The plan predicted "Low depth-gap rate" for Diagnostics. Confirmed: zero pages needed inline fixes. Phase 2 was thorough on this group.
+- Sibling-file audit caught 4 missing source files across 2 pages (patrol, prime). These were already mentioned in the page bodies but not listed in `sources:` frontmatter.
+- The scoring rubric was straightforward to apply when the source was already familiar from prior phases.
+
+**What didn't:**
+- Reading 22 wiki pages + their source files is time-intensive even when no fixes are needed. The score-only path (no fix) should be faster; consider a parallel-read workflow for future batches.
+
+**What to change next time:**
+- For batches predicted "Low," consider a lighter-weight pass: read wiki only, spot-check 2-3 source files to validate, and score. Full source reading is necessary only for "Medium" and "High" batches.
+- The 5 pages scoring 1 on side_effects or errors are cases where the page documents behavior but doesn't cite the exact write path or exact error condition. These are borderline 1/2 and not worth fixing given the threshold logic. Future batches with "High" predictions should prioritize these axes.

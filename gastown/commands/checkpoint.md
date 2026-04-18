@@ -18,6 +18,7 @@ phase4_findings: [none]
 phase5_audience: dev
 phase8_audited: 2026-04-17
 phase8_findings: [none]
+detail_depth: {params: 2, data_flow: 2, errors: 1, side_effects: 2}
 ---
 
 # gt checkpoint

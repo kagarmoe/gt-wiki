@@ -4,9 +4,10 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/patrol.go
+  - /home/kimberly/repos/gastown/internal/cmd/patrol_helpers.go
   - /home/kimberly/repos/gastown/internal/cmd/patrol_new.go
   - /home/kimberly/repos/gastown/internal/cmd/patrol_report.go
   - /home/kimberly/repos/gastown/internal/cmd/patrol_scan.go
@@ -19,6 +20,7 @@ phase3_findings_post_release: false
 phase5_audience: dev
 phase8_audited: 2026-04-17
 phase8_findings: [partial-completion, silent-suppression]
+detail_depth: {params: 2, data_flow: 2, errors: 2, side_effects: 2}
 ---
 
 # gt patrol

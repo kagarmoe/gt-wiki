@@ -4,9 +4,12 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/prime.go
+  - /home/kimberly/repos/gastown/internal/cmd/prime_molecule.go
+  - /home/kimberly/repos/gastown/internal/cmd/prime_output.go
+  - /home/kimberly/repos/gastown/internal/cmd/prime_session.go
   - /home/kimberly/repos/gastown/internal/cmd/root.go
 tags: [command, diagnostics, role, session-start, hook, polecat-safe, formula, claude-code]
 phase3_audited: 2026-04-15
@@ -18,6 +21,7 @@ phase4_findings: [none]
 phase5_audience: agent
 phase8_audited: 2026-04-17
 phase8_findings: [precondition]
+detail_depth: {params: 2, data_flow: 2, errors: 2, side_effects: 2}
 ---
 
 # gt prime

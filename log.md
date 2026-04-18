@@ -5261,3 +5261,16 @@ Scored 22 command pages in GroupDiag against source. All pages scored against th
 **Fixes:** 0 inline fixes needed. mail.md got 4 missing sibling sources added (mail_announce.go, mail_hook.go, mail_identity.go, mail_queue.go).
 
 **Pages modified:** 7 (detail_depth added to all). 1 page (mail) got updated sources.
+
+## [2026-04-18] depth-pass | Detail Gap Batch 1f — Services (11 command pages)
+
+**Verb:** depth-pass
+**Scope:** `gastown/commands/` — daemon, dolt, down, estop, maintain, quota, reaper, shutdown, start, thaw, up
+
+**Score distribution (total/8):**
+- 8/8: 7 pages (daemon, down, estop, maintain, reaper, shutdown, thaw)
+- 7/8: 4 pages (dolt, quota, start, up — errors:1 on each)
+
+**Fixes:** 0 inline fixes needed. Sibling-file audit was clean — all pages already listed their siblings.
+
+**Pages modified:** 11 (detail_depth added to all).

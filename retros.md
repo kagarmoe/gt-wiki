@@ -1695,3 +1695,19 @@ All planned phases complete:
 
 **What to change next time:**
 - Nothing — small batch, efficient processing
+
+## [2026-04-18] stage | Detail Gap Batch 1f — Services (11 pages)
+
+**Duration:** ~8 min
+**Pages scored:** 11
+**Fixes applied:** 0
+
+**Score distribution:**
+| Score | Count | Pages |
+|-------|-------|-------|
+| 8/8 | 7 | daemon, down, estop, maintain, reaper, shutdown, thaw |
+| 7/8 | 4 | dolt, quota, start, up |
+
+**What went well:**
+- All sibling files already listed (Phase 3 was thorough on Services)
+- Plan predicted "High" depth-gap rate — actual was zero fixes needed

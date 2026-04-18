@@ -5006,3 +5006,20 @@ As expected for leaf commands: read-only viewers (agent-log, health, memories, s
   - refinery: 164 silent suppressions with no aggregate cleanup-failure logging
 
 → gastown/packages/{mayor,polecat,crew,dog,deacon,refinery,witness,reaper,wisp,convoy,rig,formula,plugin}.md
+
+## [2026-04-17] drift-found | Phase 8 Batch 2d (Failure modes: packages/ Diagnostics — 4 pages)
+
+**Scope:** Failure mode analysis across 4 diagnostics package pages.
+
+**Pages audited:**
+- [doctor](gastown/packages/doctor.md) — `phase8_findings: [silent-suppression]`
+- [health](gastown/packages/health.md) — `phase8_findings: [none]`
+- [keepalive](gastown/packages/keepalive.md) — `phase8_findings: [none]`
+- [deps](gastown/packages/deps.md) — `phase8_findings: [none]`
+
+**Findings summary:**
+- 1 page with failure modes (doctor)
+- 3 pages with [none] (health, keepalive, deps)
+- Highest-value absent finding: doctor fix-mode actions discard errors — users see "fixed" but repair may not have taken effect
+
+→ gastown/packages/{doctor,health,keepalive,deps}.md

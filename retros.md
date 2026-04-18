@@ -1462,3 +1462,22 @@ All planned phases complete:
 
 **Follow-ups filed:**
 - none — lessons are purely informational
+
+## [2026-04-17 13:30] stage | 8.2.d — packages/ Diagnostics
+
+**Actor:** wiki-curator subagent
+**Unit:** 4 pages audited (doctor, health, keepalive, deps)
+**Duration:** one dispatch
+
+**What went well:**
+- doctor fix-mode suppression pattern is a genuine finding — "fixed" may not be true
+- health/keepalive/deps correctly fast-pathed to [none]
+
+**What didn't:**
+- Nothing — clean batch
+
+**What to change next time:**
+- none
+
+**Follow-ups filed:**
+- none — lessons are purely informational

@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-04-17
 sources:
   - /home/kimberly/repos/gastown/internal/doctor/doctor.go
   - /home/kimberly/repos/gastown/internal/doctor/types.go
@@ -23,6 +23,8 @@ phase3_audited: 2026-04-14
 phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 phase4_audited: 2026-04-16
 phase4_findings: [none]
 ---
@@ -606,6 +608,18 @@ that someone encoded as a permanent check.
   `runDoctor` locates the town root
 - [gt](../binaries/gt.md) — parent binary; documents doctor's double
   exemption from beads-version-check and branch-check
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+- **Fix-mode side effects discard errors:** Multiple fix handlers
+  use `_ =` for their repair actions: `agent_beads_check.go:279,295`
+  (`bd.Update` label fix), `claude_settings_check.go:696,709,754`
+  (file removal, settings re-creation, session kill),
+  `env_check.go:256` (tmux `SetEnvironment`). If a fix action fails,
+  the check reports success but the underlying problem persists.
+  **Absent** — fix-mode users see "fixed" but the repair may not
+  have taken effect.
 
 ## Notes / open questions
 

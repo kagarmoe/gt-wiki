@@ -5507,3 +5507,17 @@ Two diagnostic decision trees created at `gastown/workflows/investigations/`:
 **Sources traced:** `cmd/install.go` (preflight checks, scaffolding sequence), `cmd/rig.go` (runRigAdd, git URL validation), `deps/beads.go` (EnsureBeads, version check), `deps/dolt.go` (CheckDolt, version constants), `workspace/find.go` (Find, FindFromCwdOrError, symlink behavior, env var fallback), `cmd/status.go` (gatherStatus, parallel bead fetch, zombie detection), `cmd/agents.go` (categorizeSession, agent type taxonomy), `cmd/dashboard.go` (ensureDoltPortEnv, setup mode), `cmd/feed.go` (source aggregation, TUI/plain/window modes), `web/handler.go` (NewDashboardMux), `web/fetcher.go` (LiveConvoyFetcher).
 
 **Index updated:** Added all 4 new investigation workflow pages to index.md.
+
+## [2026-04-18] ingest | Cross-page inference Batch 2: Detail tables on investigation-linked pages
+
+Added `## Detail tables` sections with structured reference tables to 6 entity pages that the investigation workflows reference with specific values (flags, config keys, env vars, thresholds, timing constants).
+
+**Pages modified:**
+- `gastown/packages/tmux.md` — nudge protocol timing constants, 8-step NudgeSession table, liveness check constants, consumed env vars
+- `gastown/packages/doltserver.md` — server config defaults, port resolution priority, health/liveness functions, start sequence steps, stop sequence
+- `gastown/packages/mail.md` — subprocess timeouts, bd invocations, subprocess env vars, two-phase delivery labels, notification path steps
+- `gastown/packages/daemon.md` — RestartTracker constants, heartbeat/ticker intervals, state files owned, env vars set/consumed
+- `gastown/packages/beads.md` — subprocess env vars, injected flags, redirect chain, stale PID cleanup
+- `gastown/packages/session.md` — StartSession env vars, session name patterns, PID tracking
+
+**Detail tables added:** 22 structured tables across 6 pages. All values verified against source code.

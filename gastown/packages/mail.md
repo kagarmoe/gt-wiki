@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/mail/types.go
   - /home/kimberly/repos/gastown/internal/mail/mailbox.go
@@ -465,6 +465,53 @@ mb.AcknowledgeDeliveries("gastown/Toast", msgs)
 For diagnostic workflows involving this entity, see
 [Investigating: message delivery](../workflows/investigations/message-delivery.md)
 and [Investigating: data-plane failures](../workflows/investigations/data-plane.md).
+
+## Detail tables
+
+### Subprocess timeouts
+
+| Constant | Value | Why | Source |
+|---|---|---|---|
+| `bdReadTimeout` | 60s | Timeout for `bd` read operations; original 30s caused `signal: killed` under concurrent agent load | `bd.go:15-22` |
+| `bdWriteTimeout` | 60s | Timeout for `bd` write operations; same incident as above | `bd.go:15-22` |
+
+### Subprocess invocations (via `runBdCommand`)
+
+| Called binary | Flags/args | Purpose | Source |
+|---|---|---|---|
+| `bd create` | `--label gt:message --assignee <to> --priority <N> ...` | Create mail bead | `router.go:1104-1205` |
+| `bd list` | `--label gt:message --assignee <id> --json --flat` | List inbox messages | `mailbox.go:112-260` |
+| `bd show` | `<id> --json` | Get single message | `mailbox.go:461-528` |
+| `bd close` | `<id>` | Mark message as read (terminal) | `mailbox.go:529-608` |
+| `bd label add` | `<id> delivery:acked delivery-acked-by:<addr> delivery-acked-at:<ts>` | Two-phase delivery ack | `delivery.go:84-107` |
+
+### Environment variables set per subprocess
+
+| Var | Value | Source |
+|---|---|---|
+| `BEADS_DIR` | Resolved beads directory | `bd.go:88-90` |
+| `BEADS_DOLT_SERVER_DATABASE` | From `beads.DatabaseEnv` | `bd.go:95` |
+| `BD_IDENTITY` | Caller-supplied extra env | `bd.go:100` |
+| OTel propagation env | From `telemetry.OTELEnvForSubprocess` | `bd.go:93` |
+
+### Two-phase delivery labels
+
+| Label | Phase | Purpose | Source |
+|---|---|---|---|
+| `delivery:pending` | Phase 1 (send) | Message written but not acknowledged | `delivery.go:13-25` |
+| `delivery:acked` | Phase 2 (ack) | Recipient confirmed receipt | `delivery.go:13-25` |
+| `delivery-acked-by:<addr>` | Phase 2 | Which recipient acknowledged | `delivery.go:35-42` |
+| `delivery-acked-at:<timestamp>` | Phase 2 | When acknowledgment occurred | `delivery.go:35-42` |
+
+### Notification path (notifyRecipient)
+
+| Step | Action | Source |
+|---|---|---|
+| 1 | Check DND status (`isRecipientMuted`) | `router.go:1598-1603` |
+| 2 | Resolve recipient to tmux session IDs (`AddressToSessionIDs`) | `router.go:1788-1835` |
+| 3 | Try wait-idle delivery first (`WaitForIdle`) | `router.go:1638` |
+| 4 | Fall back to queue-based delivery (`nudge.Enqueue`) | `router.go:1656-1665` |
+| 5 | Queue deferred reply reminder (`enqueueReplyReminder`) | `router.go:1642,1666` |
 
 ## Notes / open questions
 

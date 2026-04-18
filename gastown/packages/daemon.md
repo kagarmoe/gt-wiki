@@ -4,7 +4,7 @@ type: package
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/daemon/daemon.go
   - /home/kimberly/repos/gastown/internal/daemon/types.go
@@ -775,6 +775,54 @@ spike detection).
 
 For diagnostic workflows involving this entity, see
 [Investigating: data-plane failures](../workflows/investigations/data-plane.md).
+
+## Detail tables
+
+### RestartTracker constants
+
+| Constant | Value | Source |
+|---|---|---|
+| Initial backoff | 30s | `restart_tracker.go:14-45` |
+| Max backoff | 10m | `restart_tracker.go:14-45` |
+| Backoff multiplier | 2.0x | `restart_tracker.go:14-45` |
+| Crash-loop window | 15m | `restart_tracker.go:14-45` |
+| Crashes before crash-loop | 5 | `restart_tracker.go:14-45` |
+| Crash-loop cooldown | 30m | `restart_tracker.go:73-78` |
+
+### Heartbeat and ticker intervals
+
+| Ticker | Default interval | Purpose | Source |
+|---|---|---|---|
+| Recovery heartbeat | 3 min | Agent restart, zombie detection, supervision | `daemon.go:713-715` |
+| `doltHealth` | 30s | Fast Dolt crash detection | `dolt.go:27` |
+| `doltRemotes` | 15m | Push Dolt DBs to git remotes | `dolt_remotes.go` |
+| `doltBackup` | 15m | Filesystem backup sync | `dolt_backup.go` |
+| `jsonlGitBackup` | 15m | Scrub + export + git push | `jsonl_git_backup.go` |
+| `wispReaper` | 30m | Close/delete stale wisps | `wisp_reaper.go` |
+| `doctorDog` | 5m | Dolt health monitor | `doctor_dog.go` |
+| `compactorDog` | 24h | Flatten commit history | `compactor_dog.go` |
+| `checkpointDog` | 10m | Auto-commit WIP polecat work | `checkpoint_dog.go` |
+| `quotaDog` | varies | Credential rotation on rate-limit | `quota_dog.go` |
+
+### State files owned
+
+| File | Format | Purpose | Source |
+|---|---|---|---|
+| `daemon/daemon.lock` | flock | Singleton marker (never deleted) | `daemon.go:341` |
+| `daemon/daemon.pid` | `"PID\nNONCE"` | Ownership verification without `ps` matching | `pidfile.go:20-30` |
+| `daemon/daemon.log` | lumberjack (100MB, 3 backups, 7 days) | Daemon log | `daemon.go:152-160` |
+| `daemon/state.json` | JSON `State` struct | Running/PID/StartedAt/LastHeartbeat/HeartbeatCount | `types.go:90-99` |
+| `daemon/shutdown.lock` | flock (never deleted) | Held by `gt down` to prevent restart tug-of-war | `daemon.go:1968-2002` |
+| `daemon/restart_state.json` | JSON | Per-agent crash-loop counters and backoff timestamps | `restart_tracker.go` |
+
+### Environment variables set/consumed
+
+| Var | Set by | Consumed by | Source |
+|---|---|---|---|
+| `BD_ACTOR` | `gt daemon run` (set to `"daemon"`) | All bd subprocess calls | `cmd/daemon.go` |
+| `GT_DOLT_PORT` | `daemon.New` from Dolt state | Spawned agent sessions | `daemon.go:277+` |
+| `BEADS_DOLT_PORT` | `daemon.New` mirror of above | bd subprocess connections | `daemon.go:277+` |
+| `GT_TOWN_ROOT` | `daemon.New` via tmux global env | All tmux sessions | `daemon.go:274` |
 
 ## Notes / open questions
 

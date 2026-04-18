@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/session/identity.go
   - /home/kimberly/repos/gastown/internal/session/lifecycle.go
@@ -427,6 +427,37 @@ result, err := session.StartSession(t, session.SessionConfig{
 
 For diagnostic workflows involving this entity, see
 [Investigating: message delivery](../workflows/investigations/message-delivery.md).
+
+## Detail tables
+
+### Environment variables set by StartSession
+
+| Var | Set via | Purpose | Source |
+|---|---|---|---|
+| `GT_ROLE` | `SetEnvironment` (suppressed errors) | Role identity for `gt prime` | `lifecycle.go:222-227` |
+| `GT_RIG` | `SetEnvironment` | Rig name | `lifecycle.go:222-227` |
+| `GT_RUN` | `SetEnvironment` | GASTA waterfall run UUID for telemetry correlation | `lifecycle.go:222-227` |
+| `GT_PANE_ID` | `GetPaneID` + `SetEnvironment` | ZFC-compliant liveness checks | `lifecycle.go:282-284` |
+| `GT_TOWN_ROOT` | `SetEnvironment` | Town root path | `lifecycle.go:222-227` |
+
+### Session name patterns
+
+| Role | Pattern | Factory | Source |
+|---|---|---|---|
+| Mayor | `hq-mayor` | `MayorSessionName()` | `names.go:16-18` |
+| Deacon | `hq-deacon` | `DeaconSessionName()` | `names.go:22-24` |
+| Overseer | `hq-overseer` | `OverseerSessionName()` | `names.go:52` |
+| Boot | `hq-boot` | `BootSessionName()` | `names.go:59` |
+| Witness | `<prefix>-witness` | `WitnessSessionName(prefix)` | `names.go:28-30` |
+| Refinery | `<prefix>-refinery` | `RefinerySessionName(prefix)` | `names.go:34` |
+| Crew | `<prefix>-<name>` | `CrewSessionName(prefix, name)` | `names.go:40` |
+| Polecat | `<prefix>-<name>` | `PolecatSessionName(prefix, name)` | `names.go:46` |
+
+### PID tracking
+
+| File | Format | Purpose | Source |
+|---|---|---|---|
+| `<townRoot>/.runtime/pids/<sessionID>.json` | JSON with PID + start time fingerprint | Orphan cleanup even after tmux loses track | `pidtrack.go:45-73` |
 
 ## Notes / open questions
 

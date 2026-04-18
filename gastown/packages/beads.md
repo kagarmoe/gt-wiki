@@ -4,7 +4,7 @@ type: package
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/beads/beads.go
   - /home/kimberly/repos/gastown/internal/beads/store.go
@@ -660,6 +660,39 @@ issue, err := b.Show("hq-cv-abc123")   // routes into hq rig automatically
 
 For diagnostic workflows involving this entity, see
 [Investigating: data-plane failures](../workflows/investigations/data-plane.md).
+
+## Detail tables
+
+### Subprocess environment variables
+
+| Var | Value | Why | Source |
+|---|---|---|---|
+| `BEADS_DIR` | Resolved beads directory | Prevents inherited values causing prefix mismatches (GH#803) | `beads.go:426-430` |
+| `BEADS_DOLT_SERVER_PORT` | From target beads dir's `metadata.json` | Cross-rig operations reach correct Dolt server | `beads.go:687-714` |
+| `BEADS_DOLT_SERVER_HOST` | From target beads dir | Cross-rig host resolution | `beads.go:687-714` |
+| `BEADS_DOLT_SERVER_DATABASE` | From `database.go` | Correct database name per rig | `database.go:33` |
+| OTel propagation env | From `telemetry.OTELEnvForSubprocess` | Subprocess telemetry joins gt's waterfall | `beads.go:440-441` |
+
+### Subprocess flags injected
+
+| Flag | Condition | Purpose | Source |
+|---|---|---|---|
+| `--allow-stale` | bd binary supports it (probed + cached) | Skip freshness checks for read operations | `beads.go:58-94` |
+| `--flat` | `bd list --json` commands on bd v0.59+ | Produce actual JSON (not nested format) | `beads.go:117-137` |
+| `--force` | Bead ID has > 1 hyphen | Bypass bd's prefix inference on multi-hyphen IDs | `force.go:11` |
+
+### Redirect chain
+
+| Mechanism | Max depth | Cycle detection | Source |
+|---|---|---|---|
+| `.beads/redirect` file follow | 3 | Yes (removes offending file) | `beads_redirect.go:381` |
+| `routes.jsonl` prefix routing | n/a | Prefix-based, no recursion | `routes.go:360` |
+
+### Stale PID cleanup
+
+| Function | Purpose | Source |
+|---|---|---|
+| `CleanStaleDoltServerPID` | Remove PID files pointing to dead processes in `.beads/dolt/` | `stale_pid.go:20-46` |
 
 ## Notes / open questions
 

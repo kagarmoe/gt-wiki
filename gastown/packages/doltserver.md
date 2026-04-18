@@ -4,7 +4,7 @@ type: package
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/doltserver/doltserver.go
   - /home/kimberly/repos/gastown/internal/doltserver/dolthub.go
@@ -596,6 +596,66 @@ _ = doltserver.Stop(townRoot)
 
 For diagnostic workflows involving this entity, see
 [Investigating: data-plane failures](../workflows/investigations/data-plane.md).
+
+## Detail tables
+
+### Server configuration defaults
+
+| Key | Value | Source |
+|---|---|---|
+| `DefaultPort` | 3307 | `doltserver.go:137` |
+| `DefaultUser` | `"root"` | `doltserver.go:139` |
+| `DefaultMaxConnections` | 1000 | `doltserver.go:141` |
+| `DefaultReadTimeoutMs` | 300000 (5 min) | `doltserver.go:143-146` |
+| `DefaultWriteTimeoutMs` | 300000 (5 min) | `doltserver.go:149-156` |
+
+### Port resolution priority
+
+| Priority | Source | Code |
+|---|---|---|
+| 1 (highest) | `.dolt-data/config.yaml` | `readPortFromConfigYAML` at `doltserver.go:159-180` |
+| 2 | `GT_DOLT_PORT` env var | `DefaultConfig` at `doltserver.go:263-339` |
+| 3 | `daemon/daemon.env` file | `readDaemonEnvVar` at `doltserver.go:343-359` |
+| 4 | `mayor/daemon.json` | `DefaultConfig` secondary fallback |
+| 5 (lowest) | Hard default `3307` | `DefaultConfig` |
+
+### Health and liveness functions
+
+| Function | Purpose | Timeout/Threshold | Source |
+|---|---|---|---|
+| `CheckServerReachable` | TCP connection + MySQL ping | 2s TCP timeout | `doltserver.go:587-600` |
+| `WaitForReady` | Poll loop around `CheckServerReachable` | `maxAttempts = dbCount * 10`, 500ms sleep | `doltserver.go:610-658` |
+| `IsRunning` | PID file read + signal(0) probe | none | `doltserver.go:526-586` |
+| `CheckPortConflict` | Find dolt process on configured port | none | `doltserver.go:711-766` |
+| `VerifyServerDataDir` | Compare running server data dir vs expected | none | `doltserver.go:996-1047` |
+| `GetHealthMetrics` | Connection count, latency, capacity | none | `doltserver.go:3388-3496` |
+| `GetActiveConnectionCount` | Current connection count vs `DefaultMaxConnections` | none | `doltserver.go:3312-3364` |
+| `MeasureQueryLatency` | Sampled `SELECT 1` latency | > 5s = degraded | `doltserver.go:3633-3665` |
+| `CheckReadOnly` | Detect read-only working set after crash | none | `doltserver.go:3497-3540` |
+| `RecoverReadOnly` | Replay into recovery branch | none | `doltserver.go:3563-3632` |
+
+### Start sequence critical steps
+
+| Step | Action | Source |
+|---|---|---|
+| 1 | Acquire `dolt.lock` flock (retry: 15s-120s scaled by DB count) | `doltserver.go:1329-1383` |
+| 2 | `StopIdleMonitors` to prevent imposter respawn | `doltserver.go:1385-1392` |
+| 3 | Check `IsRunning` — imposter detect + orphan evict | `doltserver.go:1394-1470` |
+| 4 | Quarantine phantom rig dirs (missing `.dolt/noms/manifest`) | `doltserver.go:1489-1539` |
+| 5 | `cleanupStaleDoltLock` per DB dir (checks `lsof` first) | `doltserver.go:1679-1707` |
+| 6 | Write `config.yaml` via `writeServerConfig` | `doltserver.go:1266-1319` |
+| 7 | `exec.Command("dolt", "sql-server", "--config", ...)` with `setProcessGroup` | `doltserver.go:1596+` |
+| 8 | Write PID file + save State | `doltserver.go:1640+` |
+| 9 | Wait for connections (maxAttempts = dbCount * 10, 500ms each) | `doltserver.go:1650-1672` |
+
+### Stop sequence
+
+| Step | Action | Source |
+|---|---|---|
+| 1 | `drainConnectionsBeforeStop` — reduce NomsBlockStore.Close race window | `doltserver.go:1746-1781` |
+| 2 | `gracefulTerminate` (SIGTERM, 5s wait) | `doltserver.go:1782-1838` |
+| 3 | `Kill()` force quit if still alive | `doltserver.go:1782-1838` |
+| 4 | Clean up PID file + state | `doltserver.go:1782-1838` |
 
 ## Notes / open questions
 

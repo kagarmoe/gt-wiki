@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/tmux/tmux.go
   - /home/kimberly/repos/gastown/internal/tmux/theme.go
@@ -524,6 +524,52 @@ _ = t.NudgeSessionWithOpts(name, prompt, tmux.NudgeOpts{TownRoot: townRoot})
 
 For diagnostic workflows involving this entity, see
 [Investigating: message delivery](../workflows/investigations/message-delivery.md).
+
+## Detail tables
+
+### Nudge protocol timing constants
+
+| Constant | Value | Why | Source |
+|---|---|---|---|
+| `nudgeLockTimeout` | 30s | In-process channel semaphore timeout; prevents hung tmux from permanently locking out nudges | `tmux.go:1248-1268` |
+| `sendKeysChunkSize` | 512 bytes | Max bytes per `send-keys -l` call; prevents tmux buffer overflow | `tmux.go:1509` |
+| Inter-chunk delay | 10ms | Between 512-byte chunks during `sendMessageToTarget` | `tmux.go:1511-1535` |
+| Post-Escape wait | 600ms | Must exceed bash readline `keyseq-timeout` (500ms default) so ESC is processed alone, not as meta prefix for Enter | `tmux.go` NudgeSession step 6 |
+| Flock poll interval | 100ms | Cross-process flock retry loop interval | `flock_unix.go:16-42` |
+
+### Nudge protocol steps (NudgeSession)
+
+| Step | Action | Failure it prevents | Source |
+|---|---|---|---|
+| 0 | Dismiss Rewind mode (`isInRewindMode`) | Rewind UI consuming the message (gt-8el) | `tmux.go:1378` |
+| 1 | Exit copy/scroll mode | Copy mode silently intercepting input | `tmux.go:1601+` |
+| 2 | Sanitize control chars | Shell metacharacter injection | `tmux.go:1350` |
+| 3 | Send text in 512-byte chunks | tmux buffer limits on large messages | `tmux.go:1509-1535` |
+| 4 | Adaptive delay | Message truncation under load (gt-0b5) | `tmux.go:1491` |
+| 5 | Send Escape | Stuck in vim INSERT mode (skipped for Copilot CLI, hq-isz) | `tmux.go` step 5 |
+| 6 | Wait 600ms | ESC+Enter within 500ms becomes M-Enter (no submit) | `tmux.go` step 6 |
+| 6.5 | Post-Escape Rewind check | Escape itself triggers Rewind if buffered | `tmux.go` step 6.5 |
+| 7 | `sendEnterVerified` | Enter not processed under load | `tmux.go:1434` |
+| 8 | `WakePaneIfDetached` (SIGWINCH) | Claude Code ignores input in detached panes | `tmux.go:1327` |
+
+### Liveness check constants
+
+| Constant | Value | Source |
+|---|---|---|
+| `ZombieStatus` enum values | `SessionHealthy`, `SessionDead`, `AgentDead`, `AgentHung` | `tmux.go:2108-2120` |
+| `CheckSessionHealth` | Checks session existence, agent process liveness, activity staleness | `tmux.go:2155` |
+| `IsAgentAlive` | Uses `GT_PROCESS_NAMES` env var to identify expected processes in pane | `tmux.go:2644` |
+| `DefaultReadyPromptPrefix` | `"❯ "` | `tmux.go:2825` |
+
+### Environment variables consumed
+
+| Var | Set by | Consumed by | Source |
+|---|---|---|---|
+| `GT_AGENT_READY` | `gt prime --hook` SessionStart | `WaitForCommand` fallback for wrapped agents | `tmux.go:196` |
+| `GT_PROCESS_NAMES` | Agent session creation | `IsAgentAlive` process-tree verification | `tmux.go:2644` |
+| `GT_TOWN_SOCKET` | Tmux keybindings | `SocketFromEnv` for subcommands spawned from bindings | `tmux.go:3687` |
+| `GT_AGENT` | Session startup | `NudgeSession` step 5 — skip Escape for `copilot` | `tmux.go` step 5 |
+| `TMUX` | Tmux server | `IsInsideTmux`, `CurrentSessionName`, `IsInSameSocket` | `tmux.go:3176`, `3703`, `148` |
 
 ## Notes / open questions
 

@@ -14,6 +14,8 @@ phase3_findings: [cobra-drift]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [precondition-violation, silent-suppression]
 ---
 
 # gt config
@@ -266,6 +268,17 @@ See forward-link: [../drift/README.md](../drift/README.md).
 - **Severity:** `wrong`
 - **Fix tier:** `code` — add `dolt.port` to the `Supported keys:` block of `configGetCmd.Long` at `config.go:695-705`, mirroring the `dolt.port` entry in `configSetCmd.Long` at `config.go:653-655`. The code at `config.go:896` and the error message at `config.go:911` are already correct; only the `Long` text is wrong.
 - **Release position:** `in-release` (`configGetCmd.Long` at `v1.0.0:internal/cmd/config.go:693-723` is byte-identical — `dolt.port` also missing — and `runConfigGet`'s `case "dolt.port":` already exists at `v1.0.0:internal/cmd/config.go:896`).
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+
+- **`config set default_agent` accepts any string without validation:** `config.go:762` sets `townSettings.DefaultAgent = value` without checking that the value matches a built-in preset or custom agent. Contrast with `runConfigDefaultAgent` at `config.go:560-579` which validates the agent exists. A user running `gt config set default_agent nonexistent` silently writes an invalid default that will fail at spawn time. **Absent** — predicted bug surface: no validation on the `set` path that the `default-agent` subcommand enforces.
+- **`config set maintenance.window` auto-enables maintenance patrol:** `config.go:951` sets `mc.Enabled = true` as a side effect of setting the window. The Long text at `config.go:659` does not mention this. A user setting a window to plan ahead gets an active maintenance patrol immediately. **Absent** — undocumented side effect; no way to set a window without enabling the patrol.
+
+### Silent suppression (what errors are swallowed?)
+
+- **`runConfigAgentList` reads `--json` flag generically:** `config.go:329` uses `cmd.Flags().GetBool("json")` instead of the typed `configAgentListJSON` var. When called via `default-agent list`, the flag lookup still works because both commands register `--json`, but the lookup error path (`_` ignored on `GetBool`) is swallowed. **Present** — cobra guarantees the flag exists if registered, so this is safe in practice.
 
 ## Related
 

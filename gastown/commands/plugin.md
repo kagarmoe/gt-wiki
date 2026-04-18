@@ -14,6 +14,8 @@ phase3_findings: [cobra-drift]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [precondition-violation, silent-suppression]
 ---
 
 # gt plugin
@@ -207,6 +209,19 @@ See forward-link: [../drift/README.md](../drift/README.md).
 - **Severity:** `wrong`
 - **Fix tier:** `code` — rewrite `pluginRunCmd.Long` at `plugin.go:92-100` to reflect the actual behavior: gate enforcement is cooldown-only, and other gate types are treated as always-open by the manual-run path. Alternatively, extend `runPluginRun` at `plugin.go:425-442` to handle the other gate types (larger scope). The minimal fix is the `Long` text rewrite; the behavior change is a follow-up if Gas Town wants `gt plugin run` to honor all gate types.
 - **Release position:** `in-release` (`pluginRunCmd.Long` and the cooldown-only gate switch at `plugin.go:425-442` both byte-identical at `v1.0.0:internal/cmd/plugin.go`).
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+
+- **`plugin run` gate check is cooldown-only; other gate types always pass:** `plugin.go:428` checks `p.Gate.Type == plugin.GateCooldown` and only then queries the recorder. For `GateCron`, `GateCondition`, `GateEvent`, and `GateManual`, `gateOpen` stays `true` (initialized at `plugin.go:426`). A `manual`-gated plugin can be run without `--force` because the gate is never checked. **Absent** — predicted bug surface: users expect `manual` gates to require `--force` but they do not. (Also documented as cobra-drift in the Drift section above.)
+- **`getPluginScanner` silently degrades on rig config load failure:** `plugin.go:178-181` catches errors from `config.LoadRigsConfig` and falls back to an empty config. If the rigs config is corrupt, the scanner discovers only town-level plugins; rig-level plugins are silently invisible. **Absent** — no warning emitted to the user; rig plugins silently disappear from `list`/`show`/`run`.
+
+### Silent suppression (what errors are swallowed?)
+
+- **`plugin run` always records success:** `plugin.go:480` hardcodes `Result: plugin.ResultSuccess` for manual runs. The comment at `:480` acknowledges this: "Manual runs are marked success." If the printed instructions fail when executed by the agent, the history bead is falsely optimistic. **Present** — intentional design decision; documented in code comment.
+- **`recorder.CountRunsSince` error during gate check:** `plugin.go:435-437` catches the error from the gate-status query, prints it to stderr, and continues with `gateOpen = true`. A Dolt outage means all cooldown gates silently open. **Present** — warning printed to stderr, but the plugin still runs, which may not be the desired behavior during a Dolt outage.
+- **`recorder.RecordRun` failure is a warning:** `plugin.go:483-484` catches the error from recording the run and prints it to stderr. The run has already executed; the only consequence is missing history. **Present** — warning visible.
 
 ## Related
 

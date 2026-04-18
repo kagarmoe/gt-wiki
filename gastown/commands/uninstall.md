@@ -14,6 +14,8 @@ phase3_findings: [cobra-drift]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [precondition-violation, partial-completion]
 ---
 
 # gt uninstall
@@ -154,6 +156,18 @@ See forward-link: [../drift/README.md](../drift/README.md).
 - **Severity:** `wrong`
 - **Fix tier:** `code` — either (a) narrow the `Long` text at `uninstall.go:29-45` and the `--workspace` flag help at `uninstall.go:50-51` to spell out the two-candidate scan and the "silently skipped if elsewhere" behavior, or (b) expand `findWorkspaceForUninstall` at `uninstall.go:152-171` to discover the real workspace from config (`state.Load()` already runs upstream; the install flow records the workspace root somewhere that could be read back). The minimal doc-only fix is to add one line to the `Long`: "With --workspace, removes ~/gt or ~/gastown if present; workspaces at other paths are not detected and must be removed manually." A better product fix is path (b). Even with path (b), the confirmation prompt should warn when no workspace is found, rather than silently proceeding with the XDG-only removal.
 - **Release position:** `in-release` (`uninstallCmd.Long` at `v1.0.0:internal/cmd/uninstall.go:25-46` byte-identical; `findWorkspaceForUninstall`'s two-candidate scan already present at v1.0.0).
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+
+- **`findWorkspaceForUninstall` only checks two hardcoded paths:** `uninstall.go:158-161` tries `$HOME/gt` and `$HOME/gastown` only. A workspace at any other path (e.g., `~/code/gt`, `~/work/gastown`) is silently not found. With `--workspace`, the confirmation prompt warns "WORKSPACE WILL BE DELETED" at `uninstall.go:70-72`, the user types `y`, and the workspace is silently left in place. **Absent** — predicted bug surface: no warning when `--workspace` finds nothing to delete; the user believes the workspace was removed. (Also documented as cobra-drift in the Drift section above.)
+- **`uninstall` is not beads-exempt:** `root.go:44-77` lists `install` as beads-exempt (`root.go:65`) but not `uninstall`. If the beads database is corrupt or Dolt is down, the `persistentPreRun` beads version check may block `gt uninstall` from running at all. A user trying to clean up a broken installation cannot uninstall. **Absent** — predicted bug surface: the one command designed to remove everything is gated on the subsystem most likely to be broken.
+
+### Partial completion (what doesn't it clean up?)
+
+- **Multi-step removal continues on failure, reports at end:** `uninstall.go:87-140` collects errors from each removal step into a `[]string` and only returns `fmt.Errorf("uninstall incomplete")` at the end. Individual steps are independent, so a failure in shell removal does not block state-dir removal. This is **present** — good design: each step is attempted regardless of prior failures, and the user gets a complete error summary. However, the user must manually clean up any failed steps; there is no retry mechanism.
+- **`--workspace` with empty `findWorkspaceForUninstall` result silently no-ops:** `uninstall.go:122-131` checks `workspaceDir != ""` before attempting removal. If `findWorkspaceForUninstall` returns `""` (non-standard path), the block is skipped entirely — no error, no warning. Combined with the confirmation prompt that said "WORKSPACE WILL BE DELETED," this is a false promise. **Absent** — no warning that the workspace was not found after the user confirmed deletion.
 
 ## Related
 

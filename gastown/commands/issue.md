@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [precondition-violation, silent-suppression]
 ---
 
 # gt issue
@@ -89,6 +91,17 @@ All three call into `internal/tmux`:
 ### Flags
 
 None on any subcommand.
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+
+- **Hard dependency on tmux:** All three subcommands (`set`, `clear`, `show`) require either `TMUX_PANE` to be set or `detectCurrentSession()` to succeed. Outside tmux, the error message is `"not in a tmux session"` (`issue.go:68-69`, `:85-87`, `:104-106`). **Present** — error is returned cleanly. However, the command is in `GroupConfig` (not a tmux-specific group), so users may encounter this unexpectedly.
+- **`detectCurrentSession` assumes valid GT env var combinations:** `issue.go:124-151` tries `parseRoleString(role)` at `:134` and `:145` with all three return values ignored via `_, _ :=`. If `GT_ROLE` contains an unparseable value, `parsedRole` defaults to its zero value and the function silently falls through to returning `""`, which the caller treats as "not in a tmux session." **Absent** — no error surfaced for a malformed `GT_ROLE`; the user sees a generic "not in a tmux session" message that does not indicate the real problem is a bad env var.
+
+### Silent suppression (what errors are swallowed?)
+
+- **`issueClear` sets empty string rather than unsetting tmux env var:** `issue.go:92` calls `t.SetEnvironment(session, "GT_ISSUE", "")`. The code comment at `:91` says "Set to empty string to clear." Tmux `setenv` with an empty value sets the variable to empty, not unset. `issueShow` at `:115` checks `issue == ""` and prints "No issue set", so the visible behavior is correct. But the variable persists in the tmux environment as `GT_ISSUE=`, visible to `tmux show-environment`. **Present** — correct behavior for the command's purposes, but may confuse users inspecting tmux env directly.
 
 ## Related
 

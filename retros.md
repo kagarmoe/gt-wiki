@@ -1262,3 +1262,25 @@ All planned phases complete:
 
 **Follow-ups filed:**
 - none — lessons are purely informational
+
+## [2026-04-17 13:00] stage | 8.1.1b — Failure modes: commands/ Configuration
+
+**Actor:** subagent (wiki-curator)
+**Unit:** 11 GroupConfig command pages audited for failure modes. 15 source files read (11 primary + 4 directive sibling files). 11 wiki pages updated with `## Failure modes` sections and `phase8_audited`/`phase8_findings` frontmatter.
+**Duration:** one dispatch
+
+**What went well:**
+- Read all source files before any wiki edits, as recommended by the 8.1.1a retro. This avoided the count-correction issue from last time.
+- The Configuration group had richer partial-completion findings than Diagnostics. `account switch` had three distinct absent partial-completion bugs (symlink removal before creation, RemoveAll before rename, directory creation before config save), making it the highest-yield page.
+- Two pages (enable, hooks) were fast [none] triage: enable is a single `state.Enable` call, hooks.go is a pure `requireSubcommand` dispatcher.
+
+**What didn't:**
+- config.go is 1291 lines and exceeded the 10000-token read limit, requiring three chunked reads. Should have anticipated this and used offset/limit from the start.
+- The `phase8_findings` tag vocabulary diverged slightly from Batch 1a: I used `precondition-violation` (hyphenated) while 1a used `precondition` (no suffix). Should standardize.
+
+**What to change next time:**
+- Standardize `phase8_findings` tags across batches: use the section headings from the template (`precondition-violation`, `partial-completion`, `silent-suppression`) consistently.
+- For files > 800 lines, plan chunked reads upfront rather than hitting the token limit.
+
+**Follow-ups filed:**
+- none — lessons are informational only

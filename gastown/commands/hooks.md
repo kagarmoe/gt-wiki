@@ -23,6 +23,8 @@ phase3_findings: [wiki-stale, cobra-drift]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt hooks
@@ -183,6 +185,10 @@ See forward-link: [../drift/README.md](../drift/README.md).
 - **Phase 2 claim (removed):** the Phase 2 page body stated "`hooks.go` only declares the parent. All eight advertised subcommands must be registered somewhere else under `internal/cmd/` (or not at all)" and listed a follow-up "grep for `hooksCmd.AddCommand`."
 - **Current reality (2026-04-15, gastown HEAD `9f962c4a`):** all nine subcommands — the eight advertised plus the unlisted `init` — are wired on `hooksCmd` by their respective sibling `hooks_*.go` files via per-file `init()` blocks. Confirmed via `grep -rn "hooksCmd.AddCommand" internal/cmd/`. Every one of the sibling files existed at `v1.0.0`, so this was stale at Phase 2 time — not churn-induced drift.
 - **Fix tier:** `wiki` — already fixed inline in `## What it actually does` above (the "Behavior" section now enumerates the sibling-file registrations; the "Subcommands" section now reflects that they are all wired).
+
+## Failure modes
+
+No failure modes identified in `hooks.go` itself. The parent command is a pure `requireSubcommand` dispatcher with no error paths of its own. Failure modes for the nine subcommands (`base`, `override`, `sync`, `diff`, `list`, `scan`, `registry`, `install`, `init`) live in their respective sibling files (`hooks_base.go`, etc.) and would be audited on per-subcommand pages if those pages existed. The parent file at `hooks.go:7-44` has no assumptions, no cleanup, and no suppressed errors.
 
 ## Related
 

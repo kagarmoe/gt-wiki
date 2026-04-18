@@ -4744,3 +4744,33 @@ Plus two optional sub-sections:
 - 6 pages with [none] (version, thanks, whoami, activity, checkpoint, stale)
 
 → gastown/commands/{activity,audit,checkpoint,costs,dashboard,doctor,feed,heartbeat,info,log,metrics,patrol,prime,repair,seance,stale,status,thanks,upgrade,version,vitals,whoami}.md
+
+## [2026-04-17] drift-found | Phase 8 Batch 1b (Failure modes: commands/ Configuration — 11 pages)
+
+11 GroupConfig command pages audited for failure modes via source-code error-path analysis.
+
+**Pages audited:**
+- [account](gastown/commands/account.md) — `phase8_findings: [partial-completion, silent-suppression]`
+- [config](gastown/commands/config.md) — `phase8_findings: [precondition-violation, silent-suppression]`
+- [directive](gastown/commands/directive.md) — `phase8_findings: [precondition-violation, silent-suppression]`
+- [disable](gastown/commands/disable.md) — `phase8_findings: [partial-completion]`
+- [enable](gastown/commands/enable.md) — `phase8_findings: [none]`
+- [hooks](gastown/commands/hooks.md) — `phase8_findings: [none]`
+- [issue](gastown/commands/issue.md) — `phase8_findings: [precondition-violation, silent-suppression]`
+- [plugin](gastown/commands/plugin.md) — `phase8_findings: [precondition-violation, silent-suppression]`
+- [shell](gastown/commands/shell.md) — `phase8_findings: [silent-suppression]`
+- [theme](gastown/commands/theme.md) — `phase8_findings: [precondition-violation, silent-suppression]`
+- [uninstall](gastown/commands/uninstall.md) — `phase8_findings: [precondition-violation, partial-completion]`
+
+**Findings summary:**
+- 9 pages with failure modes documented (5 precondition-violation, 3 partial-completion, 7 silent-suppression)
+- 2 pages with [none] (enable, hooks)
+
+**Notable absent findings (predicted bug surfaces):**
+- `account switch`: symlink removal before creation has no rollback; `RemoveAll` of target config dir before rename has no rollback
+- `config set default_agent`: no agent existence validation (unlike `config default-agent` subcommand)
+- `theme`: running outside a rig saves config to a spurious `unknown/` directory
+- `uninstall`: not beads-exempt, so a broken Dolt/beads can block uninstallation
+- `shell status`: treats any state load error as "not configured"
+
+→ gastown/commands/{account,config,directive,disable,enable,hooks,issue,plugin,shell,theme,uninstall}.md

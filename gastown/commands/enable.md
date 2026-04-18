@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [none]
 ---
 
 # gt enable
@@ -76,6 +78,10 @@ per-session via two env vars:
 
 Neither override is consulted by `runEnable` itself; they are honored
 by downstream checks that read the combined env + state.
+
+## Failure modes
+
+No failure modes identified. `enable.go` is a leaf command with a single `state.Enable(Version)` call whose error is properly propagated. No precondition assumptions beyond a writable state directory, no partial completion risk (single atomic write), no suppressed errors.
 
 ## Related
 

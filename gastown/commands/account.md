@@ -14,6 +14,8 @@ phase3_findings: [cobra-drift]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion, silent-suppression]
 ---
 
 # gt account
@@ -214,6 +216,23 @@ See forward-link: [../drift/README.md](../drift/README.md).
 - **Severity:** `wrong`
 - **Fix tier:** `code` — extend the Commands list in `accountCmd.Long` at `account.go:34-38` to include `switch <handle>`, matching the actual init() registration order. The `Long` texts on the individual sub-command vars (`accountSwitchCmd.Long` at `account.go:281-288`) are already correct and need no change.
 - **Release position:** `in-release` (parent `Long` text byte-identical at `v1.0.0:internal/cmd/account.go:29-38`; `accountSwitchCmd` already registered in the v1.0.0 init block).
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+
+- **`runAccountList` treats any config load error as "no accounts":** `config.LoadAccountsConfig` at `account.go:102-109` catches all errors — not just "file not found" — and prints "No accounts configured." A corrupt JSON file produces the same user-visible output as an empty config, with no error surfaced. **Absent** — predicted bug surface: user with a malformed `accounts.json` gets a misleading "no accounts" message instead of a parse error.
+
+### Partial completion (what doesn't it clean up?)
+
+- **`switch` removes old symlink before creating new one:** `account.go:440-445` removes the existing `~/.claude` symlink, then `account.go:449` creates the new one. If `os.Symlink` fails (e.g., target `ConfigDir` doesn't exist), `~/.claude` is gone and Claude Code has no config directory until manually fixed. **Absent** — no rollback: the old symlink is not restored on failure.
+- **`switch` real-directory migration removes target before rename:** `account.go:427-429` calls `os.RemoveAll(currentAcct.ConfigDir)` to clear the way for `os.Rename(~/.claude, ...)`. If the rename at `account.go:433` subsequently fails, the previously-existing account config dir has been destroyed. **Absent** — no rollback of the `RemoveAll`.
+- **`add` creates config dir before save succeeds:** `account.go:195` calls `os.MkdirAll` to create the account config directory. If `config.SaveAccountsConfig` fails at `account.go:218-220`, the directory exists on disk but is not registered in `accounts.json`. Re-running `add` with the same handle works (the dir already exists), but the orphan dir is never cleaned up on error. **Absent** — no cleanup of the created directory if save fails.
+
+### Silent suppression (what errors are swallowed?)
+
+- **`ensureSharedCommandsSymlink` silently discards symlink removal error:** `account.go:496` uses `_ = os.Remove(acctCmds)` when removing a stale symlink before recreating it. If the remove fails, `os.Symlink` at `account.go:503` will also fail, and that error is returned — but the root cause (permission denied on remove) is lost. **Present** (the downstream `os.Symlink` error propagates) but the suppressed remove error obscures diagnosis.
+- **`ensureSharedCommandsSymlink` failure in `add` is a warning, not an error:** `account.go:201-203` catches the symlink-setup error and prints a warning via `style.PrintWarning`. The account is still added. **Present** — intentional degradation; the warning is visible.
 
 ## Related
 

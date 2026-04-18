@@ -17,6 +17,8 @@ phase3_findings: [wiki-stale]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [precondition-violation, silent-suppression]
 ---
 
 # gt directive
@@ -136,6 +138,17 @@ flags in its sibling file's `init()`.
 - Rig-level: `<townRoot>/<rig>/directives/<role>.md`
 - Resolution: town and rig directives are concatenated, town first,
   rig last — rig-level content gets the last word.
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+
+- **`directive edit` falls back to `vi` if `$EDITOR` is unset:** `directive_edit.go:79-81` defaults `editor` to `"vi"` when `os.Getenv("EDITOR")` returns empty. On systems where `vi` is not installed (some minimal containers, Windows), this produces a confusing `exec: "vi": executable file not found in $PATH` error. **Absent** — no check that the editor binary exists before attempting to run it.
+
+### Silent suppression (what errors are swallowed?)
+
+- **`resolveDirectiveContext` silently ignores cwd error:** `directive_show.go:97-99` calls `os.Getwd()` and only uses the result if `err == nil`. If `Getwd` fails (deleted cwd, broken mount), `rigName` stays empty and the command silently operates at town-level scope with no indication that rig detection failed. **Absent** — no warning emitted; the user sees town-level output and may not realize rig scope was intended.
+- **`directive list` silently skips unreadable rig directories:** `directive_list.go:59-88` scans `os.ReadDir(townRoot)` and silently continues past any rig whose `directives/` subdirectory cannot be read. A permissions error on a rig directory produces no output for that rig, no error, no warning. **Absent** — the user sees a complete-looking list that may be missing entries from inaccessible rigs.
 
 ## Related
 

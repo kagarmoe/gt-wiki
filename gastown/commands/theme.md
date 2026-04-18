@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [precondition-violation, silent-suppression]
 ---
 
 # gt theme
@@ -152,6 +154,18 @@ Registered in `init()` (`theme.go:78-85`):
 |-----------------|----------------|------|---------|------------------------------------------|
 | `--list` / `-l` | `theme` root   | bool | `false` | List available tmux themes               |
 | `--all` / `-a`  | `theme apply`  | bool | `false` | Apply to all rigs, not just current      |
+
+## Failure modes
+
+### Precondition violations (what does it assume?)
+
+- **`runTheme` may save theme for rig "unknown":** `theme.go:103-106` calls `detectCurrentRig()` and defaults to `"unknown"` if no rig is detected. If the user then passes a theme name, `saveRigTheme("unknown", themeName)` at `theme.go:123` writes a rig settings file at `<townRoot>/unknown/settings/config.json`. This creates a real directory named `unknown` in the town root. **Absent** — predicted bug surface: running `gt theme forest` outside a rig creates a spurious `unknown/` directory tree.
+- **`saveRigTheme` creates rig settings directory if absent:** `theme.go:320-327` calls `config.LoadRigSettings` and on `IsNotExist` creates new settings. Combined with the "unknown" rig issue above, this means the directory is created eagerly. For legitimate rigs, this is fine; for the "unknown" fallback, it's a side effect. **Present** — the `IsNotExist` check is intentional for new rigs, but the "unknown" fallback is the real issue.
+
+### Silent suppression (what errors are swallowed?)
+
+- **`runThemeApply` discards `workspace.FindFromCwd()` error:** `theme.go:139` uses `townRoot, _ := workspace.FindFromCwd()`, discarding the error. If the workspace is not found, `townRoot` is `""`, and `tmux.ResolveSessionTheme("", rig, role)` at `theme.go:196` receives an empty town root. The theme resolution falls back to auto-assignment, but the user gets no indication that workspace resolution failed. **Absent** — predicted bug surface: running `gt theme apply` outside a workspace applies auto-assigned themes instead of configured themes, with no error or warning.
+- **`runThemeApply` silently skips sessions with unparseable names:** `theme.go:162-164` catches `session.ParseSessionName` errors and `continue`s to the next session. Non-Gas-Town sessions are expected to be skipped (via `IsKnownSession` at `:153`), but a Gas Town session with a malformed name would pass `IsKnownSession` and then be silently dropped by the parse failure. **Present** — filtering is intentional, but the silent skip of a session that passed the first filter could mask a bug.
 
 ## Related
 

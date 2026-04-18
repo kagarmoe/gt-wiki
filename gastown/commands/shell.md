@@ -14,6 +14,8 @@ phase3_findings: [cobra-drift]
 phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [silent-suppression]
 ---
 
 # gt shell
@@ -126,6 +128,13 @@ See forward-link: [../drift/README.md](../drift/README.md).
 - **Severity:** `wrong`
 - **Fix tier:** `code` — add one line to `shellInstallCmd.Long` at `shell.go:31-37` documenting the `state.Enable(Version)` side effect. Suggested wording: "Also sets the global 'enabled' state (equivalent to `gt enable`)." If the product intent is to make `shell install` install-only, remove the `state.Enable` call at `shell.go:72-74` and document separately that users who previously disabled need to run `gt enable` after reinstalling shell hooks. The minimal fix is the doc change; the behavior change is a follow-up decision.
 - **Release position:** `in-release` (`shellInstallCmd.Long` and `runShellInstall`'s `state.Enable(Version)` call both byte-identical at `v1.0.0:internal/cmd/shell.go`).
+
+## Failure modes
+
+### Silent suppression (what errors are swallowed?)
+
+- **`shell install` swallows `state.Enable` error:** `shell.go:72-74` catches the `state.Enable(Version)` error and prints a dim warning (`style.Dim`), but the command returns `nil` (success). The shell hook is installed and the user sees a success message, but the persistent "enabled" state may not have been set. On next boot, `gt status` might show "disabled" despite shell hooks being active. **Present** — warning printed, but the dim styling makes it easy to miss.
+- **`shell status` treats all `state.Load()` errors as "not configured":** `shell.go:93-98` catches any error from `state.Load()` and prints "Gas Town: not configured / Shell integration: not installed" then returns `nil`. A corrupt state file, a permissions error, or a disk I/O error all produce the same "not configured" output with no indication that something is broken. **Absent** — predicted bug surface: user with a corrupt state file sees "not configured" instead of a parse error.
 
 ## Related
 

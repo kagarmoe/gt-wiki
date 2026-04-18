@@ -14,6 +14,8 @@ phase3_findings: [none]
 phase3_severities: []
 phase3_findings_post_release: false
 phase5_audience: user
+phase8_audited: 2026-04-17
+phase8_findings: [partial-completion]
 ---
 
 # gt disable
@@ -87,6 +89,12 @@ The workspace (`~/gt`) is **preserved**. Disable flips a flag and
 
 Documented at `disable.go:33-34`: `GASTOWN_ENABLED=1` re-enables for the
 current session only, bypassing the persistent disabled flag.
+
+## Failure modes
+
+### Partial completion (what doesn't it clean up?)
+
+- **`--clean` failure leaves state disabled but shell hooks present:** `disable.go:49-55` calls `removeShellIntegration()` after `state.Disable()` has already succeeded at `disable.go:45`. If `shell.Remove()` fails, the command prints a warning but returns `nil` (success). The persistent state says "disabled" but the shell RC file still contains the Gas Town `cd` hook. Running `gt status` shows "disabled" while the shell hook is still active. **Present** (warning is printed) but the resulting inconsistent state is not self-healing — the user must manually re-run `gt shell remove` or `gt disable --clean` to resolve.
 
 ## Related
 

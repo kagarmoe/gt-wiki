@@ -694,6 +694,40 @@ For diagnostic workflows involving this entity, see
 |---|---|---|
 | `CleanStaleDoltServerPID` | Remove PID files pointing to dead processes in `.beads/dolt/` | `stale_pid.go:20-46` |
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `bd` | `version` | `--allow-stale` | capability probe | `beads.go:73` |
+| `bd` | (dynamic) | `fullArgs...` | caller-provided | `beads.go:436` |
+| `bd` | (dynamic retry) | `retryArgs...` | retry logic | `beads.go:460` |
+| `bd` | (dynamic) | `fullArgs...` | caller-provided | `beads.go:498` |
+| `bd` | `config set` | `types.custom <list>` | `constants.BeadsCustomTypes` | `beads_types.go:146` |
+| `bd` | `config get` | `types.custom` | hardcoded | `beads_types.go:163` |
+| `bd` | `config get` | `status.custom` | hardcoded | `beads_types.go:225` |
+| `bd` | `config set` | `status.custom <merged>` | runtime-computed | `beads_types.go:258` |
+| `bd` | `init` | `initArgs...` (prefix, force, etc.) | runtime config | `beads_types.go:345` |
+| `bd` | `config set` | `issue_prefix <prefix>` | rig config | `beads_types.go:367` |
+| `bd` | `migrate` | `--yes` | hardcoded | `beads_types.go:389` |
+| `bd` | `migrate` | `--yes` (retry) | hardcoded | `beads_types.go:397` |
+| `git` | `config` | `user.name` | hardcoded | `integration.go:173` |
+
+Subprocess env vars and injected flags are documented in the [Detail tables](#detail-tables) above.
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| `<beads>/audit.log` | Append audit event JSON | Operation audit trail | `audit.go:96` |
+| `<beads>/prime.md` | Prime content string | bd prime output | `beads.go:1674` |
+| `.beads/redirect` | Redirect path | Beads directory redirect | `beads_redirect.go:348` |
+| `<beads>/.types-sentinel` | Types list | Custom type registration sentinel | `beads_types.go:175` |
+| `<beads>/.statuses-sentinel` | Statuses list | Custom status registration sentinel | `beads_types.go:272` |
+| `<beads>/.catalog-*.tmp` | Catalog JSON (atomic) | Issue catalog cache | `catalog.go:154` |
+| `<beads>/config.yaml` | YAML config content | Beads configuration | `config_yaml.go:96` |
+| `<beads>/config.yaml` | Updated YAML content | Beads config update | `config_yaml.go:148` |
+| `<beads>/.routes-*.tmp` | Routes JSONL (atomic) | Prefix routing table | `routes.go:126` |
+
 ## Notes / open questions
 
 - This page is `status: partial` — coverage was expanded in Phase 6

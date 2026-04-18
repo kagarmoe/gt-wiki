@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/config/agents.go
   - /home/kimberly/repos/gastown/internal/config/loader.go
@@ -457,6 +457,36 @@ Typical command flow:
 - [go-mod](../files/go-mod.md) — dependency context; BurntSushi/toml
   and scheduler/capacity cross the module boundary from here.
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `git` | `config` | `user.name` | hardcoded | `overseer.go:126` |
+| `git` | `config` | `user.email` | hardcoded | `overseer.go:146` |
+| `gh` | `api user` | `--jq <fields>` | hardcoded | `overseer.go:165` |
+| `whoami` | (none) | (none) | hardcoded | `overseer.go:204` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| agents config | JSON data | Agent definitions | `agents.go:766` |
+| town config | JSON data (0600) | Town-level config | `loader.go:76` |
+| town config | JSON data (0600) | Town-level config update | `loader.go:120` |
+| settings file | JSON data | Settings persistence | `loader.go:189` |
+| settings file | JSON data | Settings update | `loader.go:440` |
+| rig config | JSON data | Rig configuration | `loader.go:484` |
+| rig config | JSON data | Rig config update | `loader.go:552` |
+| patrols config | JSON data | Patrol scheduling config | `loader.go:672` |
+| patrols config | JSON data | Patrol config update | `loader.go:769` |
+| accounts config | JSON data | Accounts config | `loader.go:813` |
+| messaging config | JSON data | Messaging config | `loader.go:960` |
+| agent settings | JSON data | Agent-level settings | `loader.go:1092` |
+| hook script | shell script content | Git hook scripts | `loader.go:2258` |
+| hook script | shell script content | Git hook scripts (rig) | `loader.go:2508` |
+| escalation config | JSON data | Escalation config | `loader.go:2778` |
+| overseer config | JSON data | Overseer identity | `overseer.go:69` |
 
 ## Notes / open questions
 

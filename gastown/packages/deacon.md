@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 phase3_audited: 2026-04-15
 phase3_findings: [none]
 phase3_severities: []
@@ -361,6 +361,31 @@ Defaults `DefaultPingTimeout = 30s`, `DefaultConsecutiveFailures
   cleanup-on-failure code where the primary error has already been
   captured. **Present** — most suppressions are in defer/cleanup
   contexts where POSIX semantics provide a safety net.
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `gt` | `convoy stranded` | `--json` | hardcoded | `feed_stranded.go:184` |
+| `gt` | `convoy check` | `<convoyID>` | runtime | `feed_stranded.go:338` |
+| `gt` | `sling` | `<mol> deacon/dogs --force --no-convoy` | constants + hardcoded | `feed_stranded.go:348` |
+| `bd` | `show` | `<convoyID> --json` | runtime | `feed_stranded.go:385` |
+| `bd` | `show` | `<beadID> --json` | runtime | `redispatch.go:335` |
+| `gt` | `sling` | `<beadID> <rig> --force --no-convoy` | runtime | `redispatch.go:355` |
+| `gt` | `mail send` | `mayor/ -s <subj> -m <body>` | runtime | `redispatch.go:386` |
+| `bd` | `list` | `--status=hooked --json --flat --limit=0` | hardcoded | `stale_hooks.go:159` |
+| `bd` | `update` | `<beadID> --status=open` | runtime | `stale_hooks.go:255` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| feed stranded state | JSON data | Stranded convoy tracking state | `feed_stranded.go:139` |
+| heartbeat file | JSON data | Deacon liveness heartbeat | `heartbeat.go:72` |
+| legacy heartbeat file | empty string | Backward-compat liveness | `heartbeat.go:80` |
+| pause file | JSON data | Deacon pause state | `pause.go:75` |
+| redispatch state | JSON data | Redispatch tracking state | `redispatch.go:119` |
+| stuck state | JSON data | Stuck detection state | `stuck.go:132` |
 
 ## Notes / open questions
 

@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/quota/state.go
   - /home/kimberly/repos/gastown/internal/quota/scan.go
@@ -221,6 +221,20 @@ scan/rotate/status command tree) and [`gt account`](../commands/account.md)
 - [internal/tmux](tmux.md) — implementation of the `TmuxClient` and
   `TmuxExecutor` interfaces.
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `security` | `find-generic-password` | `-s <serviceName> -w` | runtime (macOS keychain) | `keychain.go:55` |
+| `security` | `add-generic-password` | `-s <name> -a <acct> -w <pw> -U` | runtime (macOS keychain) | `keychain.go:66` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| keychain fallback file | encrypted data | Non-macOS key persistence | `keychain.go:173` |
+| keychain fallback file | encrypted data | Non-macOS key update | `keychain.go:200` |
 
 ## Notes / open questions
 

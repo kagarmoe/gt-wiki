@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 phase3_audited: 2026-04-15
 phase3_findings: [none]
 phase3_severities: []
@@ -286,6 +286,15 @@ without waiting for the next Deacon patrol tick.
   the swarm.
 - [`wisp` concept](../concepts/wisp.md) — stranded-convoy wisps
   are the primary artifact the safety-net path generates.
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `gt` | `convoy check` | `<convoyID>` | runtime | `operations.go:137` |
+| `bd` | (dynamic) | `args...` | caller | `operations.go:493` |
+| `gt` | (dynamic) | `args...` | caller | `operations.go:533` |
 
 ## Notes / open questions
 

@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/acp/proxy.go
   - /home/kimberly/repos/gastown/internal/acp/proxy_unix.go
@@ -212,6 +212,18 @@ load-bearing for the Mayor-as-IDE-agent flow.
 - **Unix/Windows process management shims:** Platform-specific
   process lifecycle code exists but Windows behavior may diverge.
   **Untested** — the ACP proxy is primarily designed for Unix tmux.
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| (agent binary) | (agent args) | spawned child process | runtime config | `proxy.go:186` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| propulsion log | append log data | ACP propulsion logging | `propulsion.go:54` |
 
 ## Notes / open questions
 

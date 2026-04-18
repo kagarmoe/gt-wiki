@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/nudge/queue.go
   - /home/kimberly/repos/gastown/internal/nudge/poller.go
@@ -233,6 +233,19 @@ if len(nudges) > 0 {
 
 For diagnostic workflows involving this entity, see
 [Investigating: message delivery](../workflows/investigations/message-delivery.md).
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `gt` | `nudge-poller` | `<session>` | runtime | `poller.go:93` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| poller PID file | PID string | Poller process identity | `poller.go:81` |
+| nudge queue file | JSON data | Nudge queue persistence | `queue.go:133` |
 
 ## Notes / open questions
 

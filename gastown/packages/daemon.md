@@ -824,6 +824,85 @@ For diagnostic workflows involving this entity, see
 | `BEADS_DOLT_PORT` | `daemon.New` mirror of above | bd subprocess connections | `daemon.go:277+` |
 | `GT_TOWN_ROOT` | `daemon.New` via tmux global env | All tmux sessions | `daemon.go:274` |
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `git` | (various) | `-C`, `rev-parse`, etc. | hardcoded | `checkpoint_dog.go:165` |
+| `gt` | `convoy stranded` | `--json` | hardcoded | `convoy_manager.go:510` |
+| `gt` | `sling` | `slingArgs...` | runtime | `convoy_manager.go:565` |
+| `gt` | `convoy check` | `<convoyID>` | runtime | `convoy_manager.go:585` |
+| `gt` | `convoy check` | `<convoyID>` | runtime | `convoy_manager.go:600` |
+| `gt` | `scheduler run` | (none) | hardcoded | `daemon.go:2713` |
+| `bd` | (dynamic) | `args...` | molecule context | `dog_molecule.go:282` |
+| `dolt` | `backup sync` | `<backupName>` | config | `dolt_backup.go:115` |
+| `rsync` | `-a --delete` | `<backupDir>/ <icloudDir>/` | config | `dolt_backup.go:151` |
+| `dolt` | `backup` | (list) | hardcoded | `dolt_backup.go:194` |
+| `dolt` | (dynamic) | `fullArgs...` | caller | `dolt.go:254` |
+| `dolt` | `sql-server` | startup args | config | `dolt.go:853` |
+| `dolt` | `version` | (none) | hardcoded | `dolt.go:1415` |
+| `dolt` | `sql` | `-q <query>` | runtime | `dolt_remotes.go:151` |
+| `dolt` | `sql` | `-r csv -q <query>` | runtime | `dolt_remotes.go:177` |
+| `dolt` | `sql` | `-r csv -q <query>` | runtime | `dolt_remotes.go:238` |
+| `dolt` | `sql` | `-r csv -q <query>` | runtime | `dolt_remotes.go:258` |
+| `dolt` | `sql` | `-r csv -q <query>` | runtime | `dolt_remotes.go:278` |
+| `dolt` | `sql` | `-r json -q <query>` | runtime | `jsonl_git_backup.go:309` |
+| `git` | `remote get-url` | `<name>` | runtime | `jsonl_git_backup.go:419` |
+| `git` | `rev-parse` | `--abbrev-ref HEAD` | hardcoded | `jsonl_git_backup.go:429` |
+| `git` | (dynamic) | `-C <dir> <args>...` | runtime | `jsonl_git_backup.go:444` |
+| `gt` | `escalate` | `-s HIGH <msg>` | runtime | `jsonl_git_backup.go:465` |
+| `git` | `show` | `HEAD:<path>` | runtime | `jsonl_git_backup.go:544` |
+| `gt` | `mail inbox` | `--identity deacon/ --json` | hardcoded | `lifecycle.go:43` |
+| `git` | `fetch` | `origin` | hardcoded | `lifecycle.go:643` |
+| `git` | `stash push` | `-u -m <msg>` | hardcoded | `lifecycle.go:666` |
+| `git` | `pull` | `--rebase origin <branch>` | config | `lifecycle.go:685` |
+| `git` | `stash pop` | (none) | hardcoded | `lifecycle.go:711` |
+| `git` | `status` | `--porcelain` | hardcoded | `lifecycle.go:731` |
+| `gt` | `mail delete` | `<id>` | runtime | `lifecycle.go:772` |
+| `bd` | `show` | `<agentBeadID> --json` | runtime | `lifecycle.go:811` |
+| `bd` | `show` | `<agentBeadID> --json` | runtime | `lifecycle.go:872` |
+| `gt` | `mail send` | `<witnessAddr> -s <subj> -m <body>` | runtime | `lifecycle.go:1145` |
+| `gt` | `mail send` | `<witnessAddr> -s <subj> -m <body>` | runtime | `lifecycle.go:1272` |
+
+### SQL / config mutations
+| Target | Statement | Value | Purpose | `file:line` |
+|---|---|---|---|---|
+| Dolt | `UPDATE dolt_rebase SET action = 'squash'` | range filter | Compaction squash | `compactor_dog.go:478` |
+| Dolt | `CREATE TABLE IF NOT EXISTS __gt_health_probe` | probe table | Health check | `dolt.go:1227` |
+| Dolt | `DROP TABLE IF EXISTS __gt_health_probe` | cleanup | Health check cleanup | `dolt.go:1227` |
+
+### Environment variables set
+| Variable | Value source | Consumed by | `file:line` |
+|---|---|---|---|
+| config-specified vars | patrol config map | daemon subsystems | `daemon.go:197` |
+| `GT_DOLT_PORT` | patrol Dolt port | gt subprocesses | `daemon.go:223` |
+| `BEADS_DOLT_PORT` | patrol Dolt port | bd subprocesses | `daemon.go:224` |
+| `GT_DOLT_HOST` | patrol Dolt host | gt subprocesses | `daemon.go:226` |
+| `BEADS_DOLT_SERVER_HOST` | patrol Dolt host | bd subprocesses | `daemon.go:227` |
+| `GT_DOLT_PORT` | config Dolt port | gt subprocesses | `daemon.go:239` |
+| `BEADS_DOLT_PORT` | config Dolt port | bd subprocesses | `daemon.go:240` |
+| `BEADS_DOLT_SERVER_HOST` | config Dolt host | bd subprocesses | `daemon.go:250` |
+
+Additional env var documentation in the [Detail tables](#detail-tables) above.
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| unhealthy signal file | payload string | Dolt health failure signal | `dolt.go:737` |
+| Dolt config file | YAML content | Server configuration | `dolt.go:796` |
+| Dolt log file | append | Server log output | `dolt.go:847` |
+| JSONL backup tmp | JSONL buffer | Atomic backup snapshot | `jsonl_git_backup.go:347` |
+| spike baseline file | JSON data | Spike detection baseline | `jsonl_git_backup.go:609` |
+| `.gitignore` | ignore rules | Backup repo ignore | `jsonl_git_backup.go:627` |
+| issues JSONL | filtered content | Spike-filtered backup | `jsonl_git_backup.go:802` |
+| rotated log dest | log content | Log rotation output | `log_rotation.go:198` |
+| notification slot | JSON data | Agent notification | `notification.go:143` |
+| notification slot | JSON data | Agent notification | `notification.go:186` |
+| notification state | state data | Notification tracking | `notification.go:217` |
+| PID file | PID string | Process identity | `pidfile.go:26` |
+| restart state file | JSON data | Restart tracking persistence | `restart_tracker.go:134` |
+
 ## Notes / open questions
 
 - **`dolt.go` (47KB), `compactor_dog.go` (31KB),

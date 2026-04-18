@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 phase3_audited: 2026-04-15
 phase3_findings: [none]
 phase3_severities: []
@@ -249,6 +249,26 @@ a connection pool of its own, and never touches the filesystem.
   connection drops mid-cleanup, some databases may be cleaned while
   others are not. **Present** — errors are returned from the top-level
   functions and callers can retry.
+
+## Outgoing calls
+
+### SQL / config mutations
+| Target | Statement | Value | Purpose | `file:line` |
+|---|---|---|---|---|
+| Dolt | `SET @@autocommit = 0` | 0 | Transaction start (wisp reap) | `reaper.go:341` |
+| Dolt | `SET @@autocommit = 1` | 1 | Transaction cleanup (wisp reap) | `reaper.go:345` |
+| Dolt | `UPDATE wisps SET status='closed'` | wisp IDs | Close reaped wisps | `reaper.go:386` |
+| Dolt | `SET @@autocommit = 0` | 0 | Transaction start (orphan labels) | `reaper.go:485` |
+| Dolt | `SET @@autocommit = 0` | 0 | Transaction start (orphan deps) | `reaper.go:553` |
+| Dolt | `SET @@autocommit = 0` | 0 | Transaction start (stale issues) | `reaper.go:662` |
+| Dolt | `UPDATE issues SET status='closed', close_reason='stale:...'` | issue IDs | Close stale issues | `reaper.go:676` |
+| Dolt | `DELETE FROM <aux_table>` | `issue_id IN (...)` | Purge auxiliary rows | `reaper.go:741` |
+| Dolt | `DELETE FROM wisp_dependencies` | `depends_on_id IN (...)` | Purge reverse deps | `reaper.go:748` |
+| Dolt | `DELETE FROM <primary_table>` | `id IN (...)` | Purge primary rows | `reaper.go:753` |
+| Dolt | `SET @@autocommit = 0` | 0 | Transaction start (escalation close) | `reaper.go:816` |
+| Dolt | `UPDATE issues SET status='closed'` | issue IDs | Close escalation issues | `reaper.go:830` |
+| Dolt | `SET @@autocommit = 0` | 0 | Transaction start (agent close) | `reaper.go:904` |
+| Dolt | `UPDATE issues SET status='closed'` | issue IDs | Close agent issues | `reaper.go:918` |
 
 ## Notes / open questions
 

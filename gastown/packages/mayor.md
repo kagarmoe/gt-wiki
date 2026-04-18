@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 phase3_audited: 2026-04-15
 phase3_findings: [none]
 phase3_severities: []
@@ -254,6 +254,21 @@ The Unix and Windows files are the two halves of the
   `_ = windows.CloseHandle(handle)`. The Windows handle close error
   is discarded. **Untested** — the Windows shim exists but diverges
   from Unix process-group semantics.
+
+## Outgoing calls
+
+### Environment variables set
+| Variable | Value source | Consumed by | `file:line` |
+|---|---|---|---|
+| config-specified vars | env map from config | mayor subsystems | `manager.go:217` |
+| `GT_TOWN_ROOT` | `m.townRoot` | all gt subcommands | `manager.go:219` |
+| override vars | override env map | mayor subsystems | `manager.go:225` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| PID file | PID string | Mayor process identity | `cleanup.go:35` |
+| agent name file | agent name string | Current agent tracking | `cleanup.go:78` |
 
 ## Notes / open questions
 

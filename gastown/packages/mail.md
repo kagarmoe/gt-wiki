@@ -513,6 +513,24 @@ and [Investigating: data-plane failures](../workflows/investigations/data-plane.
 | 4 | Fall back to queue-based delivery (`nudge.Enqueue`) | `router.go:1656-1665` |
 | 5 | Queue deferred reply reminder (`enqueueReplyReminder`) | `router.go:1642,1666` |
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `bd` | (dynamic) | `args...` | caller | `bd.go:72` |
+| `bd` | (dynamic retry) | `retryArgs...` | retry logic | `bd.go:101` |
+
+Subprocess timeouts are documented in the [Detail tables](#detail-tables) above.
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| archive file | append message | Mail archive persistence | `mailbox.go:884` |
+| tmp file | mailbox snapshot | Atomic mailbox rewrite | `mailbox.go:995` |
+| mailbox file | append message | Incoming message delivery | `mailbox.go:1198` |
+| tmp file | mailbox snapshot | Atomic mailbox compaction | `mailbox.go:1222` |
+
 ## Notes / open questions
 
 - `router.go` at ~1880 lines is the single-file hotspot for

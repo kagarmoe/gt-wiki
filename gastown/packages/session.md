@@ -459,6 +459,23 @@ For diagnostic workflows involving this entity, see
 |---|---|---|---|
 | `<townRoot>/.runtime/pids/<sessionID>.json` | JSON with PID + start time fingerprint | Orphan cleanup even after tmux loses track | `pidtrack.go:45-73` |
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| (agent exe) | (agent args) | spawned subprocess | runtime config | `agent_logging_unix.go:58` |
+| `ps` | `-o lstart=` | `-p <pid>` | runtime | `pidtrack.go:183` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| agent PID file | PID string | Agent process tracking | `agent_logging_unix.go:79` |
+| PID track file | PID + start-time record | Orphan detection fingerprint | `pidtrack.go:71` |
+| registry tmp file | JSON registry data | Atomic registry update | `registry.go:359` |
+
+Environment variables set during session startup are documented in the [Detail tables](#detail-tables) above.
+
 ## Notes / open questions
 
 - The package doc comment says "polecat session lifecycle management"

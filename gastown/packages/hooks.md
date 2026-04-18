@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/hooks/config.go
   - /home/kimberly/repos/gastown/internal/hooks/installer.go
@@ -181,6 +181,15 @@ hook), and [`gt signal`](../commands/signal.md) /
 - [gt signal](../commands/signal.md) — one of the gt commands that
   hooks route into.
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Outgoing calls
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| hooks config file | JSON data | Hook configuration persistence | `config.go:971` |
+| hook script file | script content | Git hook installation | `installer.go:125` |
+| hook script file | script content | Git hook installation (secondary) | `installer.go:183` |
 
 ## Notes / open questions
 

@@ -4,7 +4,7 @@ type: package
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 phase3_audited: 2026-04-15
 phase3_findings: [none]
 phase3_severities: []
@@ -433,6 +433,24 @@ Source:
   `_ = poolLock.Unlock()` and `_ = polecatLock.Unlock()` calls in error
   paths. **Present** — these are cleanup in error paths where the lock
   will auto-release on process exit via POSIX flock semantics.
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `git` | `config` | `-C <clonePath> beads.issue-prefix <prefix>` | rig config | `manager.go:2235` |
+| `git` | `config` | `-C <clonePath> beads.role contributor` | hardcoded | `manager.go:2239` |
+| `bd` | `show` | `<issueID> --json` | runtime | `session_manager.go:783` |
+| `bd` | `update` | `<issueID> --status=hooked --assignee=<agentID>` | runtime | `session_manager.go:879` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| heartbeat file | JSON heartbeat data | Liveness signal | `heartbeat.go:96` |
+| pending path | PID string | Pending session marker | `manager.go:1296` |
+| theme file | theme string content | Name-pool theme persistence | `namepool.go:655` |
+| theme file | theme string content | Name-pool theme update | `namepool.go:693` |
 
 ## Notes / open questions
 

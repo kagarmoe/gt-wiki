@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 phase3_audited: 2026-04-15
 phase3_findings: [none]
 phase3_severities: []
@@ -377,6 +377,26 @@ culprit(s).
   silent failures in the merge pipeline may accumulate without
   any diagnostic trail. **Absent** — no aggregate logging of
   cleanup failures across a merge batch.
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `sh` | `-c` | `<testCommand>` | rig config | `engineer.go:871` |
+| `sh` | `-c` | `<gate.Cmd>` | rig config | `engineer.go:921` |
+| `gt` | `nudge` | `mayor/ <nudgeMsg>` | runtime | `engineer.go:1210` |
+| `gt` | `nudge` | `mayor/ <mayorMsg>` | runtime | `engineer.go:1258` |
+| `gt` | `nudge` | `<target> <nudgeMsg>` | runtime | `engineer.go:1280` |
+| `gt` | `nudge` | `mayor/ <mayorMsg>` | runtime | `engineer.go:1292` |
+| `gt` | `nudge` | `deacon <nudgeMsg>` | runtime | `engineer.go:1851` |
+| `bd` | `list` | `--type=convoy --status=open --json` | hardcoded | `engineer.go:1875` |
+| `bd` | `dep list` | `<convoyID> --direction=down --type=tracks --json` | runtime | `engineer.go:1901` |
+| `bd` | `show` | `<depID> --json` | runtime | `engineer.go:1932` |
+| `bd` | `close` | `<convoyID> -r <reason>` | runtime | `engineer.go:1968` |
+| `gt` | `mail send` | `<addr> -s <subj> -m <body>` | runtime | `engineer.go:1996` |
+| `gt` | `swarm land` | `<moleculeID>` | runtime | `engineer.go:2035` |
+| `gt` | `nudge` | `<target> <nudgeMsg>` | runtime | `manager.go:651` |
 
 ## Notes / open questions
 

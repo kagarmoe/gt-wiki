@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 phase3_audited: 2026-04-15
 phase3_findings: [none]
 phase3_severities: []
@@ -457,6 +457,15 @@ silent and distant.
   is one of the health checks it consumes.
 - [`internal/beads`](beads.md) — the beads SDK exposes
   `bd formula list/show/run/create` which the CLI wraps.
+
+## Outgoing calls
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| embedded file dest | file data | Extract embedded formula file | `embed.go:123` |
+| overlay dest | file content | Overlay file extraction | `embed.go:182` |
+| overlay dest | file content | Batch overlay extraction | `embed.go:336` |
 
 ## Notes / open questions
 

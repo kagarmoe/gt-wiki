@@ -571,6 +571,32 @@ For diagnostic workflows involving this entity, see
 | `GT_AGENT` | Session startup | `NudgeSession` step 5 — skip Escape for `copilot` | `tmux.go` step 5 |
 | `TMUX` | Tmux server | `IsInsideTmux`, `CurrentSessionName`, `IsInSameSocket` | `tmux.go:3176`, `3703`, `148` |
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `ps` | `-o ppid=` | `-p <pid>` | runtime | `process_group_unix.go:21` |
+| `ps` | `-o pgid=` | `-p <pid>` | runtime | `process_group_unix.go:31` |
+| `ps` | `-axo pid,pgid` | (none) | hardcoded | `process_group_unix.go:44` |
+| `tasklist` | `/FI <filter>` | `/FO CSV /NH` (Windows) | hardcoded | `process_group_windows.go:71` |
+| `tmux` | (dynamic) | `allArgs...` (ctx) | caller | `tmux.go:177` |
+| `tmux` | (dynamic) | `allArgs...` | caller | `tmux.go:231` |
+| `kill` | `-TERM` / `-KILL` | `<pid>` | runtime | `tmux.go:640-654` |
+| `kill` | `-TERM` / `-KILL` | `<pid>` (descendants + main) | runtime | `tmux.go:733-749` |
+| `pgrep` | `-P <pid>` | (none) | runtime | `tmux.go:813` |
+| `kill` | `-TERM` / `-KILL` | `<pid>` (cascade kill) | runtime | `tmux.go:875-890` |
+| `kill` | `-TERM` / `-KILL` | `<pid>` (cascade kill) | runtime | `tmux.go:933-948` |
+| `tmux` | `-V` | (none) | hardcoded | `tmux.go:993` |
+| `ps` | `-p <pid>` | `-o comm=` | runtime | `tmux.go:2189` |
+| `pgrep` | `-P <pid>` | `-l` | runtime | `tmux.go:2228` |
+| `ps` | `-o ppid=` | `-p <pid>` | runtime | `tmux.go:2377` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| lock file | flock acquire | tmux operation serialization | `flock_unix.go:22` |
+
 ## Notes / open questions
 
 - `sessionNudgeLocks sync.Map` grows monotonically — no eviction when

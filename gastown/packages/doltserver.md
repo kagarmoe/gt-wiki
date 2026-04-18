@@ -657,6 +657,78 @@ For diagnostic workflows involving this entity, see
 | 3 | `Kill()` force quit if still alive | `doltserver.go:1782-1838` |
 | 4 | Clean up PID file + state | `doltserver.go:1782-1838` |
 
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `dolt` | `remote add` | `origin <url>` | runtime | `dolthub.go:111` |
+| `git` | `config --global` | `user.name` | hardcoded | `doltserver.go:80` |
+| `git` | `config --global` | `user.email` | hardcoded | `doltserver.go:92` |
+| `dolt` | `config --global` | `--get <key>` | runtime | `doltserver.go:110` |
+| `dolt` | `config --global` | `--unset <key>` | runtime | `doltserver.go:129` |
+| `dolt` | `config --global` | `--add <key> <value>` | runtime | `doltserver.go:132` |
+| `dolt` | (dynamic) | `fullArgs...` | caller | `doltserver.go:420` |
+| `lsof` | `-i :<port>` | `-sTCP:LISTEN -t` | hardcoded | `doltserver.go:736` |
+| `ss` | `-tlnp` | `sport = :<port>` | hardcoded | `doltserver.go:749` |
+| `lsof` | `-a -c dolt` | `-sTCP:LISTEN -i TCP -n -P -F pn` | hardcoded | `doltserver.go:782` |
+| `ps` | `-p <pid>` | `-o args=` | runtime | `doltserver.go:876` |
+| `lsof` | `-a -p <pid>` | `-d cwd -Fn` | runtime | `doltserver.go:893` |
+| `ps` | `-eo pid,args` | (none) | hardcoded | `doltserver.go:1127` |
+| `dolt` | `sql-server` | startup args | config | `doltserver.go:1594` |
+| `lsof` | `<lockPath>` | (none) | runtime | `doltserver.go:1688` |
+| `lsof` | `<socketPath>` | (none) | runtime | `doltserver.go:1728` |
+| `dolt` | `init` | (none) | hardcoded | `doltserver.go:2295` |
+| `dolt` | (dynamic) | `fullArgs...` | caller | `doltserver.go:3334` |
+| `robocopy` | (Windows) | `/E /MOVE /R:1 /W:1` | hardcoded | `doltserver.go:3767` |
+| `cp` | `-a` | `<src> <dest>` | runtime | `doltserver.go:3778` |
+| `dolt` | `remote -v` | (none) | hardcoded | `sync.go:53` |
+| `dolt` | `add .` | (none) | hardcoded | `sync.go:91` |
+| `dolt` | `commit` | `-m <msg>` | hardcoded | `sync.go:99` |
+| `dolt` | (push/pull) | `args...` | runtime | `sync.go:124` |
+| `dolt` | `pull` | `<remote> main` | runtime | `sync.go:181` |
+| `bd` | (dynamic) | `args...` | caller | `sync.go:627` |
+| `bd` | `sql` | `<query>` | runtime | `wisps_migrate.go:120` |
+| `bd` | `sql` | `--csv <query>` | runtime | `wisps_migrate.go:132` |
+| `bd` | (dynamic) | `args...` | caller | `wisps_migrate.go:144` |
+
+### SQL / config mutations
+| Target | Statement | Value | Purpose | `file:line` |
+|---|---|---|---|---|
+| Dolt | `CREATE DATABASE` | `<rigName>` | Register new rig database | `doltserver.go:2276` |
+| Dolt | `DROP DATABASE IF EXISTS` | `<dbName>` | Remove rig database | `doltserver.go:2773` |
+| Dolt | `DELETE FROM dolt_branch_control` | `database = <dbName>` | Clean branch control | `doltserver.go:2781` |
+| Dolt | health probe cycle | `CREATE TABLE; REPLACE INTO; DROP TABLE` | Health check | `doltserver.go:3513` |
+| Dolt | `CREATE TABLE wisps` | DDL | Wisps migration | `wisps_migrate.go:351` |
+| Dolt | `CREATE TABLE wisp_labels` | DDL | Wisps migration | `wisps_migrate.go:424` |
+| Dolt | `CREATE TABLE wisp_comments` | DDL | Wisps migration | `wisps_migrate.go:433` |
+| Dolt | `CREATE TABLE wisp_events` | DDL | Wisps migration | `wisps_migrate.go:445` |
+| Dolt | `CREATE TABLE wisp_dependencies` | DDL | Wisps migration | `wisps_migrate.go:460` |
+| Dolt | `UPDATE issues SET status = 'closed'` | agent wisps | Close agent issues on migration | `wisps_migrate.go:479` |
+| Dolt | `CREATE TABLE IF NOT EXISTS _meta` | DDL | Wasteland schema | `wl_commons.go:154` |
+| Dolt | `CREATE TABLE IF NOT EXISTS rigs` | DDL | Rig registry | `wl_commons.go:162` |
+| Dolt | `CREATE TABLE IF NOT EXISTS wanted` | DDL | Bounty board | `wl_commons.go:176` |
+| Dolt | `CREATE TABLE IF NOT EXISTS completions` | DDL | Completions | `wl_commons.go:196` |
+| Dolt | `CREATE TABLE IF NOT EXISTS stamps` | DDL | Stamps | `wl_commons.go:210` |
+| Dolt | `CREATE TABLE IF NOT EXISTS badges` | DDL | Badges | `wl_commons.go:235` |
+| Dolt | `CREATE TABLE IF NOT EXISTS leaderboard` | DDL | Leaderboard | `wl_commons.go:243` |
+| Dolt | `CREATE TABLE IF NOT EXISTS chain_meta` | DDL | Chain tracking | `wl_commons.go:255` |
+| Dolt | `INSERT INTO wanted` | bounty data | Post bounty | `wl_commons.go:326` |
+| Dolt | `UPDATE wanted SET claimed_by, status='claimed'` | claim data | Claim bounty | `wl_commons.go:351` |
+| Dolt | `UPDATE wanted SET status='in_review'` | review data | Submit for review | `wl_commons.go:378` |
+| Dolt | `INSERT INTO stamps` | stamp data | Record stamp | `wl_commons.go:611` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| Dolt config file | YAML content | Server configuration | `doltserver.go:1316` |
+| PID file | PID string | Process identity | `doltserver.go:1468` |
+| Dolt log file | append | Server log output | `doltserver.go:1552` |
+| PID file | PID string | Process identity (post-start) | `doltserver.go:1618` |
+| metadata JSON | atomic write | Server metadata | `doltserver.go:3076` |
+| SQL script temp file | SQL content | Batch SQL execution | `doltserver.go:3936` |
+| rollback dest file | file data | Rollback file copy | `rollback.go:254` |
+
 ## Notes / open questions
 
 - **doltserver.go is ~3990 lines** — by far the largest single file

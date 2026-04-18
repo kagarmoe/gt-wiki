@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/wasteland/wasteland.go
   - /home/kimberly/repos/gastown/internal/wasteland/spider.go
@@ -184,6 +184,31 @@ DoltHub is the data plane.
 - [internal/util](util.md) — provides `SetDetachedProcessGroup`
   used on every dolt subprocess.
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `dolt` | `sql` | `-r csv -q <query>` | runtime (spider) | `spider.go:329` |
+| `dolt` | `sql` | `-r csv -q <query>` | runtime (trust) | `trust.go:284` |
+| `dolt` | `clone` | `<remoteURL> <targetDir>` | runtime | `wasteland.go:158` |
+| `dolt` | `sql` | `-q <sql>` | runtime | `wasteland.go:182` |
+| `dolt` | `add .` | (none) | hardcoded | `wasteland.go:191` |
+| `dolt` | `commit` | `-m "Register rig: <handle>"` | runtime | `wasteland.go:198` |
+| `dolt` | `push` | `origin main` | hardcoded | `wasteland.go:216` |
+| `dolt` | `remote -v` | (none) | hardcoded | `wasteland.go:231` |
+| `dolt` | `remote add` | `upstream <url>` | runtime | `wasteland.go:243` |
+
+### SQL / config mutations
+| Target | Statement | Value | Purpose | `file:line` |
+|---|---|---|---|---|
+| Dolt | `INSERT INTO rigs` | rig registration data | Register rig in wasteland | `wasteland.go:171` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| wasteland config | JSON data | Wasteland configuration | `wasteland.go:78` |
 
 ## Notes / open questions
 

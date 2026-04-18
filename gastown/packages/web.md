@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/web/handler.go
   - /home/kimberly/repos/gastown/internal/web/templates.go
@@ -256,6 +256,23 @@ before they're passed to subprocess invocations. No exported types.
   disconnected, the error response itself fails to send.
   **Present** — intentional for HTTP handlers where the client
   is already gone.
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `gt` | (dynamic) | `args...` | API handler | `api.go:239` |
+| `bd` | (dynamic) | `args...` | API handler | `api.go:1281` |
+| `gh` | (dynamic) | `args...` | API handler | `api.go:1559` |
+| `tmux` | `display-message` | `-t <session>:0.0 -p #{pane_current_command}` | runtime | `api.go:1817` |
+| `tmux` | `capture-pane` | `-t <session> -p -J` | runtime | `api.go:1837` |
+| `tmux` | `capture-pane` | `-t <session> -p -J -S -30` | runtime | `api.go:2002` |
+| (dynamic) | (dynamic) | `args...` | fetcher caller | `fetcher.go:35` |
+| (dynamic) | (dynamic) | `args...` | fetcher caller | `fetcher.go:65` |
+| `gt` | `dashboard` | `--port <port> --bind <bind>` | runtime | `setup.go:262` |
+| `gt` | `rig list` | `--json` | hardcoded | `setup.go:348` |
+| `gt` | (dynamic) | `args...` | setup handler | `setup.go:397` |
 
 ## Notes / open questions
 

@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/git/git.go
   - /home/kimberly/repos/gastown/internal/git/copy_unix.go
@@ -216,6 +216,46 @@ groupings:
   The Windows implementation comment at `copy_windows.go:14` notes
   "This Windows implementation has not been tested on Windows."
   **Untested** — explicitly documented as untested.
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `cp` | `-a` | `<src> <dest>` (Unix) | runtime | `copy_unix.go:14` |
+| `robocopy` | (Windows) | `/E /COPYALL /SL /R:0 /W:0` | hardcoded | `copy_windows.go:25` |
+| `git` | (dynamic) | `args...` (Run) | caller | `git.go:96` |
+| `git` | (dynamic) | `args...` (Output) | caller | `git.go:119` |
+| `git` | (dynamic) | `args...` (CombinedOutput) | caller | `git.go:220` |
+| `git` | `config` | `-C <repo> core.hooksPath .githooks` | hardcoded | `git.go:328` |
+| `git` | `config` | `--git-dir <dir> remote.origin.fetch <refspec>` | hardcoded | `git.go:360` |
+| `git` | `symbolic-ref` | `--git-dir <dir> HEAD` | hardcoded | `git.go:375` |
+| `git` | `fetch` | `--git-dir <dir> --depth 1 origin` | hardcoded | `git.go:381` |
+| `git` | `fetch` | `--git-dir <dir> --depth 1 origin <refspec>` | runtime | `git.go:393` |
+| `git` | `fetch` | `--git-dir <dir> origin` | hardcoded | `git.go:402` |
+| `gh` | `pr list` | `--head <branch> --state open --json number --limit 1` | runtime | `git.go:883` |
+| `gh` | `pr list` | `--head <branch> --state open --json number --limit 1` | runtime | `git.go:897` |
+| `gh` | `pr view` | `<prNumber> --json reviewDecision` | runtime | `git.go:923` |
+| `gh` | (dynamic) | `args...` | caller | `git.go:944` |
+| `git` | (dynamic) | `args...` (worktree ops) | caller | `git.go:1057` |
+| `git` | `rev-parse` | `-C <repo> --is-shallow-repository` | hardcoded | `git.go:1396` |
+| `git` | `config` | `-C <repo> core.sparseCheckout` | hardcoded | `git.go:1408` |
+| `git` | `sparse-checkout disable` | `-C <repo>` | hardcoded | `git.go:1418` |
+| `git` | (dynamic) | `args...` (worktree) | caller | `git.go:2034` |
+| `git` | `ls-files` | `-C <repo> --error-unmatch .gitmodules` | hardcoded | `git.go:2055` |
+| `git` | `sparse-checkout init` | `-C <repo> --cone` | hardcoded | `git.go:2063` |
+| `git` | (dynamic) | `args...` (sparse-checkout set) | caller | `git.go:2072` |
+| `git` | `config -f` | `<tmp> --get-regexp ^submodule` | runtime | `git.go:2168` |
+| `git` | `config -f` | `<tmp> --get submodule.<name>.url` | runtime | `git.go:2197` |
+| `git` | `push` | `-C <path> <remote> <sha>:refs/heads/<branch>` | runtime | `git.go:2221` |
+| `git` | `symbolic-ref` | `-C <sub> refs/remotes/<remote>/HEAD` | runtime | `git.go:2239` |
+| `git` | `rev-parse` | `-C <sub> --verify --quiet <ref>` | runtime | `git.go:2254` |
+| `git` | `ls-remote` | `-C <sub> --exit-code <remote> refs/heads/<candidate>` | runtime | `git.go:2263` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| gitmodules temp file | `.gitmodules` content | Submodule config parsing | `git.go:2156` |
 
 ## Notes / open questions
 

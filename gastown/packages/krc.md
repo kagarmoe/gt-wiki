@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 sources:
   - /home/kimberly/repos/gastown/internal/krc/krc.go
   - /home/kimberly/repos/gastown/internal/krc/decay.go
@@ -144,6 +144,15 @@ Source: `/home/kimberly/repos/gastown/internal/krc/krc.go`,
 - [internal/events](events.md) — produces the JSONL data that krc then
   ages out. Supplies `events.EventsFile` as the canonical target path.
 - [go-packages inventory](../inventory/go-packages.md).
+
+## Outgoing calls
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| KRC config file | JSON data | Key rotation config persistence | `krc.go:119` |
+| KRC temp file | rotation data | Atomic key file update | `krc.go:263` |
+| autoprune state | JSON data | Autoprune state persistence | `autoprune.go:56` |
 
 ## Notes / open questions
 

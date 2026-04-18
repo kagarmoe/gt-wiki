@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 phase3_audited: 2026-04-15
 phase3_findings: [none]
 phase3_severities: []
@@ -521,6 +521,38 @@ plugins run during Deacon patrol cycles. See
   cleanup-on-failure code where the primary error has already been
   captured. **Present** — most suppressions are in defer/cleanup
   contexts where POSIX semantics provide a safety net.
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `bd` | `init` | `initArgs...` (prefix, force, etc.) | rig config | `manager.go:583` |
+| `bd` | `config set` | `types.custom <list>` | `constants.BeadsCustomTypes` | `manager.go:598` |
+| `bd` | `config set` | `issue_prefix <prefix>` | rig config | `manager.go:602` |
+| `bd` | `config set` | `issue_prefix <prefix>` | rig config | `manager.go:656` |
+| `bd` | `config set` | `types.custom <list>` | `constants.BeadsCustomTypes` | `manager.go:662` |
+| `bd` | `init` | `initArgs...` | rig config | `manager.go:1040` |
+| `bd` | `config set` | `types.custom <list>` | `constants.BeadsCustomTypes` | `manager.go:1052` |
+| `bd` | `config set` | `issue_prefix <prefix>` | rig config | `manager.go:1060` |
+| `bd` | `migrate` | `--update-repo-id` | hardcoded | `manager.go:1086` |
+| `bd` | `mol seed` | `--patrol` | hardcoded | `manager.go:1669` |
+| `bd` | `list` | `--type=molecule --format=json` | hardcoded | `manager.go:1702` |
+| `bd` | `create` | molecule creation args | runtime | `manager.go:1710` |
+| `git` | `rev-parse` | `-C <worktreePath> --git-dir` | runtime | `overlay.go:227` |
+| (hook) | (hook path) | (none) | runtime | `setuphooks.go:114` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| rig README | readme content | Rig workspace readme | `manager.go:750` |
+| rig config | JSON data | Rig configuration | `manager.go:918` |
+| beads redirect | `"mayor/rig/.beads\n"` | Beads directory redirect | `manager.go:980` |
+| `.gitignore` | append entry | Rig gitignore update | `manager.go:1184` |
+| town README | content string | Town root readme | `manager.go:1756` |
+| `.gitignore` | append entry | Overlay gitignore | `overlay.go:120` |
+| git exclude file | append entry | Overlay git exclude | `overlay.go:200` |
+| overlay dest file | file content copy | Overlay file copy | `overlay.go:288` |
 
 ## Notes / open questions
 

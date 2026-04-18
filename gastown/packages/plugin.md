@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-04-18
 phase3_audited: 2026-04-15
 phase3_findings: [none]
 phase3_severities: []
@@ -411,6 +411,20 @@ a path.
   health checks.
 - [`gt dog`](../commands/dog.md) — the dispatcher that
   receives `FormatMailBody` output.
+
+## Outgoing calls
+
+### Subprocess invocations
+| Called binary | Command | Flags | Flag source | `file:line` |
+|---|---|---|---|---|
+| `bd` | `create` | recording args (type, title, labels, etc.) | runtime | `recording.go:83` |
+| `bd` | `close` | `<id> --reason "plugin run recorded"` | hardcoded | `recording.go:109` |
+| `bd` | `update` | update args | runtime | `recording.go:163` |
+
+### File writes
+| Target | What is written | Purpose | `file:line` |
+|---|---|---|---|
+| plugin sync dest | file content copy | Plugin file synchronization | `sync.go:169` |
 
 ## Notes / open questions
 

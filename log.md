@@ -5953,3 +5953,85 @@ docs-tree inventory (new v1.0.1 docs; touches bead wiki-w71). Tracked in
 bead wiki-i2n.7.
 
 → gastown/packages/config.md, gastown/packages/deps.md, gastown/packages/daemon.md, gastown/packages/util.md
+
+## [2026-05-20] ingest | Release sync v1.0.0->v1.0.1 (A4): dog/mail + docs inventory
+
+**Scope:** Release sync from gastown `9f962c4a` to `v1.0.1` (SHA `0e18216e`).
+This batch covers the `gt dog done` plugin-mail fix (commit `03c323a2`,
+`gt-hq-lsoei`/#3541) and the docs/ tree inventory refresh for the six docs
+files added at v1.0.1.
+
+**Source files re-read at v1.0.1:**
+- `internal/cmd/dog.go` — `runDogDone` (`dog.go:636`) + the new
+  `closePluginMails` (`dog.go:733-768`, call site `dog.go:675`); confirmed
+  via `git log` that dog.go changed only in `03c323a2` (so pre-fix
+  citations are stable; escalate shifted 1214→1260, file 1225→1271 lines).
+- `internal/mail/mailbox.go` — `Archive` (`810-823`), `Delete` (`773-778`),
+  and the `archive.jsonl` helpers (`866`/`874`/`900`/`938`/`991`); the
+  release diff to this file was only defensive error-string matching
+  (`"not found"` → also `"no issue found"`) at lines before 773, so the
+  archive region is unchanged from baseline.
+- `internal/dog/manager.go` — `saveState` (`641`) now uses
+  `atomicfile.WriteJSON`; confirmed no `internal/dog` file imports
+  `internal/util` at v1.0.1 (`git grep -l`).
+- `internal/mail/delivery.go` — same defensive error-match change, in-place,
+  no citation drift.
+- `docs/` — `git diff --diff-filter=A 5f07285e..v1.0.1 -- docs/` (6 added
+  files) + per-file line counts (`git grep -c "^"`, calibrated == `wc -l`)
+  + first-H1/topic extraction.
+
+**Wiki pages updated:**
+- [gt dog](../../gastown/commands/dog.md) — documented the v1.0.1
+  `gt dog done` behavior: `runDogDone` now always closes accumulated
+  `Plugin:` dispatch mail first (via `closePluginMails`), why (unread
+  backlog re-injected every UserPromptSubmit hook, ballooning context and
+  freezing the deacon), and that it is best-effort; added a Failure-modes
+  silent-suppression entry; refreshed the drifted escalate citation
+  (1214→1260) and file length (1225→1271); forward-links mail.md.
+- [internal/mail](../../gastown/packages/mail.md) — **wiki-stale fix**:
+  the "`Delete`/`Archive`/… legacy-mode only" claim was wrong. `Delete`
+  (`773-778`) and `Archive` (`810-823`) work in **both** modes — beads-mode
+  `Delete` closes the bead via `MarkRead`; beads-mode `Archive` appends to
+  `archive.jsonl` then closes the bead. Split the bullet into Delete /
+  Archive / archive-file-helpers with accurate per-method line refs; added
+  the `gt dog done` consumer backlink; `phase3_findings: [none]→[wiki-stale]`,
+  `phase3_severities: []→[wrong]`.
+- [internal/dog](../../gastown/packages/dog.md) — `saveState` migrated
+  `util.AtomicWriteJSON` → `atomicfile.WriteJSON` (`manager.go:641`);
+  updated the Imports line (`internal/util` → `internal/atomicfile`) and
+  added an atomicfile Related-pages link. Ties into the A1/A3 atomic→
+  atomicfile move.
+- [docs-tree inventory](../../gastown/inventory/docs-tree.md) — added the 6
+  v1.0.1 docs files (line counts + topics): `contrib-harnesses/` subtree
+  (4), `cursor-runtime-beads-tasks.md`, `runtimes/NOS_TOWN.md`; new
+  sections for the 3 new subdirs; total 60→66 files, 11→14 subdirs,
+  ~23,600→~24,000 lines; refreshed `directives-and-overlays.md` count
+  (307→312, the only modified doc whose line count changed).
+
+**Wiki pages created:** none. **Marked vestigial:** none.
+
+**Wiki-stale findings fixed (lint-style inline):**
+- mail.md — body said `Delete`/`Archive` were "legacy-mode only". Current
+  source (`mailbox.go:773-823`, unchanged since baseline) shows both work
+  in beads mode. **Phase 2 root cause: phase-2-incomplete** (the claim was
+  already wrong at the v1.0.0 baseline; surfaced because the v1.0.1 dog-done
+  fix exercises the beads-mode `Archive` path).
+
+**Beads updated:**
+- Claiming + closing: wiki-i2n.7 (this batch, A4).
+- Closed: wiki-w71 (gap finding — its 6 unenumerated docs == the v1.0.1
+  docs additions, now enumerated in docs-tree.md; entity pages deferred
+  with rationale per its acceptance).
+
+**Cross-link discipline:** dog↔mail now bidirectional (commands/dog.md →
+packages/mail.md and back); dog↔atomicfile bidirectional (atomicfile.md
+already lists dog as a consumer). All touched-page links confirmed present.
+All `file:line` citations re-verified against gastown `v1.0.1` via
+`git grep`/`git show` (working-tree reads explicitly avoided — the gastown
+tree is on a non-v1.0.1 branch).
+
+**Next batch:** A5 — set `gastown_release: v1.0.1` first-run release marker
+on [gastown/README.md](../../gastown/README.md) (prior baseline 9f962c4a).
+Tracked in bead wiki-i2n.8.
+
+→ gastown/commands/dog.md, gastown/packages/mail.md, gastown/packages/dog.md, gastown/inventory/docs-tree.md

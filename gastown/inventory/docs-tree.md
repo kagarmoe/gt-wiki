@@ -4,10 +4,10 @@ type: note
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-15
+updated: 2026-05-20
 sources:
   - /home/kimberly/repos/gastown/docs/
-tags: [inventory, enumeration, docs, batch-12]
+tags: [inventory, enumeration, docs, batch-12, release-sync]
 phase3_audited: 2026-04-14
 phase3_findings: [wiki-stale]
 phase3_severities: [wrong]
@@ -17,8 +17,9 @@ phase3_findings_post_release: false
 # gastown `docs/` tree inventory
 
 Every file under `/home/kimberly/repos/gastown/docs/` with line count,
-topic extract, and path, as of 2026-04-11. Neutral enumeration — no
-summaries of content, no claim about audience.
+topic extract, and path. Base enumeration as of 2026-04-11; refreshed
+to gastown `v1.0.1` (SHA `0e18216e`) on 2026-05-20. Neutral
+enumeration — no summaries of content, no claim about audience.
 
 **Capture method:** `find /home/kimberly/repos/gastown/docs -type f` +
 `wc -l` per file for line counts (Batch 1) +
@@ -26,14 +27,25 @@ first-paragraph / first-H1 extraction for topic (Batch 12). Topics are
 factual extracts, not content summaries — they match the file's
 stated subject, not our interpretation of it.
 
-**Total:** 60 files.
+**v1.0.1 release-sync delta (2026-05-20):** 6 docs files were added
+between v1.0.0 and v1.0.1 — the `docs/contrib-harnesses/` subtree
+(4 files), `docs/cursor-runtime-beads-tasks.md`, and
+`docs/runtimes/NOS_TOWN.md` — all enumerated below (resolves bead
+`wiki-w71`). One existing file changed line count
+(`docs/design/directives-and-overlays.md`, 307→312). The other three
+v1.0.1 doc edits (`INSTALLING.md`, `agent-provider-integration.md`,
+`design/otel/otel-architecture.md`) were content-only with no
+line-count change.
 
-## docs/ (root level — 12 files)
+**Total:** 66 files (60 at baseline + 6 added in v1.0.1).
+
+## docs/ (root level — 13 files)
 
 | lines | topic                                                          | path                                          |
 |------:|----------------------------------------------------------------|-----------------------------------------------|
 |   835 | Agent Provider Integration Guide                               | `docs/agent-provider-integration.md`          |
 |   170 | Gastown/Beads Cleanup Commands Reference                       | `docs/CLEANUP.md`                             |
+|    21 | Cursor runtime plan — Beads tasks (handoff) *(new in v1.0.1)*  | `docs/cursor-runtime-beads-tasks.md`          |
 |   251 | Gas Town Hooks Management                                      | `docs/HOOKS.md`                               |
 |   321 | Installing Gas Town                                            | `docs/INSTALLING.md`                          |
 |   469 | Getting Started with the Wasteland                             | `docs/WASTELAND.md`                           |
@@ -56,13 +68,27 @@ stated subject, not our interpretation of it.
 |   381 | Polecat Lifecycle — three-layer architecture of polecat workers| `docs/concepts/polecat-lifecycle.md`          |
 |   102 | The Propulsion Principle — if it's on your hook, YOU RUN IT    | `docs/concepts/propulsion-principle.md`       |
 
+## docs/contrib-harnesses/ (1 file — new in v1.0.1)
+
+| lines | topic                                                          | path                                          |
+|------:|----------------------------------------------------------------|-----------------------------------------------|
+|    42 | Contributor Harnesses — opt-in, rig-scoped customization packs | `docs/contrib-harnesses/README.md`            |
+
+## docs/contrib-harnesses/polecat-pr-flow/ (3 files — new in v1.0.1)
+
+| lines | topic                                                                       | path                                                          |
+|------:|-----------------------------------------------------------------------------|---------------------------------------------------------------|
+|    74 | polecat-pr-flow harness — gate polecat work on a GitHub PR via overlay      | `docs/contrib-harnesses/polecat-pr-flow/README.md`            |
+|    32 | Formula overlay: polecat-PR-flow (appends PR-creation to mol-polecat-work)  | `docs/contrib-harnesses/polecat-pr-flow/mol-polecat-work.toml`|
+|    44 | PR-Flow Polecat Policy (rig-scoped role directive)                          | `docs/contrib-harnesses/polecat-pr-flow/polecat.md`           |
+
 ## docs/design/ (root level — 23 files)
 
 | lines | topic                                                          | path                                                 |
 |------:|----------------------------------------------------------------|------------------------------------------------------|
 |   853 | Agent API Touch-Point Inventory                                | `docs/design/agent-api-inventory.md`                 |
 |   381 | Gas Town Architecture (two-level beads)                        | `docs/design/architecture.md`                        |
-|   307 | Role Directives and Formula Overlays                           | `docs/design/directives-and-overlays.md`             |
+|   312 | Role Directives and Formula Overlays                           | `docs/design/directives-and-overlays.md`             |
 |    83 | Dog Execution Model: Imperative vs Formula Dispatch            | `docs/design/dog-execution-model.md`                 |
 |   509 | Dog Infrastructure: Watchdog Chain & Pool Architecture         | `docs/design/dog-infrastructure.md`                  |
 |   545 | Dolt Storage Architecture                                      | `docs/design/dolt-storage.md`                        |
@@ -137,6 +163,12 @@ stated subject, not our interpretation of it.
 |   315 | macOS sandbox-exec Research Report (gt-6qt)                            | `docs/research/macos-sandbox-exec.md`                   |
 |   647 | Survey: Agent Orchestration Frameworks vs Gas City (w-gc-004)          | `docs/research/w-gc-004-agent-framework-survey.md`      |
 
+## docs/runtimes/ (1 file — new in v1.0.1)
+
+| lines | topic                                                          | path                                          |
+|------:|----------------------------------------------------------------|-----------------------------------------------|
+|   168 | NOS Town Runtime Integration — Groq-routed Gas Town fork       | `docs/runtimes/NOS_TOWN.md`                   |
+
 ## docs/skills/ (1 file)
 
 | lines | topic                                                          | path                                      |
@@ -145,12 +177,16 @@ stated subject, not our interpretation of it.
 
 ## Totals
 
-- **60 files total** under `docs/`.
-- **11 subdirectories** (`concepts`, `design`, `design/convoy`,
+- **66 files total** under `docs/` (60 at the 2026-04-11 baseline + 6
+  added in the v1.0.1 release sync).
+- **14 subdirectories** (`concepts`, `contrib-harnesses`,
+  `contrib-harnesses/polecat-pr-flow`, `design`, `design/convoy`,
   `design/convoy/stage-launch`, `design/otel`, `examples`, `gas-city`,
-  `guides`, `research`, `skills`, `skills/convoy`).
-- **Line count total:** ~23,600 lines of documentation (sum of all
-  line counts above).
+  `guides`, `research`, `runtimes`, `skills`, `skills/convoy`) — the
+  v1.0.1 sync added `contrib-harnesses`, `contrib-harnesses/polecat-pr-flow`,
+  and `runtimes`.
+- **Line count total:** ~24,000 lines of documentation (sum of all
+  line counts above; +381 from the six v1.0.1 additions).
 - **Largest single file:** `docs/guides/mvgt-integration.md` at 1,217
   lines.
 - **Second largest:** `docs/design/witness-at-team-lead.md` at 985

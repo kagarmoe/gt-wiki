@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-18
+updated: 2026-05-20
 sources:
   - /home/kimberly/repos/gastown/internal/mail/types.go
   - /home/kimberly/repos/gastown/internal/mail/mailbox.go
@@ -15,8 +15,8 @@ sources:
   - /home/kimberly/repos/gastown/internal/mail/bd.go
 tags: [package, data-layer, mail, messaging, beads-backed, delivery, routing, two-phase-delivery]
 phase3_audited: 2026-04-15
-phase3_findings: [none]
-phase3_severities: []
+phase3_findings: [wiki-stale]
+phase3_severities: [wrong]
 phase3_findings_post_release: false
 phase4_audited: 2026-04-16
 phase4_findings: [none]
@@ -146,10 +146,23 @@ and `Router` (the sender / fan-out engine).
   bead. Used where the caller wants a read indicator but not terminal
   closure.
 - `MarkUnread` (`mailbox.go:704-772`) — reopens a closed bead.
-- `Delete`, `Archive`, `ArchivePath`, `appendToArchive`,
-  `ListArchived`, `PurgeArchive`, `rewriteArchive`
-  (`mailbox.go:773-1022`) — legacy-mode only, moving messages between
-  `inbox.jsonl` and `archive.jsonl`.
+- `Delete(id)` (`mailbox.go:773-778`) — works in **both modes**: in
+  beads mode it calls `MarkRead` (closes the underlying bead, i.e.
+  "delete" == "acknowledge/close"); in legacy mode it removes the
+  message from `inbox.jsonl` via `deleteLegacy`.
+- `Archive(id)` (`mailbox.go:810-823`) — also **both modes**: in beads
+  mode it `Get`s the message, appends a copy to the `archive.jsonl`
+  file (`appendToArchive`), then `Delete`s it (closing the bead); in
+  legacy mode it uses `archiveLegacy` (a single flock over the
+  read-archive-rewrite cycle). This beads-mode path is exactly what
+  `gt dog done`'s plugin-mail cleanup relies on
+  (see [gt dog](../commands/dog.md)).
+- The `archive.jsonl` file helpers: `ArchivePath` (`mailbox.go:866`),
+  `appendToArchive` (`mailbox.go:874`), `ListArchived`
+  (`mailbox.go:900`), `PurgeArchive` (`mailbox.go:938`),
+  `rewriteArchive` (`mailbox.go:991`). The archive is always a JSONL
+  file even in beads mode — the live bead is closed, while the archived
+  copy is appended to `archive.jsonl`.
 - `SearchOptions` struct and `Search` (`mailbox.go:1023-1099`) —
   filter by sender, subject pattern, type, priority, thread, date.
 - `Count(): total, unread` (`mailbox.go:1100-1120`).
@@ -407,6 +420,9 @@ mb.AcknowledgeDeliveries("gastown/Toast", msgs)
   `Router` and `Mailbox` use `beads.ResolveBeadsDir`,
   `beads.EnsureCustomTypes`, `beads.CleanStaleDoltServerPID`,
   `beads.InjectFlatForListJSON`, `beads.DatabaseEnv`.
+- [gt dog](../commands/dog.md) — `gt dog done` consumes
+  `Mailbox.Archive` (beads mode) to close accumulated `Plugin:`
+  dispatch mail when a dog goes idle (v1.0.1, `gt-hq-lsoei`).
 - [internal/nudge](nudge.md) — ephemeral counterpart. Mail is durable
   and commit-logged; nudge is fire-and-forget and filesystem-only.
   `Router.notifyRecipient` drops nudges as arrival notifications, so

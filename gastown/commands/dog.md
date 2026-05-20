@@ -4,7 +4,7 @@ type: command
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-16
+updated: 2026-05-20
 sources:
   - /home/kimberly/repos/gastown/internal/cmd/dog.go
 tags: [command, agents, dog, kennel, infrastructure, cross-rig, deacon, dispatch]
@@ -38,7 +38,8 @@ for persona details.
 ## What it actually does
 
 Source: `/home/kimberly/repos/gastown/internal/cmd/dog.go`
-(1225 lines). Registration: `dog.go:256-299` attaches nine
+(1271 lines at v1.0.1; grew +46 from the `gt dog done` plugin-mail
+fix). Registration: `dog.go:256-299` attaches nine
 subcommands to `dogCmd` and registers the parent on `rootCmd`.
 
 The parent `dogCmd` (`dog.go:45-65`) has no `RunE`, so `gt dog`
@@ -127,8 +128,26 @@ available. Updates last-active and can trigger session creation
 for the dog's worktrees (per `dog.go:131-132`).
 
 **`dog done [name]`** — marks a dog as done and returns it to
-idle. Without a name, auto-detects the current dog from the
-working directory (must be run from within a dog's worktree).
+idle (`runDogDone`, `dog.go:636`). Without a name, auto-detects the
+current dog from the working directory (must be run from within a
+dog's worktree).
+
+As of v1.0.1 (`gt-hq-lsoei`, #3541), `runDogDone` **always closes
+accumulated plugin mail first** — before the idle check, even if the
+dog is already idle — via `closePluginMails` (`dog.go:733-768`).
+That helper opens the dog's mailbox (`deacon/dogs/<name>`) through
+`mail.NewRouterWithTownRoot` and archives every **unread** message
+whose subject starts with `"Plugin: "` (`dog.go:675` is the call
+site). The fix exists because plugin-dispatch mails were never
+closed: `ListUnread()` returned the whole backlog, so every
+`UserPromptSubmit` hook re-injected 100–238+ open `Plugin:` beads,
+ballooning context to 60–70% and freezing the deacon. The cleanup is
+**best-effort** — a missing workspace, mailbox, or archive failure is
+silently skipped and never blocks the dog from going idle — and it
+prints `Closed N stale plugin mail(s) from inbox` when it archives
+anything. The archive path is [`internal/mail`](../packages/mail.md)'s
+`Mailbox.Archive`, which in beads mode appends to the archive then
+closes the underlying bead.
 
 **`dog clear <name>`** — resets a stuck dog to idle. By default
 refuses if the tmux session still exists; `--force` overrides.
@@ -232,14 +251,17 @@ Parent-level flags: none. Each subcommand has its own flags:
 
 ## Failure modes
 
-No failure modes discovered. The `dog.go` command layer is a thin CRUD wrapper over `dog.Manager` — add, remove, list, call, done, clear, status, dispatch, and health-check operations all propagate errors from the manager. State mutations (add/remove/dispatch) are single-step operations delegated to the `internal/dog` package. No multi-step sequences with partial-completion risk at the command level.
+The `dog.go` command layer is a thin CRUD wrapper over `dog.Manager` — add, remove, list, call, done, clear, status, dispatch, and health-check operations all propagate errors from the manager. State mutations (add/remove/dispatch) are single-step operations delegated to the `internal/dog` package. No multi-step sequences with partial-completion risk at the command level.
+
+### Silent suppression (what errors are swallowed?)
+- **`gt dog done` plugin-mail cleanup is best-effort** (`closePluginMails`, `dog.go:733-768`, v1.0.1). Every failure path — not in a workspace, mailbox lookup error, list error, per-message `Archive` error — is silently skipped so cleanup never blocks the dog from going idle. **Present (by design)** — a stale `Plugin:` mail that fails to archive simply remains in the inbox and is retried on the next `gt dog done`; the trade-off is that a persistently un-archivable mail would silently keep re-injecting.
 
 ## Outgoing calls
 
 ### Subprocess invocations
 | Called binary | Command | Flags | Flag source | `file:line` |
 |---|---|---|---|---|
-| `gt` | `escalate` | `--severity medium <msg>` | runtime (escalation message) | `dog.go:1214` |
+| `gt` | `escalate` | `--severity medium <msg>` | runtime (escalation message) | `dog.go:1260` |
 
 ## Notes / open questions
 

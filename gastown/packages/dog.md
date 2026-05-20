@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-05-20
 phase3_audited: 2026-04-15
 phase3_findings: [none]
 phase3_severities: []
@@ -41,7 +41,8 @@ auto-clears zombies.
 `internal/constants`, [`internal/git`](go-packages.md),
 [`internal/rig`](go-packages.md),
 [`internal/session`](session.md), `internal/style`,
-`internal/tmux`, [`internal/util`](util.md), stdlib.
+`internal/tmux`, [`internal/atomicfile`](atomicfile.md) (atomic
+`.dog.json` writes — replaced `internal/util` in v1.0.1), stdlib.
 **Imported by (notable):** [`gt dog`](../commands/dog.md)
 (`/home/kimberly/repos/gastown/internal/cmd/dog.go`),
 [`internal/deacon`](deacon.md) feed-stranded indirectly (via shell
@@ -132,7 +133,9 @@ Source: `/home/kimberly/repos/gastown/internal/dog/manager.go`.
   in-use branches by walking each dog's current worktree, and
   deletes orphans.
 - `loadState` / `saveState` (`manager.go:625-643`) — JSON via
-  `util.AtomicWriteJSON` for the save side.
+  `atomicfile.WriteJSON` for the save side (`manager.go:641`; migrated
+  from `util.AtomicWriteJSON` in v1.0.1, see
+  [internal/atomicfile](atomicfile.md)).
 - Pool predicates: `GetIdleDog()` (`manager.go:646-660`),
   `IdleCount()` (`manager.go:663-676`), `WorkingCount()`
   (`manager.go:679-692`).
@@ -256,6 +259,8 @@ Source: `/home/kimberly/repos/gastown/internal/dog/health.go`.
 - [`internal/git`](go-packages.md) — `WorktreeAddFromRef`,
   `WorktreeRemove`, `WorktreePrune`, `ListBranches`,
   `DeleteBranch`.
+- [`internal/atomicfile`](atomicfile.md) — `WriteJSON` for atomic
+  `.dog.json` state writes (since v1.0.1; replaced `internal/util`).
 - [`mayor` package](mayor.md) — sibling town-level package.
 - [`polecat` package](polecat.md) — the cats vs dogs counterpart.
   "Cats build features. Dogs clean up messes."

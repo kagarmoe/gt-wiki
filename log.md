@@ -5788,3 +5788,70 @@ resolve. `atomicfile` links to `util`; the reverse backlink lands in Batch A3
 [refinery](../../gastown/packages/refinery.md) (PR-provider abstraction) refresh.
 
 → gastown/packages/atomicfile.md, gastown/packages/bitbucket.md, gastown/inventory/go-packages.md, index.md, gastown/README.md
+
+## [2026-05-20] ingest | Release sync v1.0.0→v1.0.1 (Batch A2: doctor + refinery refresh)
+
+**Scope:** Release sync from gastown baseline `9f962c4a` (v1.0.0+6, the Phase 2
+mapping base) toward `v1.0.1` (SHA `0e18216e`). This batch refreshes the two
+largest per-rig-agent package pages against v1.0.1: `doctor` (4 new health
+checks) and `refinery` (the new PR-provider abstraction). Tracked in bead
+wiki-i2n.5.
+
+**Source files re-read at v1.0.1:**
+- `internal/doctor/claude_binary_check.go` (90 lines), `disk_space_check.go`
+  (78), `groq_compound_check.go` (full), `stalled_polecat_check.go` (192) — the
+  4 new checks.
+- `internal/cmd/doctor.go` registration block (`runDoctor`, lines 156-288) — to
+  reverify check ordering + registration line range.
+- `internal/refinery/pr_provider.go`, `pr_provider_github.go`,
+  `pr_provider_bitbucket.go` (the new trio, full).
+- `internal/refinery/engineer.go` (2132 lines, full) — PR-provider wiring
+  (`initPRProvider`, `doMergePR`, `VCSProvider` config) + citation drift from
+  the +75-line growth.
+- `internal/refinery/manager.go` (671 lines) — citation drift reverification.
+- `internal/git/git.go:974-1152` — GitHub + Bitbucket PR helper methods the
+  providers delegate to (verified, not re-documented; git.md is its own page).
+- `internal/deps/claude.go:13-32` — version constants backing `ClaudeBinaryCheck`.
+
+**Wiki pages updated:**
+- [doctor](../../gastown/packages/doctor.md) — file count 70→74 non-test (+55
+  test, ~38k LOC); check count ~80→~84; registration range 154-275→156-288;
+  gt-99u ordering comment 173-177→182-185. Added the 4 new checks to the
+  Infrastructure (8→11) and Cleanup (9→10) inventory groups and a new
+  "Checks added in v1.0.1" section documenting each with `file:line`. Added
+  `deps`/`util` to Related pages and sources; `updated: 2026-05-20`.
+- [refinery](../../gastown/packages/refinery.md) — file count 5→8 non-test
+  (PR-provider trio); engineer.go LOC 2057→2132; added `VCSProvider` config
+  field; rewrote the `doMergePR` entry (no longer `gh pr merge` directly — now
+  the `PRProvider` abstraction); added a "PR providers" section
+  (interface + github/bitbucket impls + `initPRProvider` selection). Refreshed
+  ALL shifted engineer.go (~24) and manager.go (~14) `file:line` citations
+  against v1.0.1. Added `internal/bitbucket` import + source. `updated: 2026-05-20`.
+- [polecat (role)](../../gastown/roles/polecat.md) — backlink: the "Stalled"
+  lifecycle state now references `StalledPolecatCheck` (bidirectional with the
+  new doctor section).
+
+**Wiki pages created:** none (refresh-only batch).
+**Wiki pages marked vestigial:** none.
+
+**Drift / wiki-stale findings:** none promoted. The `doMergePR` "uses gh pr
+merge" line was correct at the v1.0.0 baseline; v1.0.1 introduced the
+abstraction, so this is a release-content refresh (ingest), not a wiki-stale
+fix.
+
+**Beads updated:**
+- Claimed + closing: wiki-i2n.5 (this batch).
+
+**Cross-link discipline:** doctor.md gains outbound links to deps/util/git/
+session/polecat; refinery.md gains bitbucket. bitbucket.md already backlinks
+refinery (Batch A1). polecat.md backlink added. Broken-link scan on all 3
+touched pages: clean. All `file:line` citations re-verified against gastown
+`v1.0.1`.
+
+**Next batch:** A3 — [config](../../gastown/packages/config.md) (groq),
+[deps](../../gastown/packages/deps.md) (claude dep),
+[daemon](../../gastown/packages/daemon.md) (worker.go),
+[util](../../gastown/packages/util.md) (atomic.go→atomicfile move +
+diskspace*.go added). Tracked in bead wiki-i2n.6.
+
+→ gastown/packages/doctor.md, gastown/packages/refinery.md, gastown/roles/polecat.md

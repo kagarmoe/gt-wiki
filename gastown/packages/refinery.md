@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-18
+updated: 2026-05-20
 phase3_audited: 2026-04-15
 phase3_findings: [none]
 phase3_severities: []
@@ -20,7 +20,10 @@ sources:
   - /home/kimberly/repos/gastown/internal/refinery/batch.go
   - /home/kimberly/repos/gastown/internal/refinery/score.go
   - /home/kimberly/repos/gastown/internal/refinery/types.go
-tags: [package, agent-runtime, refinery, merge-queue, per-rig, batch, bisect]
+  - /home/kimberly/repos/gastown/internal/refinery/pr_provider.go
+  - /home/kimberly/repos/gastown/internal/refinery/pr_provider_github.go
+  - /home/kimberly/repos/gastown/internal/refinery/pr_provider_bitbucket.go
+tags: [package, agent-runtime, refinery, merge-queue, per-rig, batch, bisect, pr-provider]
 ---
 
 # internal/refinery
@@ -35,11 +38,14 @@ that runs quality gates and performs squash merges, and the
 batch-then-bisect merger for throughput.
 
 **Go package path:** `github.com/steveyegge/gastown/internal/refinery`
-**File count:** 5 non-test `.go` files — `manager.go`, `engineer.go`
-(the bulk: 2057 lines), `batch.go`, `score.go`, `types.go`.
+**File count:** 8 non-test `.go` files (as of v1.0.1) — `manager.go`,
+`engineer.go` (the bulk: 2132 lines), `batch.go`, `score.go`,
+`types.go`, plus the v1.0.1 PR-provider trio `pr_provider.go`,
+`pr_provider_github.go`, `pr_provider_bitbucket.go`.
 **Role:** [`refinery` role](../roles/refinery.md) — domain persona
 **CLI command:** [`gt refinery`](../commands/refinery.md)
 **Imports (notable):** [`internal/beads`](beads.md),
+[`internal/bitbucket`](bitbucket.md) (new in v1.0.1),
 [`internal/config`](config.md), `internal/constants`,
 [`internal/crew`](crew.md), [`internal/events`](events.md),
 `internal/git`, [`internal/mail`](mail.md),
@@ -56,7 +62,7 @@ daemon's health-patrol paths, and any code that needs the
 
 ZFC-compliant: there is no state file. Running state is derived
 from the rig's tmux session (`manager.go:74-79`); queue state is
-derived from beads merge-request issues (`manager.go:329-381`);
+derived from beads merge-request issues (`manager.go:340-392`);
 claims live on the bead, not in package memory.
 
 ### Types — `types.go`
@@ -109,7 +115,7 @@ claims live on the bead, not in package memory.
   sessions where Claude is alive but hasn't produced output.
 - `Manager.Status() (*tmux.SessionInfo, error)` (`manager.go:93-106`).
 - `Manager.Start(foreground bool, agentOverride string) error`
-  (`manager.go:113-271`) — the 150-line start path. Refuses
+  (`manager.go:113-282`) — the ~170-line start path. Refuses
   foreground mode (deprecated). Detects and kills zombie sessions.
   Computes `refineryRigDir = <rig>/refinery/rig` with auto-repair
   fallback via `.repo.git` worktree add (see
@@ -124,13 +130,13 @@ claims live on the bead, not in package memory.
   starts the nudge poller (`nudge.StartPoller`), runs the startup
   fallback chain, tracks the session PID, and records the agent
   instantiation event for GASTA.
-- `Manager.repairRefineryWorktree(dir) error` (`manager.go:278-308`)
+- `Manager.repairRefineryWorktree(dir) error` (`manager.go:289-319`)
   — rebuilds a missing `refinery/rig` worktree from the shared
   bare `.repo.git` when the original has been pruned or deleted.
   Self-heals instead of failing startup.
-- `Manager.Stop() error` (`manager.go:312-324`) — kills the tmux
+- `Manager.Stop() error` (`manager.go:323-335`) — kills the tmux
   session. Returns `ErrNotRunning` if there wasn't one.
-- `Manager.Queue() ([]QueueItem, error)` (`manager.go:329-381`) —
+- `Manager.Queue() ([]QueueItem, error)` (`manager.go:340-392`) —
   queries beads for open merge-request issues via
   `beads.New(m.rig.BeadsPath()).ListMergeRequests`, filters by
   `gt:merge-request` label, keeps only `status=="open"`, filters by
@@ -140,32 +146,32 @@ claims live on the bead, not in package memory.
   one the `gt refinery queue` / `gt refinery status` CLI paths use
   and is the canonical answer to "what's the queue right now".
 - `Manager.calculateIssueScore(issue, now) float64`
-  (`manager.go:395-424`) — wraps the stateless `ScoreMRWithDefaults`
+  (`manager.go:406-435`) — wraps the stateless `ScoreMRWithDefaults`
   from `score.go`.
-- `Manager.issueToMR(issue) *MergeRequest` (`manager.go:427-462`) —
+- `Manager.issueToMR(issue) *MergeRequest` (`manager.go:438-473`) —
   converts a beads issue to an `MergeRequest`, pulling branch,
   worker, source issue, target, and created-at from
   `beads.ParseMRFields`. Falls back to the rig's default branch.
-- `Manager.FindMR(idOrBranch)` (`manager.go:505-530`) — matches by
+- `Manager.FindMR(idOrBranch)` (`manager.go:516-541`) — matches by
   ID, branch, `polecat/`-prefixed branch, or ID prefix.
 - `Manager.RejectMR(idOrBranch, reason, notify)`
-  (`manager.go:550-580`) — closes the MR bead with reason
+  (`manager.go:561-591`) — closes the MR bead with reason
   `"rejected: <reason>"`, updates in-memory state, optionally
   nudges the polecat worker.
 - `Manager.PostMerge(idOrBranch) (*PostMergeResult, error)`
-  (`manager.go:594-642`) — closes the MR bead with reason
+  (`manager.go:605-653`) — closes the MR bead with reason
   `"merged"` and force-closes the source issue with
   `"Merged in <MR-ID>"`. Uses `ForceCloseWithReason` so attached
   molecule steps don't block the close. Branch deletion is the
   caller's responsibility (Manager has no git access).
-- `Manager.notifyWorkerRejected(mr, reason)` (`manager.go:645-657`)
+- `Manager.notifyWorkerRejected(mr, reason)` (`manager.go:656-668`)
   — nudges (not mails) the polecat worker with a rejection summary.
-- `Manager.Retry`, `Manager.RegisterMR` (`manager.go:535-545`) —
+- `Manager.Retry`, `Manager.RegisterMR` (`manager.go:546-556`) —
   deprecated no-ops; the Engineer handles retry autonomously and
   MRs register via beads creation.
 - Sentinel errors: `ErrNotRunning`, `ErrAlreadyRunning`,
   `ErrNoQueue`, `ErrMRNotFound`, `ErrMRNotFailed`
-  (`manager.go:31-36, 492-495`).
+  (`manager.go:31-35, 503-506`).
 
 ### Engineer — `engineer.go`
 
@@ -175,82 +181,90 @@ gate-running, squash-merging, pushing, post-merge cleanup, and
 escalation. Engineer holds the rig, beads client, git client,
 merge-queue config, output writer, mail router, and the
 `mergeSlotEnsureExists` / `mergeSlotAcquire` / `mergeSlotRelease`
-closures (`engineer.go:253-266`).
+closures (`engineer.go:277-279`).
 
-- `NewEngineer(r) *Engineer` (`engineer.go:269-301`) — determines
+- `NewEngineer(r) *Engineer` (`engineer.go:285-317`) — determines
   the git working directory (`refinery/rig` then falling back to
   `mayor/rig`), wires up beads/git clients, sets default merge
   slot retries (10) and backoff (500 ms).
-- `LoadConfig()` (`engineer.go:310-437`) — reads `config.json`
+- `LoadConfig()` (`engineer.go:326-464`) — reads `config.json`
   and applies the `merge_queue` section over defaults. Handles
   duration parsing for `poll_interval`, `stale_claim_timeout`,
   per-gate timeouts. Validates phase values for gates.
-- `MergeQueueConfig` struct (`engineer.go:103-176`) — the big
+- `MergeQueueConfig` struct (`engineer.go:114-191`) — the big
   config shape: `Enabled`, `OnConflict`, `RunTests`, `TestCommand`,
   `DeleteMergedBranches`, `RetryFlakyTests`, `PollInterval`,
   `MaxConcurrent`, `StaleClaimTimeout`, `Gates` map,
   `GatesParallel`, `StaleClaimWarningAfter`,
   `StaleClaimCriticalAfter`, `MaxRetryCount`, `AutoPush`,
-  `MergeStrategy` (`direct` or `pr`), `RequireReview`, `Batch`.
-- `GateConfig` struct (`engineer.go:74-87`) with `GatePhase`
+  `MergeStrategy` (`direct` or `pr`), `VCSProvider` (`github` default
+  or `bitbucket`, new in v1.0.1, `engineer.go:179-181`), `RequireReview`,
+  `Batch`.
+- `GateConfig` struct (`engineer.go:85-98`) with `GatePhase`
   (`GatePhasePreMerge`, `GatePhasePostSquash`, at
-  `engineer.go:62-72`). Post-squash gates run after the squash but
+  `engineer.go:71-83`). Post-squash gates run after the squash but
   before push, so a failure resets the merge.
-- `ProcessResult` struct (`engineer.go:453-463`) — per-MR outcome
+- `ProcessResult` struct (`engineer.go:498-508`) — per-MR outcome
   including `SlotTimeout`, `BranchNotFound`, `NoMerge`,
   `NeedsApproval` flags for post-processing dispatch.
 - `doMerge(ctx, branch, target, sourceIssue, skipGates...)`
-  (`engineer.go:466+`) — the core merge engine: honours the
+  (`engineer.go:511+`) — the core merge engine: honours the
   `no_merge` flag (gh#2778), verifies the local branch exists,
   checks out target, performs the squash merge, runs gates in
   two phases, acquires the main-push slot via beads-backed
   coordinated lock, pushes, and reports results.
-- `doMergePR(ctx, branch, target)` (`engineer.go:710+`) — the
-  `merge_strategy=pr` variant; uses `gh pr merge` to respect
-  branch protection and honour GitHub review requirements.
-- `acquireMainPushSlot(ctx)` (`engineer.go:784+`) — beads-backed
+- `doMergePR(ctx, branch, target)` (`engineer.go:759+`) — the
+  `merge_strategy=pr` variant. As of v1.0.1 it merges through the
+  `PRProvider` abstraction (`e.prProvider`) rather than calling
+  `gh pr merge` directly: find the PR for the branch (`FindPRNumber`),
+  optionally gate on an approving review when `require_review` is set
+  (`IsPRApproved`, returns `NeedsApproval` if not approved), squash-merge
+  via `MergePR(prNumber, "squash")`, then checkout + pull the target to
+  sync the local branch (`engineer.go:759-839`). See
+  [PR providers](#pr-providers) below.
+- `acquireMainPushSlot(ctx)` (`engineer.go:842+`) — beads-backed
   distributed lock so concurrent Refinery workers can't race on
   pushing to main. Uses `mergeSlotSeq` + nanosecond timestamps for
   a unique holder ID (Windows timer resolution workaround at
-  `engineer.go:246-249`).
+  `engineer.go:261-264`).
 - `runGate`, `runGates`, `runGatesForPhase`
-  (`engineer.go:901-1042`) — the gate execution loop with
+  (`engineer.go:959-1098`) — the gate execution loop with
   optional parallelism and per-gate timeouts.
-- `syncCrewWorkspaces()` (`engineer.go:1044+`) — pushes merged
+- `syncCrewWorkspaces()` (`engineer.go:1102+`) — pushes merged
   changes into crew workspaces via the
   [`crew` package](crew.md).
-- `ProcessMRInfo(ctx, mr)` (`engineer.go:1075+`) — the public
+- `ProcessMRInfo(ctx, mr)` (`engineer.go:1133+`) — the public
   per-MR entry. Used by `HandleMRInfoSuccess` /
-  `HandleMRInfoFailure` (`engineer.go:1107+, 1225+`) to branch
+  `HandleMRInfoFailure` (`engineer.go:1165+, 1283+`) to branch
   on result type and update bead state, escalate, re-slinging,
   etc.
-- `createConflictResolutionTaskForMR` (`engineer.go:1342+`) —
+- `createConflictResolutionTaskForMR` (`engineer.go:1400+`) —
   spawns a synthesis task bead to handle a conflicting MR; the
   synthesis bead is the mechanism by which a FRESH polecat
   re-implements the work (see the Long help quoted on
   [`gt refinery`](../commands/refinery.md)).
-- `ClaimMR`, `ReleaseMR` (`engineer.go:1780-1802`) — parallel-worker
+- `ClaimMR`, `ReleaseMR` (`engineer.go:1845-1868`) — parallel-worker
   coordination. `ClaimMR` writes the worker ID to the bead's
   claim field; claims older than `StaleClaimTimeout` (default
   30 min) are eligible for re-claim per `isClaimStale`
-  (`engineer.go:47-56`).
+  (`engineer.go:58-67`).
 - `ListReadyMRs`, `ListBlockedMRs`, `ListAllOpenMRs`
-  (`engineer.go:1534-1692`) — the bead-sourced queue views used by
+  (`engineer.go:1599-1757`) — the bead-sourced queue views used by
   `gt refinery ready`, `gt refinery blocked`.
-- `ListQueueAnomalies(now)` (`engineer.go:1693+`) — detects
+- `ListQueueAnomalies(now)` (`engineer.go:1758+`) — detects
   `stale-claim` and `orphaned-branch` problems using the
   configured warning/critical thresholds. Returned via
-  `MRAnomaly` (`engineer.go:230-237`).
+  `MRAnomaly` (`engineer.go:245-252`).
 - `postMergeConvoyCheck(mr)`, `notifyDeaconConvoyFeeding(mr)`,
   `checkAndCloseCompletedConvoys(townRoot, townBeads)`,
   `notifyConvoyCompletion`, `landConvoySwarm`
-  (`engineer.go:1804-2052`) — convoy-awareness: when a merge
+  (`engineer.go:1869-2127`) — convoy-awareness: when a merge
   completes, the Engineer checks whether it closed the last
   tracked issue in a convoy and drives the
   [`convoy-launch` workflow](../workflows/convoy-launch.md)'s
   landing phase.
-- `pruneStaleRemoteRefs()` (`engineer.go:2053+`) — housekeeping.
-- `IsBeadOpen(beadID)` (`engineer.go:1450+`) — helper for the
+- `pruneStaleRemoteRefs()` (`engineer.go:2128+`) — housekeeping.
+- `IsBeadOpen(beadID)` (`engineer.go:1515+`) — helper for the
   blocked-MR filter.
 
 ### Batcher — `batch.go`
@@ -296,8 +310,46 @@ culprit(s).
 - `ScoreMRWithDefaults(input) float64` — called from
   `Manager.calculateIssueScore` for the queue ordering.
 
+### PR providers
+
+The `pr_provider*.go` trio is new in v1.0.1. When `merge_strategy=pr`,
+the Engineer lands work through a VCS-agnostic
+`PRProvider` interface instead of calling `gh` directly. The abstraction
+landed in v1.0.1 to add Bitbucket Cloud support alongside GitHub.
+
+- `PRProvider` interface (`pr_provider.go:5-15`) — three methods:
+  `FindPRNumber(branch) (int, error)` (0 if none),
+  `IsPRApproved(prNumber) (bool, error)`, and
+  `MergePR(prNumber, method) (string, error)` returning the merge commit
+  SHA. Method strings are the generic `"squash"` / `"merge"` / `"rebase"`.
+- `githubPRProvider` (`pr_provider_github.go:6-24`) — the default. A thin
+  pass-through to the existing `git.Git` GitHub helpers
+  (`FindPRNumber`, `IsPRApproved`, `GhPrMerge` at
+  `internal/git/git.go:974-1042`), which shell out to the `gh` CLI.
+- `bitbucketPRProvider` (`pr_provider_bitbucket.go:11-53`) — wraps the
+  Bitbucket Cloud REST client. Its constructor parses the `origin` remote
+  URL into `workspace` / `repoSlug` via
+  `bitbucket.ParseBitbucketRemote` (so a misconfigured remote fails fast),
+  and delegates to the `git.Git` Bitbucket helpers
+  (`FindBitbucketPRNumber`, `IsBitbucketPRApproved`, `BitbucketPRMerge` at
+  `internal/git/git.go:1044-1152`). `MergePR` maps the generic method
+  names to Bitbucket strategy names: `squash`→`squash`, `merge`→
+  `merge_commit`, `rebase`→`fast_forward` (`pr_provider_bitbucket.go:41-52`).
+  See [`internal/bitbucket`](bitbucket.md).
+- Selection happens in `Engineer.initPRProvider` (`engineer.go:466-482`),
+  called from `LoadConfig` only when `merge_strategy=pr`
+  (`engineer.go:456-461`). It switches on `vcs_provider`: empty or
+  `"github"` → GitHub; `"bitbucket"` → Bitbucket; anything else is a
+  hard error (`unknown vcs_provider %q (supported: github, bitbucket)`).
+  The provider is stored on `Engineer.prProvider` (`engineer.go:273`) and
+  is `nil` when `merge_strategy != "pr"`.
+
 ### Notable design choices
 
+- **PR-provider abstraction (v1.0.1).** `merge_strategy=pr` is no longer
+  GitHub-only. `vcs_provider` selects GitHub (default) or Bitbucket Cloud;
+  the `PRProvider` interface keeps `doMergePR` VCS-agnostic. See
+  [PR providers](#pr-providers) above.
 - **Three different beads access patterns coexist.** `Manager`
   uses `beads.New` directly for the queue view; `Engineer` also
   uses `beads.New` but through a cached `beadsClient` for
@@ -308,8 +360,8 @@ culprit(s).
   three exist.
 - **Wisps live in the same table as MRs.** Merge requests ARE
   wisps — they're stored in the `wisps` table and queried via
-  `beads.ListMergeRequests`. The `Rig` filter at `manager.go:351-
-  355` exists because "wisps are shared across all rigs
+  `beads.ListMergeRequests`. The `Rig` filter at
+  `manager.go:362-366` exists because "wisps are shared across all rigs
   (gh#2718)": the rig has to filter by its own name even though
   the query looks like it's scoped. See
   [`wisp` concept](../concepts/wisp.md).
@@ -324,7 +376,7 @@ culprit(s).
   push to main simultaneously — the beads-backed
   `MergeSlotAcquire` / `MergeSlotRelease` serializes pushes. A
   holder ID combines nanosecond timestamp + atomic counter for
-  uniqueness on Windows timers (`engineer.go:246-249`).
+  uniqueness on Windows timers (`engineer.go:261-264`).
 - **Batch-then-bisect is opt-in.** When `Batch.MaxBatchSize <= 1`
   (the default off state), the Engineer falls through to the
   sequential single-MR path via `processSingleMR`.
@@ -396,7 +448,7 @@ culprit(s).
 | `bd` | `close` | `<convoyID> -r <reason>` | runtime | `engineer.go:1968` |
 | `gt` | `mail send` | `<addr> -s <subj> -m <body>` | runtime | `engineer.go:1996` |
 | `gt` | `swarm land` | `<moleculeID>` | runtime | `engineer.go:2035` |
-| `gt` | `nudge` | `<target> <nudgeMsg>` | runtime | `manager.go:651` |
+| `gt` | `nudge` | `<target> <nudgeMsg>` | runtime | `manager.go:662` |
 
 ## Notes / open questions
 

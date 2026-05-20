@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-17
+updated: 2026-05-20
 sources:
   - /home/kimberly/repos/gastown/internal/doctor/doctor.go
   - /home/kimberly/repos/gastown/internal/doctor/types.go
@@ -17,6 +17,10 @@ sources:
   - /home/kimberly/repos/gastown/internal/doctor/zombie_check.go
   - /home/kimberly/repos/gastown/internal/doctor/orphan_check.go
   - /home/kimberly/repos/gastown/internal/doctor/beads_check.go
+  - /home/kimberly/repos/gastown/internal/doctor/claude_binary_check.go
+  - /home/kimberly/repos/gastown/internal/doctor/disk_space_check.go
+  - /home/kimberly/repos/gastown/internal/doctor/groq_compound_check.go
+  - /home/kimberly/repos/gastown/internal/doctor/stalled_polecat_check.go
   - /home/kimberly/repos/gastown/internal/cmd/doctor.go
 tags: [package, diagnostics, health-checks, fix-mode]
 phase3_audited: 2026-04-14
@@ -33,16 +37,17 @@ phase4_findings: [none]
 # internal/doctor
 
 Gas Town's health-check registry and fix engine. Provides the `Check`
-interface, the `Doctor` runner, streaming output, and ~80 concrete check
+interface, the `Doctor` runner, streaming output, and ~84 concrete check
 implementations spanning workspace layout, infrastructure, rig state,
 config, Dolt, beads, patrol, hooks, and cleanup. Powers
 [`gt doctor`](../commands/doctor.md), [`gt repair`](../commands/repair.md),
 and chunks of [`gt upgrade`](../commands/upgrade.md).
 
 **Go package path:** `github.com/steveyegge/gastown/internal/doctor`
-**File count:** **70 non-test `.go` files + ~50 `_test.go` files** — the
-largest single package in the codebase by file count and roughly 36k
-lines of Go total (`wc -l internal/doctor/*.go`).
+**File count:** **74 non-test `.go` files + 55 `_test.go` files** (as of
+v1.0.1) — the largest single package in the codebase by file count and
+roughly 38k lines of Go total (`wc -l internal/doctor/*.go`; ~20k
+non-test).
 **CLI surface:** [`gt doctor`](../commands/doctor.md),
 [`gt repair`](../commands/repair.md), [`gt upgrade`](../commands/upgrade.md),
 [`gt vitals`](../commands/vitals.md)
@@ -216,10 +221,10 @@ regardless of the underlying status). See `types.go:356-424`.
 
 **There is no ordering mechanism in the package itself.** `Doctor.checks`
 is a plain ordered slice. All ordering is encoded in the call order
-inside `runDoctor` at `/home/kimberly/repos/gastown/internal/cmd/doctor.go:154-275`.
+inside `runDoctor` at `/home/kimberly/repos/gastown/internal/cmd/doctor.go:156-288`.
 
 The one documented constraint, for the `gt-99u` race fix, lives as an
-inline comment block at `doctor.go:173-177` (in `internal/cmd/`):
+inline comment block at `doctor.go:182-185` (in `internal/cmd/`):
 
 > `NewClaudeSettingsCheck()` must run **before** `NewDaemonCheck()` so
 > that if claude settings are stale, we fix them first (deleting stale
@@ -294,11 +299,15 @@ Grouping the 70 non-test files by filename convention:
 - `town_beads_config_check.go` — town-level beads config
 - `town_claude_md_check.go` — town-level CLAUDE.md identity anchor
 
-**Infrastructure / binaries / daemon (8 files):**
+**Infrastructure / binaries / daemon (11 files):**
 
 - `stale_binary_check.go` — gt build freshness vs repo HEAD
 - `beads_binary_check.go` — `bd` presence and min version
 - `dolt_binary_check.go` — `dolt` presence and min version
+- `claude_binary_check.go` — Claude Code presence and min version (new in
+  v1.0.1; see [Checks added in v1.0.1](#checks-added-in-v101))
+- `disk_space_check.go` — filesystem free-space thresholds (new in v1.0.1)
+- `groq_compound_check.go` — groq-compound JSON-output probe (new in v1.0.1)
 - `daemon_check.go` — Gas Town daemon running
 - `boot_check.go` — boot-health markers
 - `tmux_check.go` — linked-pane layout integrity
@@ -364,10 +373,13 @@ Grouping the 70 non-test files by filename convention:
 - `lifecycle_check.go` — lifecycle hygiene
 - `lifecycle_defaults_check.go` — lifecycle defaults
 
-**Cleanup / orphans / stale state (9 files):**
+**Cleanup / orphans / stale state (10 files):**
 
 - `orphan_check.go` — 2 checks: orphan tmux sessions, orphan processes
 - `zombie_check.go` — tmux session alive but Claude process dead
+- `stalled_polecat_check.go` — dead polecat sessions holding unpushed
+  commits (new in v1.0.1; see
+  [Checks added in v1.0.1](#checks-added-in-v101))
 - `wisp_check.go` — wisp garbage collection
 - `misclassified_wisp_check.go` — wisp misclassification
 - `jsonl_bloat_check.go` — JSONL file bloat
@@ -399,15 +411,15 @@ Grouping the 70 non-test files by filename convention:
 - `crew_check.go` — 2 checks: crew state, crew worktrees
 - `commands_check.go` — installed slash commands
 
-That's 70 files grouped into roughly **12 functional areas**, producing
-the ~80 distinct `NewXxxCheck` constructors registered by `runDoctor` at
-`/home/kimberly/repos/gastown/internal/cmd/doctor.go:154-275`. Several
+That's 74 files grouped into roughly **12 functional areas**, producing
+the ~84 distinct `NewXxxCheck` constructors registered by `runDoctor` at
+`/home/kimberly/repos/gastown/internal/cmd/doctor.go:156-288`. Several
 files define multiple checks (`patrol_check.go` has 5, `rig_check.go`
 has 13, `config_check.go` has 6, `workspace_check.go` has 5,
 `beads_check.go` has 3, `hook_check.go` has 3, `migration_check.go` has
 3, `branch_check.go` has 2, `orphan_check.go` has 2, `crew_check.go`
-has 2), which is why the file count (70) is substantially less than the
-constructor count (~80).
+has 2), which is why the file count (74) is substantially less than the
+constructor count (~84).
 
 ### Batch constructor functions
 
@@ -426,9 +438,9 @@ the command wrapper can register a block of checks atomically:
   `PolecatClonesValidCheck`, `BeadsConfigValidCheck`,
   `BeadsRedirectCheck`, `TestutilSymlinkCheck`. Only registered when
   `--rig <name>` is passed, because these checks need a populated
-  `ctx.RigName` (`internal/cmd/doctor.go:277-279`).
+  `ctx.RigName` (`internal/cmd/doctor.go:287-289`).
 
-All other ~60 checks are registered individually by name in `runDoctor`.
+All other ~64 checks are registered individually by name in `runDoctor`.
 
 ## Representative checks
 
@@ -520,6 +532,80 @@ dead sessions so Deacon (or `gt up --restore`) can re-spawn them cleanly.
 Typical of the `Cleanup` category: cache state in the struct during
 `Run`, consume it during `Fix`.
 
+## Checks added in v1.0.1
+
+Four checks landed between the v1.0.0 baseline and v1.0.1, registered in
+`runDoctor` at the positions noted below. Three are read-only
+`Infrastructure` checks; the fourth is a fixable `Cleanup` check.
+
+### `ClaudeBinaryCheck` — optional-dependency version probe
+
+`claude_binary_check.go:11-90`. Embeds `BaseCheck` (read-only).
+Delegates to `deps.CheckClaudeCode()`
+(`/home/kimberly/repos/gastown/internal/deps/claude.go`) and maps the
+returned `ClaudeCodeStatus` to a result. The defining design choice is
+that **a missing Claude Code is `StatusOK`, not an error** — Gas Town
+supports other agents, so absence is reported as "claude not found
+(optional — other agents work without it)"
+(`claude_binary_check.go:39-45`). Only a below-minimum version
+(`ClaudeCodeTooOld`) or a broken install (`ClaudeCodeExecFailed`,
+`ClaudeCodeUnknown`) produces a `StatusWarning`. The minimum
+(`2.0.20`) and recommended (`2.1.3`) versions and the install URL come
+from constants in `deps` (`deps/claude.go:16-23`). Registered at
+`internal/cmd/doctor.go:174`, immediately after the `bd`/`dolt` binary
+checks. See [internal/deps](deps.md).
+
+### `DiskSpaceCheck` — filesystem free-space threshold
+
+`disk_space_check.go:11-78`. Embeds `BaseCheck` (read-only). Calls
+`util.CheckDiskSpace(ctx.TownRoot)`
+(`/home/kimberly/repos/gastown/internal/util/diskspace.go`) and maps its
+`DiskSpaceCritical` / `DiskSpaceWarning` / OK level to
+`StatusError` / `StatusWarning` / `StatusOK`. The check exists because
+disk exhaustion is the root cause of cascading failures — the details
+string spells it out: "Dolt data loss, polecat session death, lost
+commits" (`disk_space_check.go:51-53`). Registered early under
+Infrastructure at `internal/cmd/doctor.go:163`, before the binary
+checks, so a full disk surfaces before anything that would try to write.
+See [internal/util](util.md).
+
+### `GroqCompoundCheck` — agent JSON-output probe
+
+`groq_compound_check.go:18-118`. Embeds `BaseCheck` (read-only). A
+guarded live probe: it returns early with `StatusOK`/`StatusWarning` and
+a "(skipped)" message unless **all three** preconditions hold —
+groq-compound is configured for some role (`groqCompoundConfigured`,
+`groq_compound_check.go:120-141`), `GROQ_API_KEY` is set, and the
+`claude` binary is on `PATH` (`groq_compound_check.go:34-58`). When it
+does run, it invokes `claude` with Groq routing env vars
+(`ANTHROPIC_BASE_URL=https://api.groq.com/openai/v1`,
+`ANTHROPIC_MODEL=compound-beta`) and a probe prompt ending in
+`config.GroqJSONEnforcement`, then `json.Unmarshal`s the output —
+non-JSON output is a `StatusError` (`groq_compound_check.go:71-95`).
+Registered at `internal/cmd/doctor.go:175`. See
+[internal/config](config.md) for `GroqJSONEnforcement` and the
+`AgentGroqCompound` agent type.
+
+### `StalledPolecatCheck` — unpushed-work guard (fixable)
+
+`stalled_polecat_check.go:24-198`. Embeds `FixableCheck` and caches a
+`[]stalledPolecatInfo` between `Run` and `Fix` (the same pattern as
+`ZombieSessionCheck`). `Run` walks every rig's `polecats/` directory
+(`findRigs`, `stalled_polecat_check.go:144-167`), and for each polecat
+whose tmux session is **dead** (`tmux.HasSession` false) it resolves the
+worktree (`resolveClonePath` handles both the new
+`polecats/<name>/<rig>/` and old `polecats/<name>/` layouts,
+`stalled_polecat_check.go:171-187`) and uses
+`git.BranchPushedToRemote` to count unpushed commits. Any dead session
+holding unpushed commits is a `StatusWarning`. The `Fix`
+(`stalled_polecat_check.go:124-139`) pushes each stalled branch to
+`origin` so the committed work survives before cleanup nukes the
+polecat. This is described in the source as "the most dangerous failure
+mode after disk space exhaustion" (`stalled_polecat_check.go:13-15`).
+Registered in the Cleanup block at `internal/cmd/doctor.go:209`, right
+after `ZombieSessionCheck`. See [internal/git](git.md),
+[internal/session](session.md), [polecat (role)](../roles/polecat.md).
+
 ## Notable patterns
 
 **State cached on the struct between Run and Fix.** Several checks
@@ -602,7 +688,12 @@ that someone encoded as a permanent check.
 - [internal/doltserver](doltserver.md) — doctor's Dolt reachability,
   metadata, and orphaned-database checks call into this package
 - [internal/config](config.md) — `ResolveRoleAgentConfig` and
-  `RoleSettingsDir` used by `ClaudeSettingsCheck` during fix
+  `RoleSettingsDir` used by `ClaudeSettingsCheck` during fix;
+  `GroqJSONEnforcement` / `AgentGroqCompound` used by `GroqCompoundCheck`
+- [internal/deps](deps.md) — `CheckClaudeCode` + version constants
+  backing `ClaudeBinaryCheck` (new in v1.0.1)
+- [internal/util](util.md) — `CheckDiskSpace` backing `DiskSpaceCheck`
+  (new in v1.0.1)
 - [internal/session](session.md) — session-name helpers used by
   claude-settings, zombie, and orphan checks
 - [internal/workspace](workspace.md) — `FindFromCwdOrError` is how
@@ -625,7 +716,7 @@ that someone encoded as a permanent check.
 ## Notes / open questions
 
 - No dependency graph: ordering is encoded purely in the call sequence
-  at `internal/cmd/doctor.go:154-275`, with one documented ordering
+  at `internal/cmd/doctor.go:156-288`, with one documented ordering
   constraint (`ClaudeSettingsCheck` before `DaemonCheck`). A dependency
   graph would be a reasonable future refactor.
 - No short-circuit: if `DoltServerReachableCheck` fails, the ~15

@@ -101,7 +101,10 @@ working states:
 - **Working** — session active, hook bead set, agent doing
   assigned work.
 - **Stalled** — session crashed mid-work; needs Witness
-  intervention. Detected condition.
+  intervention. Detected condition. `gt doctor`'s
+  `StalledPolecatCheck` (new in v1.0.1) also flags a stalled polecat
+  whose branch holds unpushed commits and pushes it before cleanup —
+  see [internal/doctor](../packages/doctor.md).
 - **Zombie** — `gt done` was called but cleanup failed. Detected
   condition (StateDone persisting too long).
 - **Nuked** — session ended, identity persists with

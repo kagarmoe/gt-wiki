@@ -4,7 +4,8 @@ type: note
 status: stub
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-14
+updated: 2026-05-20
+gastown_release: v1.0.1
 sources:
   - /home/kimberly/repos/gastown/
 tags: [landing, index]
@@ -59,6 +60,24 @@ discipline.
 - **Separate runtime workspace:** `~/gt/` — the Docker-containerized
   deployment of `gt`. Not part of the wiki; independent from this
   mapping effort.
+
+## Release tracking
+
+The `gastown_release:` frontmatter field on this page is the
+**authoritative marker** of which gastown release tag the wiki is
+currently synced to. The `syncing-gastown-updates` skill reads it as
+the diff base for the next release sync (a tag-to-tag operation).
+
+- **Current:** `v1.0.1` (SHA `0e18216e`, tagged 2026-04-25).
+- **Established:** 2026-05-20, during the first run of the
+  `syncing-gastown-updates` skill (Stage A of the v1.0.0→v1.1.0 sync,
+  bead `wiki-i2n`).
+- **Prior baseline:** before this marker existed, the wiki's effective
+  base was the untagged commit `9f962c4a` (gastown HEAD at the Phase 2
+  mapping batch, 2026-04-11 = v1.0.0 + 6 commits). v0.12.1 / v0.13.0 /
+  v1.0.0 are all at or below that baseline and already reflected.
+
+From here on, each release sync updates this field to the new tag.
 
 ## Scope of the map
 

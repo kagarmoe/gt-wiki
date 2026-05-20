@@ -6035,3 +6035,35 @@ on [gastown/README.md](../../gastown/README.md) (prior baseline 9f962c4a).
 Tracked in bead wiki-i2n.8.
 
 → gastown/commands/dog.md, gastown/packages/mail.md, gastown/packages/dog.md, gastown/inventory/docs-tree.md
+
+## [2026-05-20] ingest | Release sync v1.0.0->v1.0.1 (A5): establish release marker
+
+**Scope:** First-run establishment of the wiki's release marker, the final
+deliverable of Stage A. No source re-read needed — this is a wiki-side
+process anchor.
+
+**Wiki pages updated:**
+- [gastown topic landing](../../gastown/README.md) — added
+  `gastown_release: v1.0.1` to the frontmatter (the authoritative,
+  grep-checkable marker the `syncing-gastown-updates` skill reads as its
+  diff base) and a new "## Release tracking" body section documenting the
+  current tag (`v1.0.1`, SHA `0e18216e`), the establishment date, and the
+  prior untagged baseline (`9f962c4a` = v1.0.0 + 6 commits, the Phase 2
+  mapping base). `updated: 2026-05-20`.
+
+**Why this matters:** per the skill's first-run caveat, the wiki had no
+release marker — its base was an untagged Phase 2 commit. From this sync
+forward, release syncs are tag-to-tag: read `gastown_release:`, diff
+`<that tag>..<new tag>`, sync, bump the marker. Stage B (v1.0.1→v1.1.0)
+will read `v1.0.1` here as its base.
+
+**Beads updated:**
+- Claiming + closing: wiki-i2n.8 (this batch, A5). Stage A complete.
+
+**Verification:** `grep "gastown_release:" gastown/README.md` → `v1.0.1`.
+
+**Next batch:** none — Stage A (v1.0.0→v1.0.1) complete. Stage B
+(v1.0.1→v1.1.0) is the next pass under umbrella wiki-i2n; deferred follow-up
+wiki-8zc (orphan.go citation refresh) remains open.
+
+→ gastown/README.md

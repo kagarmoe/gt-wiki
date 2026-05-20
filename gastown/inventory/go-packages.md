@@ -4,7 +4,7 @@ type: note
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-15
+updated: 2026-05-20
 sources:
   - /home/kimberly/repos/gastown/cmd/
   - /home/kimberly/repos/gastown/internal/
@@ -19,7 +19,8 @@ phase3_findings_post_release: false
 # gastown Go packages inventory
 
 Every Go package directory under `cmd/`, `internal/`, and `plugins/`
-as of 2026-04-11 with file counts. Neutral enumeration.
+with file counts. Neutral enumeration. Baseline captured 2026-04-11;
+`atomicfile` and `bitbucket` rows added by the v1.0.1 release sync.
 
 **Capture method:** `find <dir> -maxdepth 1 -name '*.go'` split into
 `*_test.go` and non-test files, with `find <dir> -mindepth 1 -maxdepth 1
@@ -28,9 +29,10 @@ as of 2026-04-11 with file counts. Neutral enumeration.
 **Totals:**
 
 - **3 `cmd/` binaries** (one Go module main each)
-- **67 `internal/` packages** with Go files, counted at immediate
-  subdirectory depth only. Nested packages exist but are not listed
-  here.
+- **69 `internal/` packages** with Go files at v1.0.1 (67 at the
+  2026-04-11 baseline, plus `atomicfile` and `bitbucket` added in
+  v1.0.1), counted at immediate subdirectory depth only. Nested
+  packages exist but are not listed here.
 - **14 `plugins/` subdirectories**, only 1 of which currently contains
   a Go source file.
 - **~1088 total `.go` files** in the module (including tests), from
@@ -48,7 +50,7 @@ as of 2026-04-11 with file counts. Neutral enumeration.
 See also: [../binaries/gt.md](../binaries/gt.md),
 [../files/makefile.md](../files/makefile.md).
 
-## internal/ (67 packages)
+## internal/ (69 packages)
 
 | package         | go files | test files | nested subdirs |
 |-----------------|---------:|-----------:|---------------:|
@@ -56,7 +58,9 @@ See also: [../binaries/gt.md](../binaries/gt.md),
 | `activity`      |        1 |          1 |              0 |
 | `agent`         |        1 |          1 |              1 |
 | `agentlog`      |        3 |          1 |              0 |
+| `atomicfile`    |        1 |          1 |              0 |
 | `beads`         |       28 |         21 |              0 |
+| `bitbucket`     |        3 |          2 |              0 |
 | `boot`          |        1 |          1 |              0 |
 | `channelevents` |        1 |          1 |              0 |
 | `checkpoint`    |        2 |          2 |              0 |

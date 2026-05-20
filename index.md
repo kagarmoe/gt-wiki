@@ -90,6 +90,11 @@ Gap-fill packages (Phase 6 Batch 1 — 6 packages):
 - [connection](gastown/packages/connection.md) — address parsing + Connection interface for local/remote operations
 - [proxy](gastown/packages/proxy.md) — mTLS CA management + HTTP proxy server for sandboxed execution
 
+Release sync additions (v1.0.1):
+
+- [atomicfile](gastown/packages/atomicfile.md) — atomic file-write primitives (leaf package; successor to `util.AtomicWrite*`)
+- [bitbucket](gastown/packages/bitbucket.md) — Bitbucket Cloud REST API client for merge-queue PR lifecycle
+
 ### Roles (Batch 6)
 
 Gas Town agent personas:

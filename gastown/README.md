@@ -112,7 +112,8 @@ Platform service packages under `internal/` (Batch 4 — Layer d):
 - [style](packages/style.md) — lipgloss style wrappers + icon prefixes + small table renderer
 - [telemetry](packages/telemetry.md) — OTEL provider (**strictly opt-in**; defaults to localhost VictoriaMetrics/VictoriaLogs; no off-box leakage)
 - [ui](packages/ui.md) — Ayu palette, theme init, capability detection, glamour markdown rendering
-- [util](packages/util.md) — atomic file writes, exec helpers, process-group management, orphan Claude cleanup
+- [util](packages/util.md) — exec helpers, process-group management, orphan Claude cleanup (atomic writes moved to `atomicfile` in v1.0.1)
+- [atomicfile](packages/atomicfile.md) — atomic file-write primitives (leaf package extracted from `util` in v1.0.1)
 - [version](packages/version.md) — build-time Commit var + `CheckStaleBinary` with false-positive guards
 - [workspace](packages/workspace.md) — town-root discovery walks with env-var fallbacks
 

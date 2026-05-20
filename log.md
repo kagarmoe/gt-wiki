@@ -5754,3 +5754,37 @@ wiki-i2n), before creating new entity pages (atomicfile, bitbucket), so they are
 built from a correct single-source template. Tracked in bead wiki-i2n.3.
 
 → `.claude/skills/writing-entity-pages/SKILL.md`, `.claude/skills/syncing-gastown-updates/workflow.md`
+
+## [2026-05-20] ingest | Release sync v1.0.0→v1.0.1 (Batch A1: new packages atomicfile + bitbucket)
+
+**Scope:** Release sync from gastown baseline `9f962c4a` (v1.0.0+6, the Phase 2
+mapping base) toward `v1.0.1`. This batch creates entity pages for the two
+packages added in v1.0.1 that had no Phase 2 coverage. Tracked in bead
+wiki-i2n.4.
+
+**Source files re-read at v1.0.1:**
+- `/home/kimberly/repos/gastown/internal/atomicfile/atomicfile.go` (full, 90 lines)
+- `/home/kimberly/repos/gastown/internal/bitbucket/client.go` (125), `pr.go` (206), `remote.go` (30) (full)
+- `/home/kimberly/repos/gastown/internal/util/atomic.go` @ baseline `9f962c4a` (to document the move)
+
+**Wiki pages created:**
+- [atomicfile](../../gastown/packages/atomicfile.md) — new leaf package; successor to `util.AtomicWrite*`; `detail_depth` set; no phase3 audit yet (new page)
+- [bitbucket](../../gastown/packages/bitbucket.md) — new Bitbucket Cloud REST client; consumed only by `refinery/pr_provider_bitbucket.go`
+
+**Wiki pages updated:**
+- [go-packages inventory](../../gastown/inventory/go-packages.md) — added `atomicfile` + `bitbucket` rows; internal total 67→69; baseline-vs-v1.0.1 framing
+- [index.md](../../index.md) — added "Release sync additions (v1.0.1)" packages group
+- [gastown/README.md](../../gastown/README.md) — added `atomicfile` to the platform-services sub-index; corrected the `util` line (atomic writes moved to `atomicfile`)
+
+**Beads:**
+- Closed: wiki-7u4 (`wants-wiki-entry: internal/bitbucket/` — resolved by bitbucket.md)
+- Closed: wiki-i2n.4 (this batch)
+
+**Cross-link discipline:** 13 outbound links across the two new pages, all
+resolve. `atomicfile` links to `util`; the reverse backlink lands in Batch A3
+(util refresh). All `file:line` citations fresh from `v1.0.1`.
+
+**Next batch:** A2 — [doctor](../../gastown/packages/doctor.md) (4 new checks) +
+[refinery](../../gastown/packages/refinery.md) (PR-provider abstraction) refresh.
+
+→ gastown/packages/atomicfile.md, gastown/packages/bitbucket.md, gastown/inventory/go-packages.md, index.md, gastown/README.md

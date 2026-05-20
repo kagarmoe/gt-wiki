@@ -292,41 +292,17 @@ grep -rln "$entity" gastown/ | grep -v "^gastown/<page>.md$"
 
 ## Step 8: Per new entity — create a full page
 
-Use the Phase 2 template:
+Create the page from the **canonical entity-page template**. The single source of
+truth is the `writing-entity-pages` skill — do not duplicate the scaffold here, or
+it drifts (it did). Read the current frontmatter fields, page types, full section
+set (including `## Failure modes` and `## Outgoing calls`), `detail_depth`, and the
+drift taxonomy from:
 
-```markdown
----
-title: <entity-canonical-name>
-type: <binary|command|package|file|role|concept|workflow|service|...>
-status: verified
-topic: gastown
-created: 2026-04-14
-updated: 2026-04-14
-sources:
-  - /home/kimberly/repos/gastown/<path>
-tags: [<relevant>, <tags>]
----
+- [`../writing-entity-pages/SKILL.md`](../writing-entity-pages/SKILL.md)
 
-# <Canonical Name>
-
-**Also known as:** <aliases, if any>
-
-## What it actually does
-
-<code-grounded body with file:line references>
-
-## Docs claim
-
-<verbatim quotes from docs + source refs — Phase 3+ only; empty if no docs yet exist for the new entity>
-
-## Drift
-
-<leave empty for new entities until Phase 3 audit touches them; new entities start with no known drift>
-
-## Notes / open questions
-
-<anything that's worth flagging but not yet drift>
-```
+Release-sync specifics on top of that template: a new entity starts with
+`status: verified`, today's date for `created`/`updated`, and an empty `## Drift`
+section (new entities have no known drift until a Phase 3 audit reaches them).
 
 After writing:
 

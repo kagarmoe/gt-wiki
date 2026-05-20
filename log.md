@@ -5724,3 +5724,33 @@ miss (#3665 feature request). Navigation score (65%) now exceeds the
 grep-based score (50%) because the fixes added both content and links.
 Full progression: 35% -> 45% -> 50% -> 50% -> 45% -> **65%**. Pages:
 `gastown/drift/validation-navigation-retest.md`. Index updated.
+
+## [2026-05-20] decision | Schema: single-source the entity-page template; document detail_depth
+
+Two reference-surface fixes. No schema version bump — both are follow-through on
+already-decided schema, not new schema.
+
+1. **`detail_depth` documented in writing-entity-pages.** The [2026-04-17] decision
+   added the `detail_depth` frontmatter field and its `→` pointer named
+   writing-entity-pages/SKILL.md as the artifact to update, but the field was never
+   actually added there. Pages use it in practice (e.g. `packages/daemon.md`). Now
+   documented in both the frontmatter template block and the field reference
+   (per-axis 0-2; code pages `{params, data_flow, errors, side_effects}`, synthesis
+   pages `{synthesis, relationships}`; absence = "not yet assessed").
+
+2. **De-duplicated the entity-page scaffold.** `syncing-gastown-updates/workflow.md`
+   Step 8 carried a stale copy of the Phase 2 template (missing `## Failure modes`,
+   `## Outgoing calls`, `detail_depth`). Replaced the inline scaffold with a pointer
+   to `writing-entity-pages/SKILL.md` as the single source of truth. A pointer was
+   chosen over an Obsidian transclusion (`![[...]]`): the wiki uses no transclusion,
+   and skills are read as raw markdown by agents during a sync, so an embed would not
+   expand at read time. One source can't drift.
+
+**Artifacts touched:** `.claude/skills/writing-entity-pages/SKILL.md`,
+`.claude/skills/syncing-gastown-updates/workflow.md`.
+
+**Why now:** discovered during Stage A of the v1.0.0 -> v1.1.0 release sync (bead
+wiki-i2n), before creating new entity pages (atomicfile, bitbucket), so they are
+built from a correct single-source template. Tracked in bead wiki-i2n.3.
+
+→ `.claude/skills/writing-entity-pages/SKILL.md`, `.claude/skills/syncing-gastown-updates/workflow.md`

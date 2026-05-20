@@ -47,6 +47,9 @@ phase3_audited: 2026-04-15                # ISO date, set when the Phase 3 audit
 phase3_findings: [none]                   # category tags from the drift taxonomy (see below)
 phase3_severities: []                     # severity tags orthogonal to categories (see below)
 phase3_findings_post_release: false       # true iff ≥1 finding on this page is post-release
+
+# Optional depth-pass field (additive — see below)
+detail_depth: {params: 2, data_flow: 1, errors: 0, side_effects: 1}   # per-axis 0-2; synthesis pages use {synthesis, relationships}
 ---
 ```
 
@@ -57,6 +60,9 @@ phase3_findings_post_release: false       # true iff ≥1 finding on this page i
 - `phase3_findings` — list of **category** tags from the drift taxonomy. Legal values: `drift`, `cobra-drift`, `implementation-status-unbuilt`, `implementation-status-partial`, `implementation-status-vestigial`, `wiki-stale`, `gap`, `none`. A page with zero findings still gets `phase3_findings: [none]` when audited, so it appears in the audit roll-call.
 - `phase3_severities` — list of **severity** tags, orthogonal to categories. Legal values per the docs convention (least → most severe): `ambiguous`, `incomplete`, `wrong`, `missing`. Phase 3 findings are overwhelmingly `wrong`; `incomplete` applies to `implementation-status: partial`; `ambiguous` applies to the rare docs-wording finding. `missing` is NOT a Phase 3 severity (it's Phase 4). A page with no findings gets `phase3_severities: []` alongside `phase3_findings: [none]`.
 - `phase3_findings_post_release` — boolean. `true` iff any finding on this page has release-position `post-release` (introduced after the last stable gastown release tag).
+
+**Optional depth-pass field** (additive, non-retroactive):
+- `detail_depth` — per-axis depth scores from the detail-gap pass, each scored 0–2. Code-grounded pages use `{params, data_flow, errors, side_effects}`; synthesis pages use `{synthesis, relationships}`. Absence means "not yet assessed." Added by the [2026-04-17] schema decision. Complex pages scoring ≤4 total get fixed inline during the depth pass.
 
 Frontmatter is required from day one so Dataview queries work across the whole wiki without needing a retrofit pass later.
 

@@ -4,9 +4,10 @@ type: package
 status: partial
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-18
+updated: 2026-05-20
 sources:
   - /home/kimberly/repos/gastown/internal/daemon/daemon.go
+  - /home/kimberly/repos/gastown/internal/daemon/worker.go
   - /home/kimberly/repos/gastown/internal/daemon/types.go
   - /home/kimberly/repos/gastown/internal/daemon/pidfile.go
   - /home/kimberly/repos/gastown/internal/daemon/lifecycle.go
@@ -45,8 +46,9 @@ long-running process in a town: every other agent is either a Claude
 tmux session supervised by the daemon, or a one-shot CLI invocation.
 
 **Go package path:** `github.com/steveyegge/gastown/internal/daemon`
-**File count:** 33 non-test Go files, 29 test files — one of the
+**File count:** 34 non-test Go files, 33 test files — one of the
 largest packages in the codebase. `daemon.go` alone is ~100KB.
+(`worker.go` and four idle/cache guard test files are new in v1.0.1.)
 **CLI surface:** [`gt daemon`](../commands/daemon.md) (8 subcommands).
 **Driven by:** [`gt up`](../commands/up.md), [`gt start`](../commands/start.md),
 [`gt down`](../commands/down.md) / [`gt shutdown`](../commands/shutdown.md).
@@ -218,6 +220,50 @@ every rig that has no wisp config file, which causes log spam when
 rigs are legitimately unconfigured (issue #3554). The function
 continues past the warning and checks the wisp layer's `status` field
 for `"parked"` or `"docked"` values (`daemon.go:1844-1848`).
+
+## The per-rig worker pool (v1.0.1)
+
+Source: `/home/kimberly/repos/gastown/internal/daemon/worker.go` (99
+lines, new in v1.0.1).
+
+Several heartbeat steps act once *per rig*. With a serial loop the
+heartbeat cost is `O(N × max_op_time)` — one slow or hung rig stalls
+the per-rig work for every other rig. `RigWorkerPool`
+(`worker.go:21-25`) replaces that serial loop with bounded-concurrency,
+timeout-bounded fan-out, so the cost becomes `O(max_op_time)`.
+
+- **Construction:** `newRigWorkerPool(concurrency, timeout, logger)`
+  (`worker.go:29-40`); zero/negative values fall back to the package
+  defaults `defaultRigConcurrency = 10` and `defaultRigTimeout = 30s`
+  (`worker.go:11-12`). The daemon holds one pool as the `rigPool` field
+  (`daemon.go:123`), constructed with defaults in `daemon.New`
+  (`daemon.go:335` — `newRigWorkerPool(0, 0, logger)`).
+- **Fan-out:** `runPerRig(parent, rigs, fn)` (`worker.go:51-99`) runs
+  `fn` once per rig. A buffered channel of size `concurrency` caps the
+  number of in-flight goroutines; each `fn` gets its own
+  `context.WithTimeout(parent, timeout)` child context so a slow rig can
+  be signalled to stop (if `fn` honours `ctx.Done()`) without affecting
+  the others. It blocks until all goroutines finish, counts errors
+  under a mutex, and logs a single `rig_worker: M/N rig(s) had errors`
+  summary line rather than per-rig noise. An empty `rigs` slice is a
+  no-op.
+
+**Seven heartbeat operations run through the pool** (all in
+`daemon.go`):
+
+| Operation | Function | `file:line` |
+|---|---|---|
+| Ensure witnesses running | `ensureWitnessesRunning` | `daemon.go:1585` |
+| Ensure refineries running | `ensureRefineriesRunning` | `daemon.go:1662` |
+| Kill leftover witness sessions | `killWitnessSessions` | `daemon.go:1801` |
+| Kill leftover refinery sessions | `killRefinerySessions` | `daemon.go:1817` |
+| Polecat session health check | `checkPolecatSessionHealth` | `daemon.go:2432` |
+| Reap idle polecats | `reapIdlePolecats` | `daemon.go:2711` |
+| Prune stale tracking branches | `pruneStaleBranches` | `daemon.go:2887` |
+
+The witness/refinery `runPerRig` calls take the patrol-filtered rig set
+(`getPatrolRigs`); the session-kill, health, reap, and prune calls take
+the full `getKnownRigs()` set.
 
 ## The maintenance tickers
 
@@ -690,10 +736,11 @@ Observability uses `pourDogMolecule` on `MolDogJSONL`.
   Mayor always start regardless of system load — they're the
   recovery layer and can't be the thing being recovered.
 
-## Category breakdown of the 33 files
+## Category breakdown of the 34 files
 
-**Main loop & lifecycle (3):**
-`daemon.go`, `lifecycle.go`, `lifecycle_defaults.go`.
+**Main loop & lifecycle (4):**
+`daemon.go`, `lifecycle.go`, `lifecycle_defaults.go`, `worker.go`
+(per-rig worker pool, new in v1.0.1).
 
 **State management (3):**
 `types.go`, `pidfile.go`, `restart_tracker.go`.

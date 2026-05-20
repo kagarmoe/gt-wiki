@@ -5855,3 +5855,101 @@ touched pages: clean. All `file:line` citations re-verified against gastown
 diskspace*.go added). Tracked in bead wiki-i2n.6.
 
 → gastown/packages/doctor.md, gastown/packages/refinery.md, gastown/roles/polecat.md
+
+## [2026-05-20] ingest | Release sync v1.0.0->v1.0.1 (A3): config/deps/daemon/util
+
+**Scope:** Release sync from gastown `9f962c4a` (Phase 2 mapping baseline,
+v1.0.0 + 6 commits) to `v1.0.1` (SHA `0e18216e`). This batch covers the four
+package pages with new/removed/changed source files: `config` (groq),
+`deps` (claude dep), `daemon` (worker.go), `util` (atomic.go removed →
+atomicfile move; diskspace*.go added). Confirmed file deltas via
+`git diff --name-status 9f962c4a..v1.0.1`.
+
+**Source files re-read at v1.0.1:**
+- `internal/config/groq.go` (full — single `const GroqJSONEnforcement`),
+  `internal/config/agents.go` (full, 1046 lines — `AgentGroqCompound`
+  preset + enum/registry citation drift), `internal/config/cost_tier.go`
+  (full — two new Groq tiers + effort API).
+- `internal/deps/claude.go` (full, 80 lines — `CheckClaudeCode`,
+  `ClaudeCodeStatus`, version consts, `parseClaudeCodeVersion`).
+- `internal/daemon/worker.go` (full, 99 lines — `RigWorkerPool`) and its
+  wiring in `internal/daemon/daemon.go` (`rigPool` field at 123,
+  constructor at 335, seven `runPerRig` call sites verified via
+  `git grep -p`).
+- `internal/util/diskspace.go` / `diskspace_unix.go` /
+  `diskspace_windows.go` (full — `CheckDiskSpace`, `GetDiskSpace`,
+  thresholds), and `internal/util/orphan.go` diff (matched-runtime
+  expansion via new `isAgentOrphanCommName` at `orphan.go:410`).
+- Cross-checked `internal/doctor/groq_compound_check.go:62` (the sole
+  in-tree consumer of `GroqJSONEnforcement`) and doctor.md's existing
+  forward-links to deps/util/config.
+
+**Wiki pages updated:**
+- [config](../../gastown/packages/config.md) — added `groq.go` source +
+  a new "groq.go — groq-compound output enforcement" section
+  (`GroqJSONEnforcement`); added `AgentMistral`/`AgentGroqCompound` to the
+  preset-enum doc and **refreshed all drifted `agents.go` citations**
+  (enum 14-39→18-48; registry/lookup/ACP/test-hook ranges shifted
+  ~+50-90 lines, e.g. ACP helpers 813-935→904-1045); documented the two
+  new Groq cost tiers + effort API and refreshed `cost_tier.go` citations
+  (9-18→10-29, etc.); file counts 9→10 non-test / 12→14 test; doctor
+  backlink added. `loader.go`/`types.go`/`env.go` citations were NOT
+  re-audited (out of the groq cluster scope).
+- [deps](../../gastown/packages/deps.md) — added `claude.go` source +
+  `CheckClaudeCode`, the 6-variant `ClaudeCodeStatus` enum (with the
+  unique `OldButOK` middle band), version consts (`2.0.20`/`2.1.3`) and
+  install URL, `parseClaudeCodeVersion`; noted Claude Code is the only
+  optional / two-tier dependency; file counts 3→4 go / 2→3 test;
+  `claude --version` added to Outgoing calls; doctor backlink expanded.
+- [daemon](../../gastown/packages/daemon.md) — added `worker.go` source +
+  a new "per-rig worker pool (v1.0.1)" section (`RigWorkerPool`, bounded
+  concurrency 10 / 30s per-rig timeout, table of the 7 heartbeat
+  operations that fan out through it with v1.0.1 `daemon.go` line refs);
+  file counts 33→34 go / 29→33 test; category breakdown updated.
+- [util](../../gastown/packages/util.md) — `atomic.go` section rewritten
+  as a "moved to internal/atomicfile (v1.0.1)" redirect (the A1-deferred
+  reverse backlink `util → atomicfile` now added, both directions live);
+  new `diskspace.go/_unix/_windows` section (`CheckDiskSpace`,
+  thresholds, the real-not-stub Windows impl); orphan.go matched-runtime
+  claim corrected to the broadened `isAgentOrphanCommName` set
+  (`orphan.go:410`); file counts 9→11 go; Failure-modes / Outgoing-calls
+  / Imported-by references to the moved atomic helpers redirected to
+  atomicfile; doctor backlink added.
+
+**Wiki pages created:** none (all five A3 targets, incl. atomicfile from
+A1, pre-existed).
+
+**Wiki pages marked vestigial:** none. `atomic.go` is a file-section, not
+its own page; it is documented as *moved* (code lives on in
+[atomicfile](../../gastown/packages/atomicfile.md)), not removed-without-
+replacement.
+
+**Drift / wiki-stale findings:**
+- Fixed inline (util.md): the orphan-detection matched-runtime set was
+  stale — v1.0.1's `isAgentOrphanCommName` (`orphan.go:410`) broadened it
+  from `claude/claude-code/codex/opencode` to also include
+  `cursor-agent`, `agent`, `copilot`. Release-content change (ingest),
+  not a pre-existing wiki error.
+- **Deferred (wiki-8zc):** util.md's ~13 other orphan.go `file:line`
+  citations drifted ~+11 (orphan.go grew +16/-5 from ~line 405). Left for
+  a focused refresh pass — out of the A3 atomic/diskspace cluster scope.
+
+**Beads updated:**
+- Claiming + closing: wiki-i2n.6 (this batch, A3).
+- Opened: wiki-8zc (orphan.go citation refresh follow-up; child of
+  wiki-i2n, labels release-sync + wiki-stale).
+
+**Cross-link discipline:** New outbound links added across the four pages
+(util↔atomicfile now bidirectional; config/deps/util → doctor backlinks).
+Two new intra-page anchors verified to resolve (config `#groqgo...`, util
+`#atomicgo...`). All link targets confirmed present. All `file:line`
+citations written in this batch re-verified against gastown `v1.0.1` via
+`git grep`/`git show`; copied-then-trusted line numbers were re-checked
+(several claude.go cites were off by 1-4 lines on first pass and corrected).
+
+**Next batch:** A4 — [dog](../../gastown/packages/dog.md) +
+[mail](../../gastown/packages/mail.md) (`gt dog done` plugin-mail fix) +
+docs-tree inventory (new v1.0.1 docs; touches bead wiki-w71). Tracked in
+bead wiki-i2n.7.
+
+→ gastown/packages/config.md, gastown/packages/deps.md, gastown/packages/daemon.md, gastown/packages/util.md

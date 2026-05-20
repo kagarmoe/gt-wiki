@@ -4,7 +4,7 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-18
+updated: 2026-05-20
 sources:
   - /home/kimberly/repos/gastown/internal/config/agents.go
   - /home/kimberly/repos/gastown/internal/config/loader.go
@@ -12,6 +12,7 @@ sources:
   - /home/kimberly/repos/gastown/internal/config/types.go
   - /home/kimberly/repos/gastown/internal/config/operational.go
   - /home/kimberly/repos/gastown/internal/config/cost_tier.go
+  - /home/kimberly/repos/gastown/internal/config/groq.go
   - /home/kimberly/repos/gastown/internal/config/directives.go
   - /home/kimberly/repos/gastown/internal/config/overseer.go
   - /home/kimberly/repos/gastown/internal/config/roles.go
@@ -41,9 +42,10 @@ variable map and shell startup command that actually launches each
 agent, and provides the cost-tier system for bulk model selection.
 
 **Go package path:** `github.com/steveyegge/gastown/internal/config`
-**File count:** 9 non-test go files plus an embedded `roles/*.toml`
-directory. 12 test files. `loader.go` alone is ~92 KB and `types.go`
+**File count:** 10 non-test go files plus an embedded `roles/*.toml`
+directory. 14 test files. `loader.go` alone is ~92 KB and `types.go`
 ~67 KB, making this the largest surface area in the whole repo.
+`groq.go` (new in v1.0.1) is at the opposite extreme — a single `const`.
 **Imports (notable):** stdlib (`encoding/json`, `os`, `os/exec`,
 `path/filepath`, `sync`, `runtime`, `sort`, `strings`, `strconv`,
 `embed`, `time`), `github.com/BurntSushi/toml` (for role TOML),
@@ -66,7 +68,7 @@ mail surface.
 
 ## What it actually does
 
-Nine non-test files, each with a clear functional focus. This page
+Ten non-test files, each with a clear functional focus. This page
 summarizes the responsibilities of each file and enumerates the public
 API. Because of the sheer volume, drill-down details per type/function
 have been kept terse; see `file:line` refs when you need the body.
@@ -84,38 +86,67 @@ new agent = adding a `builtinPresets` entry** (plus an optional hook
 installer) with no `switch agent.Name {}` statements leaking outside
 this file.
 
-**Built-in preset enum** (`agents.go:14-39`): `AgentClaude`,
+**Built-in preset enum** (`agents.go:18-48`): `AgentClaude`,
 `AgentGemini`, `AgentCodex`, `AgentCursor`, `AgentAuggie`, `AgentAmp`,
-`AgentOpenCode`, `AgentCopilot`, `AgentPi`, `AgentOmp`. Comment on
-`AgentOmp` credits the `github.com/ProbabilityEngineer/pi-mono` Gas
-Town integration.
+`AgentOpenCode`, `AgentCopilot`, `AgentPi`, `AgentOmp`,
+`AgentMistral` (`"vibe"`), and `AgentGroqCompound` (`"groq-compound"`).
+Comment on `AgentOmp` credits the
+`github.com/ProbabilityEngineer/pi-mono` Gas Town integration. The last
+two are new in v1.0.1: `AgentMistral` is the Mistral Vibe CLI;
+`AgentGroqCompound` routes the `claude` binary to Groq's compound-beta
+model as an SDK proxy (`agents.go:42-47`) — see the
+[groq-compound preset](#groqgo--groq-compound-output-enforcement)
+section below.
 
 **Public API:**
 
 - `AgentPreset`, `AgentPresetInfo`, `ACPConfig`, `NonInteractiveConfig`,
-  `AgentRegistry` types (`agents.go:14-210`).
+  `AgentRegistry` types (`agents.go:15-218`).
 - `LoadAgentRegistry(path)` / `LoadRigAgentRegistry(path)` and the
   corresponding path helpers `DefaultAgentRegistryPath(townRoot)`,
   `DefaultRigAgentRegistryPath(rigPath)`, `RigAgentRegistryPath(rigPath)`
-  (`agents.go:497-529`).
+  (`agents.go:580-612`).
 - `GetAgentPreset(name)`, `GetAgentPresetByName(name)`,
-  `ListAgentPresets()`, `DefaultAgentPreset()`, `IsKnownPreset(name)`
-  (`agents.go:531-755`) — lookups against the global registry.
-- `RuntimeConfigFromPreset(preset) *RuntimeConfig` (`agents.go:567-600`) —
+  `ListAgentPresets()`, `BuiltInAgentPresetSummary()`,
+  `DefaultAgentPreset()` (`agents.go:614-657`) and `IsKnownPreset(name)`
+  (`agents.go:838`) — lookups against the global registry.
+- `RuntimeConfigFromPreset(preset) *RuntimeConfig` (`agents.go:658-691`) —
   materialises a `RuntimeConfig` from a preset + defaults.
 - `BuildResumeCommand(agentName, sessionID) string`,
   `SupportsSessionResume(agentName) bool`,
   `GetSessionIDEnvVar(agentName) string`,
   `GetProcessNames(agentName)`, `ResolveProcessNames(agentName, command)`
-  (`agents.go:602-745`) — session-resume and process-matching helpers.
+  (`agents.go:693-808`) — session-resume and process-matching helpers.
 - `SaveAgentRegistry(path, registry)`, `NewExampleAgentRegistry()`
-  (`agents.go:756-791`).
+  (`agents.go:847-882`).
 - ACP (Agent Client Protocol) helpers: `ResolveACPConfig`,
   `SupportsACP`, `GetACPConfig`, `GetACPCommand`, `GetACPArgs`,
   `RuntimeConfigSupportsACP`, `GetACPConfigFromRuntime`
-  (`agents.go:813-935`).
+  (`agents.go:904-1045`).
 - Test hooks: `ResetRegistryForTesting()`,
-  `RegisterAgentForTesting(name, info)` (`agents.go:793-810`).
+  `RegisterAgentForTesting(name, info)` (`agents.go:884-902`).
+
+### groq.go — groq-compound output enforcement
+
+Source: `/home/kimberly/repos/gastown/internal/config/groq.go`. New in
+v1.0.1. The entire file is a single package-level constant.
+
+- `GroqJSONEnforcement` (`groq.go:5-8`) — a prompt suffix appended to
+  prompts for **groq-compound non-interactive invocations** to force
+  JSON-only output from the compound model. The text instructs the model
+  to "Respond ONLY with a single valid JSON object" (no markdown or code
+  fences) and to fall back to `{"error": "<reason>"}` if it cannot
+  comply. The compound-beta model is otherwise prone to wrapping JSON in
+  prose, which breaks programmatic parsing.
+
+The only consumer in-tree is
+[`internal/doctor`](doctor.md)'s `GroqCompoundCheck`
+(`/home/kimberly/repos/gastown/internal/doctor/groq_compound_check.go:62`),
+which appends `config.GroqJSONEnforcement` to its live probe prompt and
+then `json.Unmarshal`s the result — non-JSON output fails the check.
+This pairs with the `AgentGroqCompound` preset documented in the
+`agents.go` section above and the Groq cost tiers in the `cost_tier.go`
+section below.
 
 ### loader.go — the load/save/resolve bulk
 
@@ -337,34 +368,58 @@ per-town overrides on top of the compiled defaults.
 
 Source: `/home/kimberly/repos/gastown/internal/config/cost_tier.go`.
 
-Three predefined cost tiers that map role → Claude model variant in
-bulk, so users can switch the whole town from opus-everywhere to
-sonnet/haiku without editing per-role settings.
+Five predefined cost tiers (three Claude-only, two Groq-hybrid) that
+map role → model variant in bulk, so users can switch the whole town
+from opus-everywhere to sonnet/haiku — or to Groq's compound-beta for
+the patrol/utility roles — without editing per-role settings. v1.0.1
+added the two Groq tiers and a parallel per-role *effort* mapping.
 
 **Public API:**
 
 - `CostTier` string type; constants `TierStandard`, `TierEconomy`,
-  `TierBudget` (`cost_tier.go:9-18`).
+  `TierBudget`, and (new in v1.0.1) `TierCustomGroqOpus`,
+  `TierCustomGroqSonnet` (`cost_tier.go:10-29`). The two Groq tiers
+  route patrol/utility roles to `groq-compound` while keeping Opus
+  (or Sonnet) for the quality-critical mayor/crew roles.
 - `ValidCostTiers() []string`, `IsValidTier(tier string) bool`
-  (`cost_tier.go:21-33`).
-- `TierManagedRoles` package-level slice (`cost_tier.go:38`):
+  (`cost_tier.go:32-50`) — both now enumerate all five tiers.
+- `TierManagedRoles` package-level slice (`cost_tier.go:57`):
   `["mayor", "deacon", "witness", "refinery", "polecat", "crew",
   "boot", "dog"]`. These are the only roles `ApplyCostTier` touches;
   custom user roles are preserved. Boot and dog are utility roles
   that always use haiku even on the standard tier.
-- `CostTierRoleAgents(tier) map[string]string` (`cost_tier.go:46-89`)
-  — role → agent-name mapping for a tier.
+- `CostTierRoleAgents(tier) map[string]string` (`cost_tier.go:62-135`)
+  — role → agent-name mapping for a tier. The Groq tiers map
+  deacon/witness/refinery/polecat/boot/dog (and, for
+  `TierCustomGroqSonnet`, crew) to `"groq-compound"`.
+- `CostTierRoleEffort(tier) map[string]string` (`cost_tier.go:138-177`,
+  new in v1.0.1) — role → reasoning-effort (`low`/`medium`/`high`)
+  mapping; workers get the highest effort for the tier, patrols drop
+  effort. Returns `nil` for the Groq tiers (effort defaults apply).
+- `ValidEffortLevels() []string`, `IsValidEffortLevel(level string) bool`
+  (`cost_tier.go:179-191`, new) — the legal effort set is
+  `low`/`medium`/`high`/`max`.
 - `CostTierAgents(tier) map[string]*RuntimeConfig`
-  (`cost_tier.go:91-124`) — richer mapping including full
-  RuntimeConfig.
+  (`cost_tier.go:197-228`) — richer mapping including full
+  `RuntimeConfig`. The Groq tiers include a `groq-compound` entry built
+  by `groqCompoundPreset()`.
+- Internal preset builders `claudeSonnetPreset()` (`cost_tier.go:230`),
+  `claudeHaikuPreset()` (`cost_tier.go:239`), and `groqCompoundPreset()`
+  (`cost_tier.go:261-276`). `groqCompoundPreset` derives its config from
+  the canonical `AgentGroqCompound` builtin via `RuntimeConfigFromPreset`
+  and resolves `$GROQ_API_KEY` from the shell env **at preset-creation
+  time** so the live key (not the `$GROQ_API_KEY` sentinel) is what
+  lands in the settings file.
 - `ApplyCostTier(settings *TownSettings, tier CostTier) error`
-  (`cost_tier.go:126-173`) — mutates a `TownSettings` in place.
+  (`cost_tier.go:278-334`) — mutates a `TownSettings` in place; now also
+  applies the tier's effort defaults and clears the `groq-compound`
+  preset when switching back to standard.
 - `GetCurrentTier(settings *TownSettings) string`
-  (`cost_tier.go:175-210`) — reverse lookup, "which tier matches
+  (`cost_tier.go:336-355`) — reverse lookup, "which tier matches
   this settings file?"
-- `TierDescription(tier CostTier) string`,
-  `FormatTierRoleTable(tier CostTier) string` — user-facing strings
-  (`cost_tier.go:212-...`).
+- `TierDescription(tier CostTier) string` (`cost_tier.go:369`),
+  `FormatTierRoleTable(tier CostTier) string` (`cost_tier.go:387`) —
+  user-facing strings.
 
 ### directives.go — role directive loading
 
@@ -450,6 +505,9 @@ Typical command flow:
 - [internal/session](session.md) — downstream consumer of
   `RuntimeConfig`, `AgentEnvConfig`, and the `BuildStartupCommand*`
   family.
+- [internal/doctor](doctor.md) — its `GroqCompoundCheck` consumes
+  `GroqJSONEnforcement` (from `groq.go`) and the `AgentGroqCompound`
+  preset; the doctor page forward-links here.
 - [gt config](../commands/config.md), [gt agents](../commands/agents.md),
   [gt costs](../commands/costs.md), [gt rigs](../commands/rigs.md),
   [gt mayor](../commands/mayor.md), [gt overseer](../commands/overseer.md)

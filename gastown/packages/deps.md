@@ -4,12 +4,13 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-18
+updated: 2026-05-20
 sources:
   - /home/kimberly/repos/gastown/internal/deps/beads.go
   - /home/kimberly/repos/gastown/internal/deps/dolt.go
+  - /home/kimberly/repos/gastown/internal/deps/claude.go
   - /home/kimberly/repos/gastown/internal/deps/version.go
-tags: [package, diagnostics, dependencies, prereqs, versioning, beads, dolt]
+tags: [package, diagnostics, dependencies, prereqs, versioning, beads, dolt, claude-code]
 phase3_audited: 2026-04-14
 phase3_findings: [none]
 phase3_severities: []
@@ -21,18 +22,19 @@ detail_depth: {params: 2, data_flow: 2, errors: 1, side_effects: 1}
 
 # internal/deps
 
-Prerequisite checks for the two external binaries Gas Town depends on:
-`bd` (beads) and `dolt`. Defines the minimum supported version for each,
-implements a small semver comparator, and — for beads only — knows how
-to go-install a missing or outdated copy into `~/.local/bin`.
+Prerequisite checks for the external binaries Gas Town depends on:
+`bd` (beads) and `dolt` (both required), plus `claude` (Claude Code,
+optional — added in v1.0.1). Defines the minimum supported version for
+each, implements a small semver comparator, and — for beads only — knows
+how to go-install a missing or outdated copy into `~/.local/bin`.
 
 **Go package path:** `github.com/steveyegge/gastown/internal/deps`
-**File count:** 3 go files, 2 test files
+**File count:** 4 go files, 3 test files
 **Imports (notable):** stdlib (`context`, `os/exec`, `regexp`, `strconv`,
 `strings`, `time`, `path/filepath`) plus [`internal/util`](util.md) for
 `SetDetachedProcessGroup`.
 **Imported by:**
-[`internal/doctor`](doctor.md) (dolt and beads binary checks),
+[`internal/doctor`](doctor.md) (dolt, beads, and claude binary checks),
 [`internal/daemon`](../inventory/go-packages.md),
 [`internal/cmd/rig.go`](../commands/rig.md),
 [`internal/cmd/install.go`](../commands/install.md), and
@@ -43,7 +45,7 @@ constants directly so version bumps propagate automatically.
 
 ## What it actually does
 
-Source files: `beads.go`, `dolt.go`, `version.go`.
+Source files: `beads.go`, `dolt.go`, `claude.go`, `version.go`.
 
 ### Public API
 
@@ -59,6 +61,16 @@ Source files: `beads.go`, `dolt.go`, `version.go`.
   (`dolt.go:19`) — dolt is not go-installable from source like beads, so
   `deps` only knows how to tell the user where to go, not how to install
   it.
+- `MinClaudeCodeVersion = "2.0.20"` (`claude.go:16`) — the version that
+  introduced the Skills system Gas Town relies on (crew-commit,
+  ghi-list, pr-list, pr-sheriff). See
+  `docs/design/claude-code-minimum-version.md`.
+- `RecommendedClaudeCodeVersion = "2.1.3"` (`claude.go:20`) — where
+  skills and slash commands merged into a unified system. Versions
+  between the minimum and recommended are tolerated (`ClaudeCodeOldButOK`).
+- `ClaudeCodeInstallURL = "https://claude.ai/claude-code"`
+  (`claude.go:23`) — like dolt, Claude Code is not go-installable, so
+  `deps` only points the user at the install page.
 
 **Status enums:**
 
@@ -71,6 +83,13 @@ Source files: `beads.go`, `dolt.go`, `version.go`.
   (binary present but `dolt version` returned a non-zero exit) from
   `Unknown` (returned zero but output didn't match the regex), because
   broken dolt installs are a real operational hazard.
+- `ClaudeCodeStatus` (`claude.go:26-35`): `ClaudeCodeOK | ClaudeCodeNotFound
+  | ClaudeCodeTooOld | ClaudeCodeOldButOK | ClaudeCodeExecFailed |
+  ClaudeCodeUnknown`. The richest of the three enums. It carries both
+  the `DoltStatus`-style `ExecFailed`/`Unknown` split **and** a unique
+  `OldButOK` variant for the "above minimum but below recommended"
+  middle band — Claude Code has a two-tier version policy, where `bd`
+  and `dolt` have only a single floor.
 
 **Check functions:**
 
@@ -88,6 +107,17 @@ Source files: `beads.go`, `dolt.go`, `version.go`.
   so stderr ends up in the detail string; (3) the `DoltUnknown` case
   returns the raw (trimmed) output so the user sees what went wrong
   parsing.
+- `CheckClaudeCode() (ClaudeCodeStatus, string)` (`claude.go:39-68`) —
+  same shape as `CheckDolt`: `exec.LookPath("claude")`, then
+  `claude --version` under a 10-second `context.WithTimeout` with
+  `util.SetDetachedProcessGroup`, captured via `cmd.CombinedOutput()`.
+  Returns `ClaudeCodeNotFound` if not on PATH, `ClaudeCodeExecFailed`
+  if the version command errors, `ClaudeCodeUnknown` if the output
+  doesn't parse, then the three-way version verdict:
+  below `MinClaudeCodeVersion` → `ClaudeCodeTooOld`; below
+  `RecommendedClaudeCodeVersion` → `ClaudeCodeOldButOK`; else
+  `ClaudeCodeOK`. Returns the parsed version string alongside the status
+  for `TooOld`/`OldButOK`/`OK`.
 
 **Installer (beads only):**
 
@@ -126,13 +156,18 @@ Source files: `beads.go`, `dolt.go`, `version.go`.
   (\d+\.\d+\.\d+)`. Both regexes are anchored to the binary's own
   version-line prefix, so an attacker substituting a malicious binary
   named `bd` would at minimum need to print a plausible version line.
+- `parseClaudeCodeVersion` (`claude.go:72-80`) is looser: it matches
+  `^(\d+\.\d+\.\d+)` against the trimmed output (handling both
+  `"2.1.101 (Claude Code)"` and a bare `"2.1.101"`). Unlike the bd/dolt
+  parsers it is *not* anchored to a binary-name prefix, so any leading
+  semver triple is accepted.
 - `appendGOBIN` (`beads.go:127-141`) walks the existing environ to
   replace any inherited `GOBIN=...` rather than stacking a second
   definition — otherwise `go install` would use the last entry and Gas
   Town couldn't override a user-exported GOBIN.
-- All three exec calls (`bd version`, `dolt version`, `go install`) run
-  with `util.SetDetachedProcessGroup`, so a hanging binary can be
-  cleanly killed via its process group.
+- All four exec calls (`bd version`, `dolt version`, `claude --version`,
+  `go install`) run with `util.SetDetachedProcessGroup`, so a hanging
+  binary can be cleanly killed via its process group.
 - No retry logic. Every exec call is one-shot with a 10s timeout.
 
 ### Usage pattern
@@ -163,7 +198,8 @@ constant is bumped — this is the intended pattern for downstream code:
 
 - [gt](../binaries/gt.md) — parent binary.
 - [internal/doctor](doctor.md) — primary consumer; wraps `CheckBeads` /
-  `CheckDolt` into doctor `CheckResult`s with fix hints.
+  `CheckDolt` / `CheckClaudeCode` into doctor `CheckResult`s with fix
+  hints.
 - [gt doctor](../commands/doctor.md) — CLI that surfaces these checks.
 - [gt health](../commands/health.md) and [gt vitals](../commands/vitals.md)
   — sibling diagnostic commands (they don't currently import `deps`
@@ -182,6 +218,7 @@ constant is bumped — this is the intended pattern for downstream code:
 | `bd` | `version` | (none) | hardcoded | `beads.go:49` |
 | `go` | `install` | `BeadsInstallPath` | hardcoded | `beads.go:103` |
 | `dolt` | `version` | (none) | hardcoded | `dolt.go:43` |
+| `claude` | `--version` | (none) | hardcoded | `claude.go:47` |
 
 ## Notes / open questions
 
@@ -197,7 +234,15 @@ constant is bumped — this is the intended pattern for downstream code:
   change.
 - `ParseVersion` silently collapses non-numeric parts to 0, so
   `"1.82.4-rc1"` compared via raw `ParseVersion` would equal `"1.82.4"`
-  — but both parse functions strip suffixes via regex before calling
-  it, so this is only a risk if a new caller forgets the regex layer.
+  — but all three parse functions strip suffixes via regex before
+  calling it, so this is only a risk if a new caller forgets the regex
+  layer.
 - Only three components are compared. A version bump to `1.82.4.1`
   would be treated as equal to `1.82.4`.
+- Claude Code is the only dependency `deps` treats as **optional** and
+  the only one with a **two-tier** version policy (minimum +
+  recommended). The package itself just returns `ClaudeCodeNotFound`;
+  the "absence is fine, Gas Town supports other agents" decision lives
+  in [`internal/doctor`](doctor.md)'s `ClaudeBinaryCheck`, which maps
+  `NotFound` to `StatusOK`. `CheckClaudeCode` has no installer
+  counterpart to `EnsureBeads`.

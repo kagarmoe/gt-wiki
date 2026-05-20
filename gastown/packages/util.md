@@ -4,9 +4,8 @@ type: package
 status: verified
 topic: gastown
 created: 2026-04-11
-updated: 2026-04-18
+updated: 2026-05-20
 sources:
-  - /home/kimberly/repos/gastown/internal/util/atomic.go
   - /home/kimberly/repos/gastown/internal/util/exec.go
   - /home/kimberly/repos/gastown/internal/util/exec_unix.go
   - /home/kimberly/repos/gastown/internal/util/exec_windows.go
@@ -15,7 +14,10 @@ sources:
   - /home/kimberly/repos/gastown/internal/util/url.go
   - /home/kimberly/repos/gastown/internal/util/orphan.go
   - /home/kimberly/repos/gastown/internal/util/orphan_windows.go
-tags: [package, platform-service, util, atomic-write, exec, process-groups, orphan-cleanup, redaction]
+  - /home/kimberly/repos/gastown/internal/util/diskspace.go
+  - /home/kimberly/repos/gastown/internal/util/diskspace_unix.go
+  - /home/kimberly/repos/gastown/internal/util/diskspace_windows.go
+tags: [package, platform-service, util, atomic-write, exec, process-groups, orphan-cleanup, redaction, disk-space]
 phase3_audited: 2026-04-15
 phase3_findings: [wiki-stale]
 phase3_severities: [incomplete]
@@ -29,19 +31,25 @@ detail_depth: {params: 2, data_flow: 1, errors: 1, side_effects: 2}
 
 # internal/util
 
-Grab-bag of low-level helpers: atomic JSON/file writes, subprocess
-wrappers that set platform-specific process groups (for Windows no-flash
-and Unix kill-the-tree semantics), home-directory tilde expansion, slice
-helpers, URL credential redaction, and — by far the largest single
-member — the orphan/zombie Claude process hunter used by `gt doctor`
-and daemon cleanup patrols.
+Grab-bag of low-level helpers: subprocess wrappers that set
+platform-specific process groups (for Windows no-flash and Unix
+kill-the-tree semantics), home-directory tilde expansion, slice helpers,
+URL credential redaction, filesystem free-space queries, and — by far
+the largest single member — the orphan/zombie Claude process hunter used
+by `gt doctor` and daemon cleanup patrols. The atomic file-write
+primitives that used to live here (`atomic.go`) moved out to the
+dependency-free [internal/atomicfile](atomicfile.md) leaf package in
+v1.0.1; see the [atomic.go section](#atomicgo--moved-to-internalatomicfile-v101) below.
 
 **Go package path:** `github.com/steveyegge/gastown/internal/util`
-**File count:** 9 go files (`atomic.go`, `exec.go`, `exec_unix.go`,
+**File count:** 11 go files (`exec.go`, `exec_unix.go`,
 `exec_windows.go`, `orphan.go`, `orphan_windows.go`, `path.go`,
-`slice.go`, `url.go`), 6 test files.
-**Imports (notable):** stdlib (`encoding/json`, `os`, `os/exec`,
-`syscall`, `path/filepath`, `net/url`, `regexp`, `strconv`, `time`), and
+`slice.go`, `url.go`, `diskspace.go`, `diskspace_unix.go`,
+`diskspace_windows.go`), 6 test files. `atomic.go` was removed in
+v1.0.1; `diskspace*.go` were added.
+**Imports (notable):** stdlib (`os`, `os/exec`, `syscall`, `unsafe`
+(Windows disk-space only), `path/filepath`, `net/url`, `regexp`,
+`strconv`, `time`, `fmt`), and
 — inside `orphan.go` only — [`internal/tmux`](../inventory/go-packages.md)
 and `internal/lock` for cross-socket pane-PID discovery.
 **Imported by (notable):** nearly everywhere. The top consumers are:
@@ -50,34 +58,32 @@ and `internal/lock` for cross-socket pane-PID discovery.
   `SetDetachedProcessGroup`.
 - [`internal/session`](session.md) — uses atomic writes for PID
   tracking and identity files.
-- [`internal/config`](config.md) — `AtomicWriteJSON`/
-  `EnsureDirAndWriteJSON` for saving all JSON config files.
+- [`internal/config`](config.md) — previously used `AtomicWriteJSON`/
+  `EnsureDirAndWriteJSON` for saving JSON config; as of v1.0.1 those
+  calls go to [internal/atomicfile](atomicfile.md), not this package.
 - [`gt doctor`](../commands/doctor.md), [`gt cleanup`](../commands/cleanup.md)
-  — call the orphan/zombie cleanup functions.
+  — call the orphan/zombie cleanup functions; `gt doctor`'s
+  `DiskSpaceCheck` also calls `CheckDiskSpace`.
 - Generally, any command page that shells out to git, ps, or another
   CLI binary lands here for the process-group wrapper.
 
 ## What it actually does
 
-### atomic.go — atomic file writes
+### atomic.go — moved to internal/atomicfile (v1.0.1)
 
-Source: `/home/kimberly/repos/gastown/internal/util/atomic.go`.
-
-- `AtomicWriteFile(path, data, perm) error` (`atomic.go:58-95`) —
-  writes to a `CreateTemp`-generated sibling file, `Close`s, `Chmod`s,
-  then `os.Rename`s into place. The rename is atomic on POSIX. On
-  error at any step, the temp file is removed. The pattern
-  `base + ".tmp.*"` in the `CreateTemp` call prevents concurrent
-  writers from colliding on the temp file name.
-- `AtomicWriteJSON(path, v) error` (`atomic.go:14-20`) — marshal +
-  `AtomicWriteFile` with 0644 perms.
-- `AtomicWriteJSONWithPerm(path, v, perm) error` (`atomic.go:26-32`)
-  — same with custom perms.
-- `EnsureDirAndWriteJSON(path, v) error` (`atomic.go:39-44`) —
-  `os.MkdirAll(filepath.Dir(path), 0755)` then `AtomicWriteJSON`. The
-  most common pattern, since most callers write into a `<townRoot>/
-  .runtime/...` path that may not exist yet.
-- `EnsureDirAndWriteJSONWithPerm(...)` (`atomic.go:47-52`).
+`internal/util/atomic.go` was **removed in v1.0.1**. Its atomic
+file-write primitives (`AtomicWriteFile`, `AtomicWriteJSON`,
+`AtomicWriteJSONWithPerm`, `EnsureDirAndWriteJSON`,
+`EnsureDirAndWriteJSONWithPerm`) moved to the new dependency-free
+[internal/atomicfile](atomicfile.md) leaf package and were renamed
+(`AtomicWriteJSON` → `atomicfile.WriteJSON`, `AtomicWriteFile` →
+`atomicfile.WriteFile`; the two `EnsureDir*` names were kept). The move
+exists so that low-level packages which `internal/util` transitively
+depends on can still write atomically without an import cycle — see the
+[atomicfile page](atomicfile.md#relationship-to-internalutil-the-move)
+for the full old→new name table and rationale. Callers that used to
+reach into `util` for atomic writes (config, daemon, doctor, polecat,
+quota, …) now import `atomicfile` directly.
 
 ### exec.go / exec_unix.go / exec_windows.go — subprocess wrappers
 
@@ -137,6 +143,44 @@ Source: `/home/kimberly/repos/gastown/internal/util/atomic.go`.
     accidentally logging embedded secrets that `net/url` couldn't
     extract.
 
+### diskspace.go / diskspace_unix.go / diskspace_windows.go — filesystem free space
+
+New in v1.0.1. A small cross-platform free-space query plus a
+threshold-based level classifier, added to give
+[`gt doctor`](../commands/doctor.md)'s `DiskSpaceCheck` (and any other
+caller) a single place to decide "is the disk dangerously full?". Disk
+exhaustion is called out elsewhere as the root cause of cascading
+failures (Dolt data loss, polecat session death, lost commits).
+
+- `DiskSpaceInfo` struct (`diskspace.go:8-20`) — `AvailableBytes`,
+  `TotalBytes`, `UsedBytes`, `UsedPercent`. Methods `AvailableMB()`
+  (`diskspace.go:23`), `AvailableGB()` (`diskspace.go:28`),
+  `AvailableHuman()` (`diskspace.go:33`).
+- `FormatBytesHuman(bytes uint64) string` (`diskspace.go:38-58`) —
+  renders bytes as `B`/`KB`/`MB`/`GB`/`TB` with one decimal.
+- Threshold constants (`diskspace.go:60-73`): `DiskSpaceMinimumMB = 500`
+  (hard floor — block disk-heavy operations below this),
+  `DiskSpaceWarningMB = 1024` (warn / shed load), and
+  `DiskSpaceCriticalPercent = 95.0` (block regardless of absolute free
+  bytes once usage crosses 95%).
+- `DiskSpaceLevel` enum (`diskspace.go:76-85`): `DiskSpaceOK |
+  DiskSpaceWarning | DiskSpaceCritical`, with a `String()` method
+  (`diskspace.go:88-100`).
+- `CheckDiskSpace(path) (DiskSpaceLevel, string, error)`
+  (`diskspace.go:103-126`) — calls `GetDiskSpace`, then returns
+  `DiskSpaceCritical` if available is below the minimum **or** usage is
+  at/above the critical percent, `DiskSpaceWarning` below the warning
+  threshold, else `DiskSpaceOK` with an empty message. A `GetDiskSpace`
+  error is returned as `DiskSpaceOK` with the error (fail-open: a stat
+  failure does not by itself block operations).
+- `GetDiskSpace(path) (*DiskSpaceInfo, error)` is the platform split:
+  Unix uses `syscall.Statfs` (`diskspace_unix.go:11-33`, build tag
+  `!windows`); Windows calls `GetDiskFreeSpaceExW` via
+  `syscall.NewLazyDLL` + `unsafe.Pointer`
+  (`diskspace_windows.go:12-41`, build tag `windows`). Unlike the orphan
+  cleanup below, the disk-space query has a real Windows implementation,
+  not a stub.
+
 ### orphan.go — Claude / codex / opencode cleanup
 
 The biggest file in the package (~1000 lines; exact body starts at
@@ -150,8 +194,14 @@ other Gas Towns on the same machine.
 **Detection strategy** (two sibling paths):
 
 1. **Orphans** — processes with TTY `?`/`??` (no controlling terminal)
-   that match `claude`, `claude-code`, `codex`, or `opencode`. These
-   are the primary Task-tool leak case.
+   whose `ps` `comm` field is a tracked agent runtime. As of v1.0.1 the
+   match set is centralised in `isAgentOrphanCommName`
+   (`orphan.go:410-419`) and broadened beyond the original
+   `claude`/`claude-code`/`codex`/`opencode` to also cover
+   `cursor-agent`, `agent`, and `copilot` — keeping orphan detection in
+   step with the `internal/config` agent presets. Both
+   `FindOrphanedClaudeProcesses` and `FindZombieClaudeProcesses` call it.
+   These are the primary Task-tool leak case.
 2. **Zombies** — Claude processes that aren't members of any PID set
    belonging to any active tmux session on any socket. Catches cases
    where the tmux pane itself died.
@@ -226,11 +276,10 @@ results. The ps-tree/syscall.Kill approach is Unix-only.
   Replaces per-PID `pgrep` calls, reducing O(N) process spawns to
   O(1) — an important optimization because the cleanup path runs
   inside a daemon patrol loop.
-- Atomic-write temp file pattern (`atomic.go:65`) uses `base +
-  ".tmp.*"` so `CreateTemp` generates a unique suffix per writer,
-  eliminating race conditions between concurrent `AtomicWriteJSON`
-  calls targeting the same destination (rare but possible under
-  daemon + CLI concurrency).
+- The atomic-write temp-file pattern (`base + ".tmp.*"` so `CreateTemp`
+  generates a unique per-writer suffix) now lives in
+  [internal/atomicfile](atomicfile.md), not this package — it moved out
+  of `util` in v1.0.1.
 - `FirstLine` is a single-purpose hack specifically for stripping
   cobra's multi-line usage-on-error output down to the real error —
   noted in the doc comment (`exec.go:13`).
@@ -242,25 +291,32 @@ results. The ps-tree/syscall.Kill approach is Unix-only.
 - [gt doctor](../commands/doctor.md) — top-level consumer of the
   orphan and zombie cleanup functions.
 - [gt cleanup](../commands/cleanup.md) — another orphan-cleanup surface.
+- [internal/atomicfile](atomicfile.md) — new in v1.0.1; the leaf
+  package that now owns the atomic file-write primitives `atomic.go`
+  used to provide. The other half of the v1.0.1 split.
+- [internal/doctor](doctor.md) — its `DiskSpaceCheck` wraps
+  `CheckDiskSpace`, and its orphan/zombie checks call the cleanup
+  functions here; the doctor page forward-links here.
 - [internal/version](version.md) — uses `SetDetachedProcessGroup` for
   every git subprocess.
-- [internal/session](session.md) — uses atomic writes for PID
-  tracking and identity files.
-- [internal/config](config.md) — uses atomic writes for every JSON
-  config save.
+- [internal/session](session.md) — uses `SetDetachedProcessGroup`; its
+  atomic writes for PID/identity files now go through
+  [internal/atomicfile](atomicfile.md).
+- [internal/config](config.md) — its JSON-config atomic writes now go
+  through [internal/atomicfile](atomicfile.md), not this package
+  (v1.0.1).
 - [go-packages inventory](../inventory/go-packages.md).
 
 ## Failure modes
 
 ### Precondition violations (what does it assume?)
-- **Atomic rename cross-device:** `AtomicWriteFile` at
-  `atomic.go:88-91` uses `os.Rename(tmpName, path)`. On POSIX, rename
-  is atomic only within the same filesystem. If `path` and the temp
-  file are on different mount points (e.g., `/tmp` vs. a network
-  mount), `os.Rename` fails with `EXDEV`. **Present** — the error is
-  returned and the temp file is cleaned up, but the error message is
-  Go's raw `"invalid cross-device link"` with no explanation of what
-  happened.
+- **Atomic rename cross-device:** the `AtomicWriteFile` cross-device
+  (`EXDEV`) failure mode previously documented here moved with the code
+  to [internal/atomicfile](atomicfile.md) in v1.0.1 — and the move
+  largely defused it, since `atomicfile.WriteFile` now creates the temp
+  file in the **target's own directory** rather than a shared temp dir,
+  keeping the rename within one filesystem. See that page's Failure
+  modes section.
 - **`getProcessCwd` requires proc or lsof:** `orphan.go:270-298` —
   on hardened Linux kernels (`kernel.yama.ptrace_scope=1`),
   `readlink(/proc/<pid>/cwd)` fails for non-descendant processes. The
@@ -300,8 +356,10 @@ results. The ps-tree/syscall.Kill approach is Unix-only.
 ### File writes
 | Target | What is written | Purpose | `file:line` |
 |---|---|---|---|
-| (atomic temp) | caller data | `AtomicWriteFile` helper | `atomic.go:58` |
 | orphan report | report data | Orphan cleanup report | `orphan.go:230` |
+
+(The former `AtomicWriteFile` temp-file write moved to
+[internal/atomicfile](atomicfile.md) in v1.0.1.)
 
 ## Notes / open questions
 
